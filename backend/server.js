@@ -3,6 +3,7 @@ const cors = require('cors');
 require('dotenv').config();
 
 const pool = require('./db');
+const authRouter = require('./routes/auth');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -10,6 +11,8 @@ const PORT = process.env.PORT || 3000;
 // Middleware
 app.use(cors());
 app.use(express.json());
+
+app.use('/api/auth', authRouter);
 
 // Test endpoint - çalışıyor mu diye kontrol
 app.get('/', async (req, res) => {

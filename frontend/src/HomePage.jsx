@@ -39,7 +39,7 @@ function SearchIcon() {
   )
 }
 
-export default function HomePage({ onNavigate, onLogout }) {
+export default function HomePage({ isLoggedIn, onNavigate, onRequireAuth, onLogout }) {
   const [cartCount] = useState(0)
   const [wishlistCount] = useState(0)
   const [searchQuery, setSearchQuery] = useState('')
@@ -66,11 +66,14 @@ export default function HomePage({ onNavigate, onLogout }) {
               <WishlistIcon />
               {wishlistCount > 0 && <span className="badge">{wishlistCount}</span>}
             </button>
-            <button className="icon-btn" aria-label="Shopping cart" onClick={() => onNavigate('cart')}>
+            <button className="icon-btn" aria-label="Shopping cart" onClick={() => isLoggedIn ? onNavigate('cart') : onRequireAuth()}>
               <CartIcon />
               {cartCount > 0 && <span className="badge">{cartCount}</span>}
             </button>
-            <button className="logout-btn" onClick={onLogout}>Sign out</button>
+            {isLoggedIn
+              ? <button className="logout-btn" onClick={onLogout}>Sign out</button>
+              : <button className="logout-btn" onClick={onRequireAuth}>Sign in</button>
+            }
           </nav>
         </div>
       </header>

@@ -7,11 +7,22 @@ import CartPage from './CartPage'
 import './App.css'
 
 function App() {
-  const [token, setToken] = useState('dev')
+  const [token, setToken] = useState(null)
+  const [showAuth, setShowAuth] = useState(false)
   const [page, setPage] = useState('login')
   const [view, setView] = useState('home')
 
-  if (!token) {
+  function handleLogin(t) {
+    setToken(t)
+    setShowAuth(false)
+  }
+
+  function requireAuth() {
+    setPage('login')
+    setShowAuth(true)
+  }
+
+  if (!token && showAuth) {
     if (page === 'register') {
       return <RegisterPage onBack={() => setPage('login')} />
     }
@@ -20,7 +31,7 @@ function App() {
     }
     return (
       <LoginPage
-        onLogin={setToken}
+        onLogin={handleLogin}
         onRegister={() => setPage('register')}
         onForgotPassword={() => setPage('forgot-password')}
       />
@@ -33,7 +44,9 @@ function App() {
 
   return (
     <HomePage
+      isLoggedIn={!!token}
       onNavigate={setView}
+      onRequireAuth={requireAuth}
       onLogout={() => { setToken(null); setPage('login'); setView('home') }}
     />
   )
