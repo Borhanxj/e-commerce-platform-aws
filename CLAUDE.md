@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-An e-commerce platform with a React frontend (Vite) and Express.js backend. Early-stage development on the `sprint-1` branch.
+An e-commerce platform with a React frontend (Vite) and Express.js backend.
 
 ## Commands
 
@@ -34,14 +34,30 @@ Services: frontend → http://localhost:5173, backend → http://localhost:3000,
 
 Each service has a `Dockerfile` (production) and `Dockerfile.dev` (development). `docker-compose.yml` uses the dev Dockerfiles with volume mounts for hot reload.
 
+## Database
+
+```bash
+docker compose exec db psql -U postgres -d ecommerce   # Open psql shell
+docker compose exec db psql -U postgres -d ecommerce -c "\dt"   # List tables
+docker compose exec db psql -U postgres -d ecommerce -c "\d users"   # Describe a table
+```
+
 ## Architecture
 
 **Frontend:** React 19 + Vite. Entry point: `src/main.jsx` → `src/App.jsx`. Styling via CSS custom properties in `src/index.css` (supports light/dark mode). ESLint uses the modern flat config format (`eslint.config.js`).
 
-**Backend:** Express 5 server (`server.js`). Dependencies are installed for PostgreSQL (`pg`), JWT auth (`jsonwebtoken`), and password hashing (`bcrypt`), but none are wired up yet — only a single `GET /` health-check route exists. No routes, models, or database connection are implemented.
+**Backend:** Express 5 server (`server.js`). PostgreSQL connection via `db.js` (uses `DATABASE_URL`). Auth routes live in `routes/auth.js` — `POST /api/auth/register` and `POST /api/auth/login` — using `bcrypt` for password hashing and `jsonwebtoken` for JWT issuance. `GET /` is a health-check that also verifies DB connectivity.
 
 **No monorepo tooling** — frontend and backend are independent npm workspaces; run `npm install` separately in each directory.
 
 ## Environment
 
-Backend reads `PORT` from environment (defaults to `3000`). No `.env.example` exists yet — create a `.env` in `backend/` for local config (already gitignored).
+Create a `.env` in `backend/` for local config (already gitignored). Required variables:
+
+```
+PORT=3000
+DATABASE_URL=postgres://postgres:password@localhost:5432/ecommerce
+JWT_SECRET=your_secret_here
+```
+
+`PORT` defaults to `3000` if not set.
