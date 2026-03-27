@@ -13,6 +13,18 @@ import OrdersPage from './pages/orders/OrdersPage'
 import HelpPage from './pages/help/HelpPage'
 import './App.css'
 
+function decodeJwtPayload(token) {
+  try {
+    const parts = token.split('.')
+    if (parts.length < 3) return null
+    const base64 = parts[1].replace(/-/g, '+').replace(/_/g, '/')
+    const padded = base64 + '='.repeat((4 - (base64.length % 4)) % 4)
+    return JSON.parse(atob(padded))
+  } catch {
+    return null
+  }
+}
+
 function CategoryRoute() {
   const { state } = useLocation()
   const navigate = useNavigate()
@@ -29,13 +41,21 @@ function App() {
   const [user, setUser] = useState(() => {
     const t = localStorage.getItem('token')
     if (!t) return null
-    const payload = JSON.parse(atob(t.split('.')[1]))
+    const payload = decodeJwtPayload(t)
+    if (!payload) {
+      localStorage.removeItem('token')
+      return null
+    }
     return { email: payload.email }
   })
   const navigate = useNavigate()
 
   function handleLogin(t) {
-    const payload = JSON.parse(atob(t.split('.')[1]))
+    const payload = decodeJwtPayload(t)
+    if (!payload) {
+      localStorage.removeItem('token')
+      return
+    }
     localStorage.setItem('token', t)
     setToken(t)
     setUser({ email: payload.email })
