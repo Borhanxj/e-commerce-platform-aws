@@ -44,7 +44,9 @@
   color: var(--text);
   cursor: pointer;
   text-align: left;
-  transition: background 0.15s, color 0.15s;
+  transition:
+    background 0.15s,
+    color 0.15s;
 }
 
 .admin-sidebar-link:hover {
@@ -109,7 +111,9 @@
   background: var(--bg);
   color: var(--text);
   cursor: pointer;
-  transition: border-color 0.15s, color 0.15s;
+  transition:
+    border-color 0.15s,
+    color 0.15s;
 }
 
 .admin-logout-btn:hover {
@@ -152,7 +156,9 @@
   background: var(--bg);
   cursor: pointer;
   font: inherit;
-  transition: border-color 0.15s, background 0.15s;
+  transition:
+    border-color 0.15s,
+    background 0.15s;
 }
 
 .admin-placeholder-card:hover {
