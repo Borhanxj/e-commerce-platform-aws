@@ -42,6 +42,30 @@ docker compose exec db psql -U postgres -d ecommerce -c "\dt"   # List tables
 docker compose exec db psql -U postgres -d ecommerce -c "\d users"   # Describe a table
 ```
 
+### Querying the database
+
+```bash
+# List all registered users (id, email, role, created_at — password_hash excluded)
+docker compose exec db psql -U postgres -d ecommerce -c "SELECT id, email, role, created_at FROM users;"
+
+# Count users
+docker compose exec db psql -U postgres -d ecommerce -c "SELECT COUNT(*) FROM users;"
+
+# Find a specific user by email
+docker compose exec db psql -U postgres -d ecommerce -c "SELECT id, email, role, created_at FROM users WHERE email = 'user@example.com';"
+
+# Delete a user by email (useful for re-testing registration)
+docker compose exec db psql -U postgres -d ecommerce -c "DELETE FROM users WHERE email = 'user@example.com';"
+```
+
+### Running migrations
+
+```bash
+docker compose exec -T db psql -U postgres -d ecommerce < backend/migrations/initial_schema.sql
+```
+
+Run this once after first setup, or whenever a new migration file is added to `backend/migrations/`.
+
 ## Architecture
 
 **Frontend:** React 19 + Vite. Entry point: `src/main.jsx` → `src/App.jsx`. Styling via CSS custom properties in `src/index.css` (supports light/dark mode). ESLint uses the modern flat config format (`eslint.config.js`).

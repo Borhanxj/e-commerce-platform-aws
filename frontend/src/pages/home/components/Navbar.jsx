@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react'
 import { CartIcon, WishlistIcon, SearchIcon, UserIcon, OrdersIcon, SettingsIcon, HelpIcon, LogoutIcon } from '../../../components/icons'
 
-export default function Navbar({ isLoggedIn, onNavigate, onRequireAuth, onLogout, cartCount, wishlistCount, searchQuery, setSearchQuery }) {
+export default function Navbar({ isLoggedIn, userEmail, onNavigate, onRequireAuth, onLogout, cartCount, wishlistCount, searchQuery, setSearchQuery }) {
   const [avatarOpen, setAvatarOpen] = useState(false)
   const avatarRef = useRef(null)
 
@@ -52,34 +52,44 @@ export default function Navbar({ isLoggedIn, onNavigate, onRequireAuth, onLogout
 
             {avatarOpen && (
               <div className="avatar-dropdown">
-                <div className="dropdown-header">
-                  <div className="dropdown-avatar-circle"><UserIcon /></div>
-                  <div>
-                    <p className="dropdown-name">My Account</p>
-                    <p className="dropdown-email">user@example.com</p>
-                  </div>
-                </div>
+                {isLoggedIn ? (
+                  <>
+                    <div className="dropdown-header">
+                      <div className="dropdown-avatar-circle"><UserIcon /></div>
+                      <div>
+                        <p className="dropdown-name">My Account</p>
+                        <p className="dropdown-email">{userEmail}</p>
+                      </div>
+                    </div>
 
-                <div className="dropdown-divider" />
+                    <div className="dropdown-divider" />
 
-                <button className="dropdown-item" onClick={() => { setAvatarOpen(false); onNavigate('orders') }}>
-                  <OrdersIcon /> My Orders
-                </button>
+                    <button className="dropdown-item" onClick={() => { setAvatarOpen(false); onNavigate('orders') }}>
+                      <OrdersIcon /> My Orders
+                    </button>
 
-                <div className="dropdown-divider" />
+                    <div className="dropdown-divider" />
 
-                <button className="dropdown-item" onClick={() => { setAvatarOpen(false); onNavigate('account-settings') }}>
-                  <SettingsIcon /> Account Settings
-                </button>
-                <button className="dropdown-item" onClick={() => { setAvatarOpen(false); onNavigate('help') }}>
-                  <HelpIcon /> Help & Support
-                </button>
+                    <button className="dropdown-item" onClick={() => { setAvatarOpen(false); onNavigate('account-settings') }}>
+                      <SettingsIcon /> Account Settings
+                    </button>
+                    <button className="dropdown-item" onClick={() => { setAvatarOpen(false); onNavigate('help') }}>
+                      <HelpIcon /> Help & Support
+                    </button>
 
-                <div className="dropdown-divider" />
+                    <div className="dropdown-divider" />
 
-                <button className="dropdown-item dropdown-item--danger" onClick={onLogout}>
-                  <LogoutIcon /> Sign Out
-                </button>
+                    <button className="dropdown-item dropdown-item--danger" onClick={onLogout}>
+                      <LogoutIcon /> Sign Out
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <button className="dropdown-item" onClick={() => { setAvatarOpen(false); onRequireAuth() }}>
+                      <UserIcon /> Sign In
+                    </button>
+                  </>
+                )}
               </div>
             )}
           </div>
