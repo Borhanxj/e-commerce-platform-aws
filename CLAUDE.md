@@ -39,32 +39,37 @@ Each service has a `Dockerfile` (production) and `Dockerfile.dev` (development).
 ```bash
 docker compose exec db psql -U postgres -d ecommerce   # Open psql shell
 docker compose exec db psql -U postgres -d ecommerce -c "\dt"   # List tables
-docker compose exec db psql -U postgres -d ecommerce -c "\d users"   # Describe a table
+docker compose exec db psql -U postgres -d ecommerce -c "\d auth.users"   # Describe a table
 ```
 
 ### Querying the database
 
 ```bash
 # List all registered users (id, email, role, created_at — password_hash excluded)
-docker compose exec db psql -U postgres -d ecommerce -c "SELECT id, email, role, created_at FROM users;"
+docker compose exec db psql -U postgres -d ecommerce -c "SELECT id, email, role, created_at FROM auth.users;"
 
 # Count users
-docker compose exec db psql -U postgres -d ecommerce -c "SELECT COUNT(*) FROM users;"
+docker compose exec db psql -U postgres -d ecommerce -c "SELECT COUNT(*) FROM auth.users;"
 
 # Find a specific user by email
-docker compose exec db psql -U postgres -d ecommerce -c "SELECT id, email, role, created_at FROM users WHERE email = 'user@example.com';"
+docker compose exec db psql -U postgres -d ecommerce -c "SELECT id, email, role, created_at FROM auth.users WHERE email = 'user@example.com';"
 
 # Delete a user by email (useful for re-testing registration)
-docker compose exec db psql -U postgres -d ecommerce -c "DELETE FROM users WHERE email = 'user@example.com';"
+docker compose exec db psql -U postgres -d ecommerce -c "DELETE FROM auth.users WHERE email = 'user@example.com';"
 ```
 
 ### Running migrations
 
+Migrations are managed with `node-pg-migrate`. Migration scripts live in `backend/migrations/scripts/`.
+
 ```bash
-docker compose exec -T db psql -U postgres -d ecommerce < backend/migrations/initial_schema.sql
+docker compose exec backend npm run migrate:up    # Apply all pending migrations
+docker compose exec backend npm run migrate:down  # Roll back the last migration
 ```
 
-Run this once after first setup, or whenever a new migration file is added to `backend/migrations/`.
+To add a new migration, create `backend/migrations/scripts/<N>_description.js` (increment N) with `exports.up` and `exports.down` functions, then run `migrate:up`.
+
+The runner tracks applied migrations in a `pgmigrations` table in the database. Never edit a migration file that has already been applied — write a new one instead.
 
 ## Architecture
 

@@ -12,14 +12,14 @@ router.post('/register', async (req, res) => {
     return res.status(400).json({ error: 'Email and password are required' });
   }
 
-  const existing = await pool.query('SELECT id FROM users WHERE email = $1', [email]);
+  const existing = await pool.query('SELECT id FROM auth.users WHERE email = $1', [email]);
   if (existing.rows.length > 0) {
     return res.status(409).json({ error: 'Email already in use' });
   }
 
   const password_hash = await bcrypt.hash(password, 10);
   const result = await pool.query(
-    'INSERT INTO users (email, password_hash, role) VALUES ($1, $2, $3) RETURNING id, email, role',
+    'INSERT INTO auth.users (email, password_hash, role) VALUES ($1, $2, $3) RETURNING id, email, role',
     [email, password_hash, 'customer']
   );
   const user = result.rows[0];
@@ -41,7 +41,7 @@ router.post('/login', async (req, res) => {
   }
 
   const result = await pool.query(
-    'SELECT id, email, password_hash, role FROM users WHERE email = $1',
+    'SELECT id, email, password_hash, role FROM auth.users WHERE email = $1',
     [email]
   );
   const user = result.rows[0];
