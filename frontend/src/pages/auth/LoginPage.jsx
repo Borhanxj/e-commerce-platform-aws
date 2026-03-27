@@ -61,7 +61,11 @@ function LoginPage({ onLogin, onForgotPassword, onRegister }) {
               placeholder="••••••••"
             />
           </div>
-          {error && <p className="login-error" role="alert">{error}</p>}
+          {error && (
+            <p className="login-error" role="alert">
+              {error}
+            </p>
+          )}
           <button type="submit" className="login-btn" disabled={loading}>
             {loading ? 'Signing in…' : 'Sign in'}
           </button>

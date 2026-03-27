@@ -16,7 +16,9 @@ export default function HeroBanner() {
 
   // Clear the inner transition timeout on unmount
   useEffect(() => {
-    return () => { clearTimeout(transitionRef.current) }
+    return () => {
+      clearTimeout(transitionRef.current)
+    }
   }, [])
 
   function goTo(idx) {
@@ -35,7 +37,7 @@ export default function HeroBanner() {
       setTransitioning(true)
       clearTimeout(transitionRef.current)
       transitionRef.current = setTimeout(() => {
-        setHeroIndex(i => (i + 1) % HERO_THEMES.length)
+        setHeroIndex((i) => (i + 1) % HERO_THEMES.length)
         setTransitioning(false)
       }, 350)
     }, 5000)

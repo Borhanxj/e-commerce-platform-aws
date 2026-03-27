@@ -15,14 +15,26 @@
   height: 38px;
   display: flex;
   align-items: center;
-  background: linear-gradient(90deg, #7c12d4 0%, #c026d3 30%, #ff3b8a 55%, #ff7c3b 75%, #c026d3 90%, #7c12d4 100%);
+  background: linear-gradient(
+    90deg,
+    #7c12d4 0%,
+    #c026d3 30%,
+    #ff3b8a 55%,
+    #ff7c3b 75%,
+    #c026d3 90%,
+    #7c12d4 100%
+  );
   background-size: 200% 100%;
   animation: banner-shift 6s linear infinite;
 }
 
 @keyframes banner-shift {
-  0%   { background-position: 0% 0%; }
-  100% { background-position: 200% 0%; }
+  0% {
+    background-position: 0% 0%;
+  }
+  100% {
+    background-position: 200% 0%;
+  }
 }
 
 .sale-marquee-track {
@@ -36,8 +48,12 @@
 }
 
 @keyframes marquee-scroll {
-  from { transform: translateX(0); }
-  to   { transform: translateX(-50%); }
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
 }
 
 .sale-marquee-list {
@@ -56,7 +72,7 @@
 }
 
 .sale-marquee-list strong {
-  background: rgba(255,255,255,0.25);
+  background: rgba(255, 255, 255, 0.25);
   padding: 2px 6px;
   border-radius: 4px;
   letter-spacing: 1px;
@@ -67,7 +83,7 @@
   right: 12px;
   top: 50%;
   transform: translateY(-50%);
-  background: rgba(0,0,0,0.2);
+  background: rgba(0, 0, 0, 0.2);
   border: none;
   color: #fff;
   width: 22px;
@@ -83,7 +99,7 @@
 }
 
 .sale-banner-close:hover {
-  background: rgba(0,0,0,0.4);
+  background: rgba(0, 0, 0, 0.4);
 }
 
 /* ── Sale nav button ── */
@@ -108,8 +124,15 @@
 }
 
 @keyframes sale-pulse {
-  0%, 100% { box-shadow: 0 0 8px rgba(255,59,138,0.5); }
-  50%       { box-shadow: 0 0 18px rgba(255,59,138,0.9), 0 0 30px rgba(255,124,59,0.4); }
+  0%,
+  100% {
+    box-shadow: 0 0 8px rgba(255, 59, 138, 0.5);
+  }
+  50% {
+    box-shadow:
+      0 0 18px rgba(255, 59, 138, 0.9),
+      0 0 30px rgba(255, 124, 59, 0.4);
+  }
 }
 
 /* ── Navbar ── */
@@ -233,11 +256,13 @@
   background: var(--accent-bg);
   color: var(--text-h);
   cursor: pointer;
-  transition: border-color 0.15s, background 0.15s;
+  transition:
+    border-color 0.15s,
+    background 0.15s;
 }
 
 .avatar-btn:hover,
-.avatar-btn[aria-expanded="true"] {
+.avatar-btn[aria-expanded='true'] {
   border-color: var(--accent);
   color: var(--accent);
 }
@@ -257,8 +282,14 @@
 }
 
 @keyframes dropdown-in {
-  from { opacity: 0; transform: translateY(-6px); }
-  to   { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .dropdown-header {
@@ -313,7 +344,9 @@
   border-radius: 8px;
   cursor: pointer;
   text-align: left;
-  transition: background 0.12s, color 0.12s;
+  transition:
+    background 0.12s,
+    color 0.12s;
 }
 
 .dropdown-item:hover {
@@ -386,7 +419,10 @@
   color: #fff;
   cursor: pointer;
   backdrop-filter: blur(4px);
-  transition: background 0.15s, border-color 0.15s, transform 0.15s;
+  transition:
+    background 0.15s,
+    border-color 0.15s,
+    transform 0.15s;
 }
 
 .hero-arrow:hover {
@@ -415,7 +451,7 @@
   content: '';
   position: absolute;
   inset: 0;
-  background: radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,0.55) 100%);
+  background: radial-gradient(ellipse at center, transparent 40%, rgba(0, 0, 0, 0.55) 100%);
   pointer-events: none;
 }
 
@@ -487,12 +523,20 @@
   top: 0;
   bottom: 0;
   width: 1px;
-  background: linear-gradient(to bottom, transparent, rgba(255,255,255,0.06) 40%, transparent);
+  background: linear-gradient(to bottom, transparent, rgba(255, 255, 255, 0.06) 40%, transparent);
 }
 
-.decor-stripe-1 { right: 20%; }
-.decor-stripe-2 { right: 35%; opacity: 0.5; }
-.decor-stripe-3 { left: 48%; opacity: 0.3; }
+.decor-stripe-1 {
+  right: 20%;
+}
+.decor-stripe-2 {
+  right: 35%;
+  opacity: 0.5;
+}
+.decor-stripe-3 {
+  left: 48%;
+  opacity: 0.3;
+}
 
 /* Horizontal rule accent */
 .decor-lines {
@@ -501,7 +545,13 @@
   right: 0;
   bottom: 0;
   height: 1px;
-  background: linear-gradient(to right, transparent, rgba(170,59,255,0.4) 40%, rgba(192,132,252,0.2) 60%, transparent);
+  background: linear-gradient(
+    to right,
+    transparent,
+    rgba(170, 59, 255, 0.4) 40%,
+    rgba(192, 132, 252, 0.2) 60%,
+    transparent
+  );
 }
 
 /* ── Hero text (above decorations via z-index) ── */
@@ -530,7 +580,7 @@
   color: #fff;
   margin: 0 0 16px;
   line-height: 1.05;
-  text-shadow: 0 4px 40px rgba(0,0,0,0.4);
+  text-shadow: 0 4px 40px rgba(0, 0, 0, 0.4);
 }
 
 .hero-sub {
@@ -552,7 +602,9 @@
   cursor: pointer;
   letter-spacing: 1.5px;
   text-transform: uppercase;
-  transition: opacity 0.15s, box-shadow 0.15s;
+  transition:
+    opacity 0.15s,
+    box-shadow 0.15s;
   box-shadow: 0 0 32px rgba(170, 59, 255, 0.4);
 }
 
@@ -570,9 +622,17 @@
     min-height: 320px;
     padding: 56px 24px;
   }
-  .decor-circle-1 { width: 300px; height: 300px; }
-  .decor-circle-2 { width: 220px; height: 220px; }
-  .decor-diamond-1 { display: none; }
+  .decor-circle-1 {
+    width: 300px;
+    height: 300px;
+  }
+  .decor-circle-2 {
+    width: 220px;
+    height: 220px;
+  }
+  .decor-diamond-1 {
+    display: none;
+  }
 }
 
 /* ── Shared section layout ── */
@@ -876,7 +936,9 @@
   border-radius: 12px;
   overflow: hidden;
   background: var(--bg);
-  transition: box-shadow 0.2s, transform 0.2s;
+  transition:
+    box-shadow 0.2s,
+    transform 0.2s;
 }
 
 .release-card:hover {
@@ -960,7 +1022,10 @@
   background: transparent;
   color: var(--text);
   cursor: pointer;
-  transition: background 0.15s, color 0.15s, border-color 0.15s;
+  transition:
+    background 0.15s,
+    color 0.15s,
+    border-color 0.15s;
 }
 
 .release-cart-btn:hover {
@@ -978,7 +1043,13 @@
   overflow: hidden;
   /* Fade edges */
   mask-image: linear-gradient(to right, transparent 0%, black 5%, black 95%, transparent 100%);
-  -webkit-mask-image: linear-gradient(to right, transparent 0%, black 5%, black 95%, transparent 100%);
+  -webkit-mask-image: linear-gradient(
+    to right,
+    transparent 0%,
+    black 5%,
+    black 95%,
+    transparent 100%
+  );
 }
 
 .reviews-track {
@@ -993,8 +1064,12 @@
 }
 
 @keyframes reviews-scroll {
-  from { transform: translateX(0); }
-  to   { transform: translateX(-50%); }
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
 }
 
 .review-card {
@@ -1070,7 +1145,9 @@
   cursor: pointer;
   text-align: left;
   padding: 0;
-  transition: box-shadow 0.2s, transform 0.2s;
+  transition:
+    box-shadow 0.2s,
+    transform 0.2s;
 }
 
 .category-card:hover {

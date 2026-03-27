@@ -81,40 +81,63 @@ function App() {
 
   return (
     <Routes>
-      <Route path="/" element={
-        <HomePage
-          isLoggedIn={!!token}
-          userEmail={user?.email}
-          onNavigate={handleNavigate}
-          onRequireAuth={requireAuth}
-          onLogout={() => { localStorage.removeItem('token'); setToken(null); setUser(null); navigate('/') }}
-        />
-      } />
-      <Route path="/login" element={
-        <LoginPage
-          onLogin={handleLogin}
-          onRegister={() => navigate('/register')}
-          onForgotPassword={() => navigate('/forgot-password')}
-        />
-      } />
-      <Route path="/register"        element={<RegisterPage onBack={() => navigate('/login')} />} />
-      <Route path="/forgot-password" element={<ForgotPasswordPage onBack={() => navigate('/login')} />} />
-      <Route path="/reset-password"  element={<ResetPasswordPage onBack={() => navigate('/login')} />} />
-      <Route path="/cart"             element={<CartPage onBack={() => navigate(-1)} />} />
-      <Route path="/wishlist"         element={<WishlistPage onBack={() => navigate(-1)} />} />
-      <Route path="/category"         element={<CategoryRoute />} />
-      <Route path="/account-settings" element={
-        <RequireAuth token={token}>
-          <AccountSettingsPage onBack={() => navigate(-1)} token={token} />
-        </RequireAuth>
-      } />
-      <Route path="/orders"           element={
-        <RequireAuth token={token}>
-          <OrdersPage onBack={() => navigate(-1)} />
-        </RequireAuth>
-      } />
-      <Route path="/help"             element={<HelpPage onBack={() => navigate(-1)} />} />
-      <Route path="*"                 element={<Navigate to="/" replace />} />
+      <Route
+        path="/"
+        element={
+          <HomePage
+            isLoggedIn={!!token}
+            userEmail={user?.email}
+            onNavigate={handleNavigate}
+            onRequireAuth={requireAuth}
+            onLogout={() => {
+              localStorage.removeItem('token')
+              setToken(null)
+              setUser(null)
+              navigate('/')
+            }}
+          />
+        }
+      />
+      <Route
+        path="/login"
+        element={
+          <LoginPage
+            onLogin={handleLogin}
+            onRegister={() => navigate('/register')}
+            onForgotPassword={() => navigate('/forgot-password')}
+          />
+        }
+      />
+      <Route path="/register" element={<RegisterPage onBack={() => navigate('/login')} />} />
+      <Route
+        path="/forgot-password"
+        element={<ForgotPasswordPage onBack={() => navigate('/login')} />}
+      />
+      <Route
+        path="/reset-password"
+        element={<ResetPasswordPage onBack={() => navigate('/login')} />}
+      />
+      <Route path="/cart" element={<CartPage onBack={() => navigate(-1)} />} />
+      <Route path="/wishlist" element={<WishlistPage onBack={() => navigate(-1)} />} />
+      <Route path="/category" element={<CategoryRoute />} />
+      <Route
+        path="/account-settings"
+        element={
+          <RequireAuth token={token}>
+            <AccountSettingsPage onBack={() => navigate(-1)} token={token} />
+          </RequireAuth>
+        }
+      />
+      <Route
+        path="/orders"
+        element={
+          <RequireAuth token={token}>
+            <OrdersPage onBack={() => navigate(-1)} />
+          </RequireAuth>
+        }
+      />
+      <Route path="/help" element={<HelpPage onBack={() => navigate(-1)} />} />
+      <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   )
 }

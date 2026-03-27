@@ -6,38 +6,88 @@ import Footer from './components/Footer'
 import './HomePage.css'
 
 const CATEGORIES = [
-  { id: 1, title: "Women's Clothing", subtitle: 'New arrivals every week',     hue: 280 },
-  { id: 2, title: "Men's Clothing",   subtitle: 'Timeless essentials',         hue: 210 },
-  { id: 3, title: 'Outerwear',        subtitle: 'Coats, jackets & more',       hue: 200 },
-  { id: 4, title: 'Footwear',         subtitle: 'Step into style',             hue: 160 },
-  { id: 5, title: 'Accessories',      subtitle: 'Finish the look',             hue:  40 },
-  { id: 6, title: 'Activewear',       subtitle: 'Move in comfort',             hue: 340 },
-  { id: 7, title: 'Formal',           subtitle: 'Dress to impress',            hue: 260 },
-  { id: 8, title: 'Kids & Baby',      subtitle: 'Adorable styles for little ones', hue: 20 },
+  { id: 1, title: "Women's Clothing", subtitle: 'New arrivals every week', hue: 280 },
+  { id: 2, title: "Men's Clothing", subtitle: 'Timeless essentials', hue: 210 },
+  { id: 3, title: 'Outerwear', subtitle: 'Coats, jackets & more', hue: 200 },
+  { id: 4, title: 'Footwear', subtitle: 'Step into style', hue: 160 },
+  { id: 5, title: 'Accessories', subtitle: 'Finish the look', hue: 40 },
+  { id: 6, title: 'Activewear', subtitle: 'Move in comfort', hue: 340 },
+  { id: 7, title: 'Formal', subtitle: 'Dress to impress', hue: 260 },
+  { id: 8, title: 'Kids & Baby', subtitle: 'Adorable styles for little ones', hue: 20 },
 ]
 
 const NEW_RELEASES = [
-  { id: 1, name: 'Oversized Linen Shirt',   category: "Women's", price: 79.99,  hue: 280 },
-  { id: 2, name: 'Slim Fit Chinos',         category: "Men's",   price: 69.99,  hue: 210 },
-  { id: 3, name: 'Leather Moto Jacket',     category: 'Outerwear', price: 249.99, hue: 200 },
-  { id: 4, name: 'Platform Loafers',        category: 'Footwear',  price: 119.99, hue: 160 },
-  { id: 5, name: 'Structured Tote',         category: 'Accessories', price: 139.99, hue: 40 },
-  { id: 6, name: 'Ribbed Midi Dress',       category: "Women's", price: 94.99,  hue: 340 },
-  { id: 7, name: 'Merino Polo',             category: "Men's",   price: 89.99,  hue: 190 },
-  { id: 8, name: 'Cropped Blazer',          category: 'Formal',  price: 179.99, hue: 260 },
+  { id: 1, name: 'Oversized Linen Shirt', category: "Women's", price: 79.99, hue: 280 },
+  { id: 2, name: 'Slim Fit Chinos', category: "Men's", price: 69.99, hue: 210 },
+  { id: 3, name: 'Leather Moto Jacket', category: 'Outerwear', price: 249.99, hue: 200 },
+  { id: 4, name: 'Platform Loafers', category: 'Footwear', price: 119.99, hue: 160 },
+  { id: 5, name: 'Structured Tote', category: 'Accessories', price: 139.99, hue: 40 },
+  { id: 6, name: 'Ribbed Midi Dress', category: "Women's", price: 94.99, hue: 340 },
+  { id: 7, name: 'Merino Polo', category: "Men's", price: 89.99, hue: 190 },
+  { id: 8, name: 'Cropped Blazer', category: 'Formal', price: 179.99, hue: 260 },
 ]
 
 const REVIEWS = [
-  { id: 1,  name: 'Sophie M.',    rating: 5, text: 'Absolutely love the quality. The fabric is soft and the fit is perfect — I get compliments every time I wear it.' },
-  { id: 2,  name: 'James K.',     rating: 5, text: 'Fast shipping and exactly as described. Already ordered two more colours.' },
-  { id: 3,  name: 'Priya R.',     rating: 4, text: 'Great value for money. Sizing runs slightly large but the quality is excellent.' },
-  { id: 4,  name: 'Lucas B.',     rating: 5, text: 'The best online fashion store I\'ve used. Returns were hassle-free too.' },
-  { id: 5,  name: 'Emma T.',      rating: 5, text: 'Stunning piece — looks even better in person. Will definitely be shopping here again.' },
-  { id: 6,  name: 'Callum D.',    rating: 4, text: 'Really happy with my purchase. Packaged beautifully and arrived ahead of schedule.' },
-  { id: 7,  name: 'Yuki N.',      rating: 5, text: 'I was unsure about ordering online but the size guide was spot on. Perfect fit!' },
-  { id: 8,  name: 'Amara O.',     rating: 5, text: 'Lovely materials and the colours are true to the photos. Highly recommend.' },
-  { id: 9,  name: 'Finn W.',      rating: 4, text: 'Solid quality at a fair price. The stitching is neat and it washes really well.' },
-  { id: 10, name: 'Isabella C.',  rating: 5, text: 'Customer service was brilliant when I needed to exchange a size. So easy.' },
+  {
+    id: 1,
+    name: 'Sophie M.',
+    rating: 5,
+    text: 'Absolutely love the quality. The fabric is soft and the fit is perfect — I get compliments every time I wear it.',
+  },
+  {
+    id: 2,
+    name: 'James K.',
+    rating: 5,
+    text: 'Fast shipping and exactly as described. Already ordered two more colours.',
+  },
+  {
+    id: 3,
+    name: 'Priya R.',
+    rating: 4,
+    text: 'Great value for money. Sizing runs slightly large but the quality is excellent.',
+  },
+  {
+    id: 4,
+    name: 'Lucas B.',
+    rating: 5,
+    text: "The best online fashion store I've used. Returns were hassle-free too.",
+  },
+  {
+    id: 5,
+    name: 'Emma T.',
+    rating: 5,
+    text: 'Stunning piece — looks even better in person. Will definitely be shopping here again.',
+  },
+  {
+    id: 6,
+    name: 'Callum D.',
+    rating: 4,
+    text: 'Really happy with my purchase. Packaged beautifully and arrived ahead of schedule.',
+  },
+  {
+    id: 7,
+    name: 'Yuki N.',
+    rating: 5,
+    text: 'I was unsure about ordering online but the size guide was spot on. Perfect fit!',
+  },
+  {
+    id: 8,
+    name: 'Amara O.',
+    rating: 5,
+    text: 'Lovely materials and the colours are true to the photos. Highly recommend.',
+  },
+  {
+    id: 9,
+    name: 'Finn W.',
+    rating: 4,
+    text: 'Solid quality at a fair price. The stitching is neat and it washes really well.',
+  },
+  {
+    id: 10,
+    name: 'Isabella C.',
+    rating: 5,
+    text: 'Customer service was brilliant when I needed to exchange a size. So easy.',
+  },
 ]
 
 export default function HomePage({ isLoggedIn, userEmail, onNavigate, onRequireAuth, onLogout }) {
@@ -52,13 +102,15 @@ export default function HomePage({ isLoggedIn, userEmail, onNavigate, onRequireA
       {saleBannerVisible && (
         <div className="sale-banner">
           <div className="sale-marquee-track">
-            {[0, 1].map(copy => (
+            {[0, 1].map((copy) => (
               <ul key={copy} className="sale-marquee-list" aria-hidden={copy === 1}>
                 <li>🔥 SUMMER SALE — UP TO 50% OFF</li>
                 <li>·</li>
                 <li>FREE SHIPPING ON ORDERS OVER £50</li>
                 <li>·</li>
-                <li>USE CODE <strong>SUMMER25</strong> FOR 25% OFF YOUR FIRST ORDER</li>
+                <li>
+                  USE CODE <strong>SUMMER25</strong> FOR 25% OFF YOUR FIRST ORDER
+                </li>
                 <li>·</li>
                 <li>NEW ARRIVALS DROPPING EVERY WEEK</li>
                 <li>·</li>
@@ -72,8 +124,18 @@ export default function HomePage({ isLoggedIn, userEmail, onNavigate, onRequireA
             onClick={() => setSaleBannerVisible(false)}
             aria-label="Dismiss sale banner"
           >
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-              <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
+            <svg
+              width="14"
+              height="14"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <line x1="18" y1="6" x2="6" y2="18" />
+              <line x1="6" y1="6" x2="18" y2="18" />
             </svg>
           </button>
         </div>
@@ -100,11 +162,17 @@ export default function HomePage({ isLoggedIn, userEmail, onNavigate, onRequireA
           <button className="section-link">View All</button>
         </div>
         <div className="category-grid">
-          {CATEGORIES.map(cat => (
-            <button key={cat.id} className="category-card" onClick={() => onNavigate('category', cat)}>
+          {CATEGORIES.map((cat) => (
+            <button
+              key={cat.id}
+              className="category-card"
+              onClick={() => onNavigate('category', cat)}
+            >
               <div
                 className="card-image-placeholder"
-                style={{ background: `linear-gradient(160deg, hsl(${cat.hue},35%,10%) 0%, hsl(${cat.hue},45%,17%) 100%)` }}
+                style={{
+                  background: `linear-gradient(160deg, hsl(${cat.hue},35%,10%) 0%, hsl(${cat.hue},45%,17%) 100%)`,
+                }}
               >
                 <span className="placeholder-label" style={{ color: `hsl(${cat.hue},70%,70%)` }}>
                   {cat.title[0]}
@@ -129,13 +197,18 @@ export default function HomePage({ isLoggedIn, userEmail, onNavigate, onRequireA
           <button className="section-link">View All</button>
         </div>
         <div className="releases-scroll">
-          {NEW_RELEASES.map(product => (
+          {NEW_RELEASES.map((product) => (
             <div key={product.id} className="release-card">
               <div
                 className="release-image"
-                style={{ background: `linear-gradient(160deg, hsl(${product.hue},35%,10%) 0%, hsl(${product.hue},50%,20%) 100%)` }}
+                style={{
+                  background: `linear-gradient(160deg, hsl(${product.hue},35%,10%) 0%, hsl(${product.hue},50%,20%) 100%)`,
+                }}
               >
-                <span className="release-placeholder" style={{ color: `hsl(${product.hue},70%,70%)` }}>
+                <span
+                  className="release-placeholder"
+                  style={{ color: `hsl(${product.hue},70%,70%)` }}
+                >
                   {product.name[0]}
                 </span>
               </div>
@@ -182,7 +255,6 @@ export default function HomePage({ isLoggedIn, userEmail, onNavigate, onRequireA
       </section>
 
       <Footer />
-
     </div>
   )
 }

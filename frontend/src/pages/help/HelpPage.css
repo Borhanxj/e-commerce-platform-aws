@@ -37,7 +37,9 @@
   cursor: pointer;
   padding: 6px 10px;
   border-radius: 8px;
-  transition: background 0.15s, color 0.15s;
+  transition:
+    background 0.15s,
+    color 0.15s;
 }
 
 .help-header .back-btn:hover {
@@ -84,7 +86,7 @@
 
 .help-sub {
   font-size: 15px;
-  color: rgba(255,255,255,0.55);
+  color: rgba(255, 255, 255, 0.55);
   margin: 0 0 8px;
 }
 
@@ -100,7 +102,7 @@
   left: 14px;
   top: 50%;
   transform: translateY(-50%);
-  color: rgba(255,255,255,0.4);
+  color: rgba(255, 255, 255, 0.4);
   display: flex;
   pointer-events: none;
 }
@@ -109,23 +111,25 @@
   width: 100%;
   box-sizing: border-box;
   padding: 14px 44px;
-  background: rgba(255,255,255,0.08);
-  border: 1px solid rgba(255,255,255,0.15);
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
   border-radius: 10px;
   color: #fff;
   font: inherit;
   font-size: 15px;
   outline: none;
-  transition: border-color 0.2s, background 0.2s;
+  transition:
+    border-color 0.2s,
+    background 0.2s;
 }
 
 .help-search input::placeholder {
-  color: rgba(255,255,255,0.35);
+  color: rgba(255, 255, 255, 0.35);
 }
 
 .help-search input:focus {
   border-color: var(--accent);
-  background: rgba(255,255,255,0.12);
+  background: rgba(255, 255, 255, 0.12);
 }
 
 .help-search-clear {
@@ -135,7 +139,7 @@
   transform: translateY(-50%);
   background: none;
   border: none;
-  color: rgba(255,255,255,0.5);
+  color: rgba(255, 255, 255, 0.5);
   font-size: 20px;
   line-height: 1;
   cursor: pointer;
@@ -177,7 +181,10 @@
   font-size: 13px;
   font-weight: 500;
   cursor: pointer;
-  transition: border-color 0.15s, color 0.15s, background 0.15s;
+  transition:
+    border-color 0.15s,
+    color 0.15s,
+    background 0.15s;
   white-space: nowrap;
 }
 
@@ -297,8 +304,14 @@
 }
 
 @keyframes faq-expand {
-  from { opacity: 0; transform: translateY(-6px); }
-  to   { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* ── No results ── */
@@ -354,7 +367,7 @@
 
 .help-contact-sub {
   font-size: 13px;
-  color: rgba(255,255,255,0.5);
+  color: rgba(255, 255, 255, 0.5);
   margin: 0;
 }
 
@@ -372,7 +385,7 @@
   font-weight: 600;
   cursor: pointer;
   transition: opacity 0.15s;
-  border: 1px solid rgba(255,255,255,0.25);
+  border: 1px solid rgba(255, 255, 255, 0.25);
   background: transparent;
   color: #fff;
 }

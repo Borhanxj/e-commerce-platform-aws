@@ -37,7 +37,9 @@
   cursor: pointer;
   padding: 6px 10px;
   border-radius: 8px;
-  transition: background 0.15s, color 0.15s;
+  transition:
+    background 0.15s,
+    color 0.15s;
 }
 
 .orders-header .back-btn:hover {
@@ -114,7 +116,9 @@
 
 .order-card--active {
   border-color: var(--accent);
-  box-shadow: 0 0 0 1px var(--accent), 0 4px 24px rgba(170,59,255,0.08);
+  box-shadow:
+    0 0 0 1px var(--accent),
+    0 4px 24px rgba(170, 59, 255, 0.08);
 }
 
 .order-card-header {
@@ -169,11 +173,26 @@
   border-radius: 99px;
 }
 
-.status-placed            { background: rgba(100,116,139,0.15); color: #64748b; }
-.status-processing        { background: rgba(245,158,11,0.15);  color: #d97706; }
-.status-shipped           { background: rgba(59,130,246,0.15);  color: #3b82f6; }
-.status-out_for_delivery  { background: rgba(170,59,255,0.15);  color: var(--accent); }
-.status-delivered         { background: rgba(34,197,94,0.15);   color: #16a34a; }
+.status-placed {
+  background: rgba(100, 116, 139, 0.15);
+  color: #64748b;
+}
+.status-processing {
+  background: rgba(245, 158, 11, 0.15);
+  color: #d97706;
+}
+.status-shipped {
+  background: rgba(59, 130, 246, 0.15);
+  color: #3b82f6;
+}
+.status-out_for_delivery {
+  background: rgba(170, 59, 255, 0.15);
+  color: var(--accent);
+}
+.status-delivered {
+  background: rgba(34, 197, 94, 0.15);
+  color: #16a34a;
+}
 
 /* ── Delivery timeline ── */
 .timeline {
@@ -219,7 +238,9 @@
   position: relative;
   z-index: 1;
   color: var(--text);
-  transition: border-color 0.2s, background 0.2s;
+  transition:
+    border-color 0.2s,
+    background 0.2s;
 }
 
 .timeline-step.done .timeline-dot {
@@ -305,7 +326,9 @@
   font-weight: 600;
   cursor: pointer;
   white-space: nowrap;
-  transition: border-color 0.15s, color 0.15s;
+  transition:
+    border-color 0.15s,
+    color 0.15s;
 }
 
 .copy-btn:hover {
@@ -457,8 +480,14 @@
 }
 
 @keyframes expand-in {
-  from { opacity: 0; transform: translateY(-4px); }
-  to   { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* ── Responsive ── */

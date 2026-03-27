@@ -1,7 +1,26 @@
 import { useState, useRef, useEffect } from 'react'
-import { CartIcon, WishlistIcon, SearchIcon, UserIcon, OrdersIcon, SettingsIcon, HelpIcon, LogoutIcon } from '../../../components/icons'
+import {
+  CartIcon,
+  WishlistIcon,
+  SearchIcon,
+  UserIcon,
+  OrdersIcon,
+  SettingsIcon,
+  HelpIcon,
+  LogoutIcon,
+} from '../../../components/icons'
 
-export default function Navbar({ isLoggedIn, userEmail, onNavigate, onRequireAuth, onLogout, cartCount, wishlistCount, searchQuery, setSearchQuery }) {
+export default function Navbar({
+  isLoggedIn,
+  userEmail,
+  onNavigate,
+  onRequireAuth,
+  onLogout,
+  cartCount,
+  wishlistCount,
+  searchQuery,
+  setSearchQuery,
+}) {
   const [avatarOpen, setAvatarOpen] = useState(false)
   const avatarRef = useRef(null)
 
@@ -21,29 +40,39 @@ export default function Navbar({ isLoggedIn, userEmail, onNavigate, onRequireAut
         <div className="brand">MODÉ</div>
 
         <div className="search-bar">
-          <span className="search-icon"><SearchIcon /></span>
+          <span className="search-icon">
+            <SearchIcon />
+          </span>
           <input
             type="text"
             placeholder="Search for clothes, brands…"
             value={searchQuery}
-            onChange={e => setSearchQuery(e.target.value)}
+            onChange={(e) => setSearchQuery(e.target.value)}
           />
         </div>
 
         <nav className="nav-actions">
           <button className="sale-nav-btn">SALE</button>
-          <button className="icon-btn" aria-label="Wishlist" onClick={() => isLoggedIn ? onNavigate('wishlist') : onRequireAuth()}>
+          <button
+            className="icon-btn"
+            aria-label="Wishlist"
+            onClick={() => (isLoggedIn ? onNavigate('wishlist') : onRequireAuth())}
+          >
             <WishlistIcon />
             {wishlistCount > 0 && <span className="badge">{wishlistCount}</span>}
           </button>
-          <button className="icon-btn" aria-label="Shopping cart" onClick={() => isLoggedIn ? onNavigate('cart') : onRequireAuth()}>
+          <button
+            className="icon-btn"
+            aria-label="Shopping cart"
+            onClick={() => (isLoggedIn ? onNavigate('cart') : onRequireAuth())}
+          >
             <CartIcon />
             {cartCount > 0 && <span className="badge">{cartCount}</span>}
           </button>
           <div className="avatar-menu" ref={avatarRef}>
             <button
               className="avatar-btn"
-              onClick={() => setAvatarOpen(o => !o)}
+              onClick={() => setAvatarOpen((o) => !o)}
               aria-label="Account menu"
               aria-expanded={avatarOpen}
             >
@@ -55,7 +84,9 @@ export default function Navbar({ isLoggedIn, userEmail, onNavigate, onRequireAut
                 {isLoggedIn ? (
                   <>
                     <div className="dropdown-header">
-                      <div className="dropdown-avatar-circle"><UserIcon /></div>
+                      <div className="dropdown-avatar-circle">
+                        <UserIcon />
+                      </div>
                       <div>
                         <p className="dropdown-name">My Account</p>
                         <p className="dropdown-email">{userEmail}</p>
@@ -64,16 +95,34 @@ export default function Navbar({ isLoggedIn, userEmail, onNavigate, onRequireAut
 
                     <div className="dropdown-divider" />
 
-                    <button className="dropdown-item" onClick={() => { setAvatarOpen(false); onNavigate('orders') }}>
+                    <button
+                      className="dropdown-item"
+                      onClick={() => {
+                        setAvatarOpen(false)
+                        onNavigate('orders')
+                      }}
+                    >
                       <OrdersIcon /> My Orders
                     </button>
 
                     <div className="dropdown-divider" />
 
-                    <button className="dropdown-item" onClick={() => { setAvatarOpen(false); onNavigate('account-settings') }}>
+                    <button
+                      className="dropdown-item"
+                      onClick={() => {
+                        setAvatarOpen(false)
+                        onNavigate('account-settings')
+                      }}
+                    >
                       <SettingsIcon /> Account Settings
                     </button>
-                    <button className="dropdown-item" onClick={() => { setAvatarOpen(false); onNavigate('help') }}>
+                    <button
+                      className="dropdown-item"
+                      onClick={() => {
+                        setAvatarOpen(false)
+                        onNavigate('help')
+                      }}
+                    >
                       <HelpIcon /> Help & Support
                     </button>
 
@@ -85,7 +134,13 @@ export default function Navbar({ isLoggedIn, userEmail, onNavigate, onRequireAut
                   </>
                 ) : (
                   <>
-                    <button className="dropdown-item" onClick={() => { setAvatarOpen(false); onRequireAuth() }}>
+                    <button
+                      className="dropdown-item"
+                      onClick={() => {
+                        setAvatarOpen(false)
+                        onRequireAuth()
+                      }}
+                    >
                       <UserIcon /> Sign In
                     </button>
                   </>
