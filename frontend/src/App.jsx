@@ -1,41 +1,67 @@
 import { useState } from 'react'
-import LoginPage from './LoginPage'
-import RegisterPage from './RegisterPage'
-import ForgotPasswordPage from './ForgotPasswordPage'
-import HomePage from './HomePage'
-import CartPage from './CartPage'
+import { Routes, Route, Navigate, useNavigate, useLocation } from 'react-router-dom'
+import LoginPage from './pages/auth/LoginPage'
+import RegisterPage from './pages/auth/RegisterPage'
+import ForgotPasswordPage from './pages/auth/ForgotPasswordPage'
+import HomePage from './pages/home/HomePage'
+import CartPage from './pages/cart/CartPage'
+import WishlistPage from './pages/wishlist/WishlistPage'
+import CategoryPage from './pages/category/CategoryPage'
+import AccountSettingsPage from './pages/account/AccountSettingsPage'
+import OrdersPage from './pages/orders/OrdersPage'
+import HelpPage from './pages/help/HelpPage'
 import './App.css'
+
+function CategoryRoute() {
+  const { state } = useLocation()
+  const navigate = useNavigate()
+  return <CategoryPage category={state?.category} onBack={() => navigate(-1)} />
+}
 
 function App() {
   const [token, setToken] = useState('dev')
-  const [page, setPage] = useState('login')
-  const [view, setView] = useState('home')
+  const navigate = useNavigate()
 
   if (!token) {
-    if (page === 'register') {
-      return <RegisterPage onBack={() => setPage('login')} />
-    }
-    if (page === 'forgot-password') {
-      return <ForgotPasswordPage onBack={() => setPage('login')} />
-    }
     return (
-      <LoginPage
-        onLogin={setToken}
-        onRegister={() => setPage('register')}
-        onForgotPassword={() => setPage('forgot-password')}
-      />
+      <Routes>
+        <Route path="/register" element={<RegisterPage onBack={() => navigate('/login')} />} />
+        <Route path="/forgot-password" element={<ForgotPasswordPage onBack={() => navigate('/login')} />} />
+        <Route path="*" element={
+          <LoginPage
+            onLogin={(t) => { setToken(t); navigate('/') }}
+            onRegister={() => navigate('/register')}
+            onForgotPassword={() => navigate('/forgot-password')}
+          />
+        } />
+      </Routes>
     )
   }
 
-  if (view === 'cart') {
-    return <CartPage onBack={() => setView('home')} />
+  function handleNavigate(nextView, data) {
+    if (nextView === 'category') {
+      navigate('/category', { state: { category: data } })
+    } else {
+      navigate('/' + nextView)
+    }
   }
 
   return (
-    <HomePage
-      onNavigate={setView}
-      onLogout={() => { setToken(null); setPage('login'); setView('home') }}
-    />
+    <Routes>
+      <Route path="/" element={
+        <HomePage
+          onNavigate={handleNavigate}
+          onLogout={() => { setToken(null); navigate('/login') }}
+        />
+      } />
+      <Route path="/cart"             element={<CartPage onBack={() => navigate(-1)} />} />
+      <Route path="/wishlist"         element={<WishlistPage onBack={() => navigate(-1)} />} />
+      <Route path="/category"         element={<CategoryRoute />} />
+      <Route path="/account-settings" element={<AccountSettingsPage onBack={() => navigate(-1)} />} />
+      <Route path="/orders"           element={<OrdersPage onBack={() => navigate(-1)} />} />
+      <Route path="/help"             element={<HelpPage onBack={() => navigate(-1)} />} />
+      <Route path="*"                 element={<Navigate to="/" replace />} />
+    </Routes>
   )
 }
 
