@@ -3,6 +3,7 @@ import { Routes, Route, Navigate, useNavigate, useLocation } from 'react-router-
 import LoginPage from './pages/auth/LoginPage'
 import RegisterPage from './pages/auth/RegisterPage'
 import ForgotPasswordPage from './pages/auth/ForgotPasswordPage'
+import ResetPasswordPage from './pages/auth/ResetPasswordPage'
 import HomePage from './pages/home/HomePage'
 import CartPage from './pages/cart/CartPage'
 import WishlistPage from './pages/wishlist/WishlistPage'
@@ -68,10 +69,11 @@ function App() {
       } />
       <Route path="/register"        element={<RegisterPage onBack={() => navigate('/login')} />} />
       <Route path="/forgot-password" element={<ForgotPasswordPage onBack={() => navigate('/login')} />} />
+      <Route path="/reset-password"  element={<ResetPasswordPage onBack={() => navigate('/login')} />} />
       <Route path="/cart"             element={<CartPage onBack={() => navigate(-1)} />} />
       <Route path="/wishlist"         element={<WishlistPage onBack={() => navigate(-1)} />} />
       <Route path="/category"         element={<CategoryRoute />} />
-      <Route path="/account-settings" element={<AccountSettingsPage onBack={() => navigate(-1)} />} />
+      <Route path="/account-settings" element={<AccountSettingsPage onBack={() => navigate(-1)} token={token} />} />
       <Route path="/orders"           element={<OrdersPage onBack={() => navigate(-1)} />} />
       <Route path="/help"             element={<HelpPage onBack={() => navigate(-1)} />} />
       <Route path="*"                 element={<Navigate to="/" replace />} />

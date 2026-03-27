@@ -8,6 +8,8 @@ CREATE TABLE auth.users (
     password_hash VARCHAR(255)  NOT NULL,
     role          auth.user_role NOT NULL DEFAULT 'customer',
     created_at    TIMESTAMPTZ   NOT NULL DEFAULT NOW()
+    reset_token            VARCHAR(64),
+    reset_token_expires_at TIMESTAMPTZ
 );
 
 CREATE TABLE auth.customers (
