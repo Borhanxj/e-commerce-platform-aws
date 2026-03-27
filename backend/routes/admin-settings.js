@@ -34,7 +34,7 @@ router.put('/', async (req, res) => {
   res.json({ settings: result.rows });
 });
 
-// GET /api/admin/stats — dashboard analytics
+// GET /api/admin/settings/stats — dashboard analytics
 router.get('/stats', async (req, res) => {
   const [users, products, orders, revenue, recentOrders, ordersByStatus] = await Promise.all([
     pool.query('SELECT COUNT(*) FROM auth.users'),

@@ -78,7 +78,7 @@ router.post('/', async (req, res) => {
     `INSERT INTO products (name, description, price, stock, category, image_url)
      VALUES ($1, $2, $3, $4, $5, $6)
      RETURNING *`,
-    [name, description || null, price, parseInt(stock) || 0, category || null, image_url || null]
+    [name, description || null, price, Number.isFinite(parseInt(stock)) ? parseInt(stock) : 0, category || null, image_url || null]
   );
 
   res.status(201).json({ product: result.rows[0] });
@@ -102,7 +102,7 @@ router.put('/:id', async (req, res) => {
     if (parseFloat(price) < 0) return res.status(400).json({ error: 'Price must be non-negative' });
     sets.push(`price = $${idx}`); params.push(price); idx++;
   }
-  if (stock !== undefined) { sets.push(`stock = $${idx}`); params.push(parseInt(stock)); idx++; }
+  if (stock !== undefined) { sets.push(`stock = $${idx}`); params.push(Number.isFinite(parseInt(stock)) ? parseInt(stock) : 0); idx++; }
   if (category !== undefined) { sets.push(`category = $${idx}`); params.push(category); idx++; }
   if (image_url !== undefined) { sets.push(`image_url = $${idx}`); params.push(image_url); idx++; }
 

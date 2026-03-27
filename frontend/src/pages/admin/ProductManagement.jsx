@@ -178,7 +178,8 @@ function ProductModal({ mode, product, onClose, onCreate, onUpdate }) {
     setError('')
     setSaving(true)
     try {
-      const body = { name, description, price: parseFloat(price), stock: parseInt(stock), category, image_url: imageUrl }
+      const parsedStock = parseInt(stock, 10)
+      const body = { name, description, price: parseFloat(price), stock: Number.isNaN(parsedStock) ? 0 : parsedStock, category, image_url: imageUrl }
       if (mode === 'create') {
         await onCreate(body)
       } else {

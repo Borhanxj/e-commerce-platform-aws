@@ -45,7 +45,8 @@ router.get('/users', async (req, res) => {
     idx++;
   }
 
-  if (role) {
+  const validRoles = ['customer', 'sales_manager', 'product_manager', 'admin'];
+  if (role && validRoles.includes(role)) {
     where.push(`role = $${idx}::auth.user_role`);
     params.push(role);
     idx++;

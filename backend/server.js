@@ -22,10 +22,10 @@ app.use(cors());
 app.use(express.json());
 
 app.use('/api/auth', authRouter);
-app.use('/api/admin', adminRouter);
 app.use('/api/admin/products', adminProductsRouter);
 app.use('/api/admin/orders', adminOrdersRouter);
 app.use('/api/admin/settings', adminSettingsRouter);
+app.use('/api/admin', adminRouter);
 
 // Test endpoint - çalışıyor mu diye kontrol
 app.get('/', async (req, res) => {
