@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import './OrdersPage.css'
 
 /* ── Mock data ───────────────────────────────────────────── */
@@ -143,11 +143,19 @@ function DeliveryTimeline({ status }) {
 
 function TrackingRow({ code, carrier }) {
   const [copied, setCopied] = useState(false)
+  const timeoutRef = useRef(null)
+
+  useEffect(() => {
+    return () => {
+      if (timeoutRef.current) clearTimeout(timeoutRef.current)
+    }
+  }, [])
 
   function copy() {
     navigator.clipboard.writeText(code).catch(() => {})
     setCopied(true)
-    setTimeout(() => setCopied(false), 2000)
+    clearTimeout(timeoutRef.current)
+    timeoutRef.current = setTimeout(() => setCopied(false), 2000)
   }
 
   return (

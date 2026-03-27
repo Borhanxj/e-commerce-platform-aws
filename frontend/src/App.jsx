@@ -25,6 +25,11 @@ function decodeJwtPayload(token) {
   }
 }
 
+function RequireAuth({ token, children }) {
+  if (!token) return <Navigate to="/login" replace />
+  return children
+}
+
 function CategoryRoute() {
   const { state } = useLocation()
   const navigate = useNavigate()
@@ -98,8 +103,16 @@ function App() {
       <Route path="/cart"             element={<CartPage onBack={() => navigate(-1)} />} />
       <Route path="/wishlist"         element={<WishlistPage onBack={() => navigate(-1)} />} />
       <Route path="/category"         element={<CategoryRoute />} />
-      <Route path="/account-settings" element={<AccountSettingsPage onBack={() => navigate(-1)} token={token} />} />
-      <Route path="/orders"           element={<OrdersPage onBack={() => navigate(-1)} />} />
+      <Route path="/account-settings" element={
+        <RequireAuth token={token}>
+          <AccountSettingsPage onBack={() => navigate(-1)} token={token} />
+        </RequireAuth>
+      } />
+      <Route path="/orders"           element={
+        <RequireAuth token={token}>
+          <OrdersPage onBack={() => navigate(-1)} />
+        </RequireAuth>
+      } />
       <Route path="/help"             element={<HelpPage onBack={() => navigate(-1)} />} />
       <Route path="*"                 element={<Navigate to="/" replace />} />
     </Routes>
