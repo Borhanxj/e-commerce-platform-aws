@@ -9,6 +9,10 @@ if (!process.env.JWT_SECRET || process.env.JWT_SECRET.trim() === '') {
 
 const pool = require('./db');
 const authRouter = require('./routes/auth');
+const adminRouter = require('./routes/admin');
+const adminProductsRouter = require('./routes/admin-products');
+const adminOrdersRouter = require('./routes/admin-orders');
+const adminSettingsRouter = require('./routes/admin-settings');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -18,6 +22,10 @@ app.use(cors());
 app.use(express.json());
 
 app.use('/api/auth', authRouter);
+app.use('/api/admin/products', adminProductsRouter);
+app.use('/api/admin/orders', adminOrdersRouter);
+app.use('/api/admin/settings', adminSettingsRouter);
+app.use('/api/admin', adminRouter);
 
 // Test endpoint - çalışıyor mu diye kontrol
 app.get('/', async (req, res) => {

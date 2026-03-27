@@ -1,5 +1,7 @@
 import { useState } from 'react'
 import { Routes, Route, Navigate, useNavigate, useLocation } from 'react-router-dom'
+import AdminLoginPage from './pages/admin/AdminLoginPage'
+import AdminDashboard from './pages/admin/AdminDashboard'
 import LoginPage from './pages/auth/LoginPage'
 import RegisterPage from './pages/auth/RegisterPage'
 import ForgotPasswordPage from './pages/auth/ForgotPasswordPage'
@@ -30,6 +32,15 @@ function RequireAuth({ token, children }) {
   return children
 }
 
+function RequireAdmin({ adminToken, children }) {
+  if (!adminToken) return <Navigate to="/admin/login" replace />
+
+  const payload = decodeJwtPayload(adminToken)
+  if (!payload || payload.role !== 'admin') return <Navigate to="/admin/login" replace />
+
+  return children
+}
+
 function CategoryRoute() {
   const { state } = useLocation()
   const navigate = useNavigate()
@@ -53,6 +64,8 @@ function App() {
     }
     return { email: payload.email }
   })
+
+  const [adminToken, setAdminToken] = useState(() => localStorage.getItem('adminToken'))
   const navigate = useNavigate()
 
   function handleLogin(t) {
@@ -65,6 +78,18 @@ function App() {
     setToken(t)
     setUser({ email: payload.email })
     navigate('/')
+  }
+
+  function handleAdminLogin(t) {
+    localStorage.setItem('adminToken', t)
+    setAdminToken(t)
+    navigate('/admin')
+  }
+
+  function handleAdminLogout() {
+    localStorage.removeItem('adminToken')
+    setAdminToken(null)
+    navigate('/admin/login')
   }
 
   function requireAuth() {
@@ -114,6 +139,17 @@ function App() {
         </RequireAuth>
       } />
       <Route path="/help"             element={<HelpPage onBack={() => navigate(-1)} />} />
+
+      {/* Admin routes */}
+      <Route path="/admin/login" element={
+        adminToken ? <Navigate to="/admin" replace /> : <AdminLoginPage onLogin={handleAdminLogin} />
+      } />
+      <Route path="/admin" element={
+        <RequireAdmin adminToken={adminToken}>
+          <AdminDashboard token={adminToken} onLogout={handleAdminLogout} />
+        </RequireAdmin>
+      } />
+
       <Route path="*"                 element={<Navigate to="/" replace />} />
     </Routes>
   )

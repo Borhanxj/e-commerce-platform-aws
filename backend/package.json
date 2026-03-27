@@ -6,7 +6,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "migrate:up": "node-pg-migrate up --migrations-dir migrations/scripts",
-    "migrate:down": "node-pg-migrate down --migrations-dir migrations/scripts"
+    "migrate:down": "node-pg-migrate down --migrations-dir migrations/scripts",
+    "seed:admin": "node scripts/seed-admin.js"
   },
   "keywords": [],
   "author": "",
