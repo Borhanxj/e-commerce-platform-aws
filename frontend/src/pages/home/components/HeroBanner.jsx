@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { ChevronLeftIcon, ChevronRightIcon } from '../../../components/icons'
 
 const HERO_THEMES = [
@@ -12,11 +12,18 @@ const HERO_THEMES = [
 export default function HeroBanner() {
   const [heroIndex, setHeroIndex] = useState(0)
   const [transitioning, setTransitioning] = useState(false)
+  const transitionRef = useRef(null)
+
+  // Clear the inner transition timeout on unmount
+  useEffect(() => {
+    return () => { clearTimeout(transitionRef.current) }
+  }, [])
 
   function goTo(idx) {
     if (transitioning) return
     setTransitioning(true)
-    setTimeout(() => {
+    clearTimeout(transitionRef.current)
+    transitionRef.current = setTimeout(() => {
       setHeroIndex(idx)
       setTransitioning(false)
     }, 350)
@@ -26,7 +33,8 @@ export default function HeroBanner() {
     if (transitioning) return
     const id = setTimeout(() => {
       setTransitioning(true)
-      setTimeout(() => {
+      clearTimeout(transitionRef.current)
+      transitionRef.current = setTimeout(() => {
         setHeroIndex(i => (i + 1) % HERO_THEMES.length)
         setTransitioning(false)
       }, 350)
