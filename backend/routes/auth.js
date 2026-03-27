@@ -79,7 +79,7 @@ router.put('/change-password', authenticate, async (req, res) => {
   }
 
   const result = await pool.query(
-    'SELECT password_hash FROM users WHERE id = $1',
+    'SELECT password_hash FROM auth.users WHERE id = $1',
     [req.user.userId]
   );
   const user = result.rows[0];
@@ -94,7 +94,7 @@ router.put('/change-password', authenticate, async (req, res) => {
   }
 
   const newHash = await bcrypt.hash(newPassword, 10);
-  await pool.query('UPDATE users SET password_hash = $1 WHERE id = $2', [newHash, req.user.userId]);
+  await pool.query('UPDATE auth.users SET password_hash = $1 WHERE id = $2', [newHash, req.user.userId]);
 
   res.json({ message: 'Password updated successfully' });
 });
@@ -108,7 +108,7 @@ router.post('/forgot-password', async (req, res) => {
   }
 
   // Always return success to prevent email enumeration
-  const result = await pool.query('SELECT id FROM users WHERE email = $1', [email]);
+  const result = await pool.query('SELECT id FROM auth.users WHERE email = $1', [email]);
   const user = result.rows[0];
 
   if (user) {
@@ -116,7 +116,7 @@ router.post('/forgot-password', async (req, res) => {
     const expiresAt = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
 
     await pool.query(
-      'UPDATE users SET reset_token = $1, reset_token_expires_at = $2 WHERE id = $3',
+      'UPDATE auth.users SET reset_token = $1, reset_token_expires_at = $2 WHERE id = $3',
       [token, expiresAt, user.id]
     );
 
@@ -140,7 +140,7 @@ router.post('/reset-password', async (req, res) => {
   }
 
   const result = await pool.query(
-    'SELECT id FROM users WHERE reset_token = $1 AND reset_token_expires_at > NOW()',
+    'SELECT id FROM auth.users WHERE reset_token = $1 AND reset_token_expires_at > NOW()',
     [token]
   );
   const user = result.rows[0];
@@ -151,7 +151,7 @@ router.post('/reset-password', async (req, res) => {
 
   const hash = await bcrypt.hash(newPassword, 10);
   await pool.query(
-    'UPDATE users SET password_hash = $1, reset_token = NULL, reset_token_expires_at = NULL WHERE id = $2',
+    'UPDATE auth.users SET password_hash = $1, reset_token = NULL, reset_token_expires_at = NULL WHERE id = $2',
     [hash, user.id]
   );
 
