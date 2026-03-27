@@ -39,7 +39,7 @@ function Toggle({ checked, onChange, label }) {
   )
 }
 
-export default function AccountSettingsPage({ onBack }) {
+export default function AccountSettingsPage({ onBack, token }) {
   // Profile
   const [name, setName] = useState('Jane Smith')
   const [email, setEmail] = useState('user@example.com')
@@ -51,6 +51,7 @@ export default function AccountSettingsPage({ onBack }) {
   const [confirmPw, setConfirmPw] = useState('')
   const [pwError, setPwError] = useState('')
   const [pwSaved, setPwSaved] = useState(false)
+  const [pwLoading, setPwLoading] = useState(false)
 
   // Notifications
   const [notifOrderUpdates, setNotifOrderUpdates] = useState(true)
@@ -72,14 +73,36 @@ export default function AccountSettingsPage({ onBack }) {
     setTimeout(() => setProfileSaved(false), 2500)
   }
 
-  function handlePasswordSave(e) {
+  async function handlePasswordSave(e) {
     e.preventDefault()
     setPwError('')
     if (newPw !== confirmPw) { setPwError('New passwords do not match.'); return }
     if (newPw.length < 8)    { setPwError('Password must be at least 8 characters.'); return }
-    setPwSaved(true)
-    setCurrentPw(''); setNewPw(''); setConfirmPw('')
-    setTimeout(() => setPwSaved(false), 2500)
+
+    setPwLoading(true)
+    try {
+      const res = await fetch('http://localhost:3000/api/auth/change-password', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify({ currentPassword: currentPw, newPassword: newPw }),
+      })
+      const data = await res.json()
+
+      if (!res.ok) {
+        setPwError(data.error || 'Failed to update password')
+      } else {
+        setPwSaved(true)
+        setCurrentPw(''); setNewPw(''); setConfirmPw('')
+        setTimeout(() => setPwSaved(false), 2500)
+      }
+    } catch {
+      setPwError('Could not connect to server')
+    } finally {
+      setPwLoading(false)
+    }
   }
 
   function handleAddressSave(e) {
@@ -149,7 +172,9 @@ export default function AccountSettingsPage({ onBack }) {
             {pwError && <p className="field-error">{pwError}</p>}
             <div className="form-footer">
               {pwSaved && <span className="save-confirm">Password updated!</span>}
-              <button type="submit" className="save-btn">Update Password</button>
+              <button type="submit" className="save-btn" disabled={pwLoading}>
+                {pwLoading ? 'Updating…' : 'Update Password'}
+              </button>
             </div>
           </form>
         </Section>
