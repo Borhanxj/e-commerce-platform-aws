@@ -5,8 +5,17 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "eslint .",
+    "format:check": "prettier --check .",
+    "format": "prettier --write .",
     "migrate:up": "node-pg-migrate up --migrations-dir migrations/scripts",
     "migrate:down": "node-pg-migrate down --migrations-dir migrations/scripts"
+  },
+  "lint-staged": {
+    "*.js": [
+      "eslint --max-warnings=0",
+      "prettier --check"
+    ]
   },
   "keywords": [],
   "author": "",
@@ -20,5 +29,11 @@
     "jsonwebtoken": "^9.0.3",
     "node-pg-migrate": "^8.0.4",
     "pg": "^8.20.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "eslint": "^10.1.0",
+    "globals": "^17.4.0",
+    "prettier": "^3.8.1"
   }
 }
