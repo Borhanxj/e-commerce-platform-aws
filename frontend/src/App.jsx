@@ -19,12 +19,18 @@ function CategoryRoute() {
 }
 
 function App() {
-  const [token, setToken] = useState(null)
-  const [user, setUser] = useState(null)
+  const [token, setToken] = useState(() => localStorage.getItem('token'))
+  const [user, setUser] = useState(() => {
+    const t = localStorage.getItem('token')
+    if (!t) return null
+    const payload = JSON.parse(atob(t.split('.')[1]))
+    return { email: payload.email }
+  })
   const navigate = useNavigate()
 
   function handleLogin(t) {
     const payload = JSON.parse(atob(t.split('.')[1]))
+    localStorage.setItem('token', t)
     setToken(t)
     setUser({ email: payload.email })
     navigate('/')
@@ -50,7 +56,7 @@ function App() {
           userEmail={user?.email}
           onNavigate={handleNavigate}
           onRequireAuth={requireAuth}
-          onLogout={() => { setToken(null); setUser(null); navigate('/') }}
+          onLogout={() => { localStorage.removeItem('token'); setToken(null); setUser(null); navigate('/') }}
         />
       } />
       <Route path="/login" element={
