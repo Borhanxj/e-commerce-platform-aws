@@ -10,15 +10,20 @@ An e-commerce platform with a React frontend (Vite) and Express.js backend.
 
 ### Frontend (`frontend/`)
 ```bash
-npm run dev       # Start Vite dev server with HMR
-npm run build     # Production build
-npm run lint      # ESLint
-npm run preview   # Preview production build
+npm run dev           # Start Vite dev server with HMR
+npm run build         # Production build
+npm run lint          # ESLint
+npm run preview       # Preview production build
+npm run format        # Prettier auto-fix
+npm run format:check  # Prettier validation (used in CI)
 ```
 
 ### Backend (`backend/`)
 ```bash
-node server.js    # Start Express server (default port 3000)
+node server.js        # Start Express server (default port 3000)
+npm run lint          # ESLint
+npm run format        # Prettier auto-fix
+npm run format:check  # Prettier validation (used in CI)
 ```
 
 No test runner is configured yet in either package.
@@ -75,9 +80,13 @@ The runner tracks applied migrations in a `pgmigrations` table in the database. 
 
 **Frontend:** React 19 + Vite. Entry point: `src/main.jsx` → `src/App.jsx`. Styling via CSS custom properties in `src/index.css` (supports light/dark mode). ESLint uses the modern flat config format (`eslint.config.js`).
 
-**Backend:** Express 5 server (`server.js`). PostgreSQL connection via `db.js` (uses `DATABASE_URL`). Auth routes live in `routes/auth.js` — `POST /api/auth/register` and `POST /api/auth/login` — using `bcrypt` for password hashing and `jsonwebtoken` for JWT issuance. `GET /` is a health-check that also verifies DB connectivity.
+**Backend:** Express 5 server (`server.js`). PostgreSQL connection via `db.js` (uses `DATABASE_URL`). Auth routes live in `routes/auth.js` — `POST /api/auth/register` and `POST /api/auth/login` — using `bcrypt` for password hashing and `jsonwebtoken` for JWT issuance. `GET /` is a health-check that also verifies DB connectivity. ESLint uses the modern flat config format (`eslint.config.mjs`). Prettier config in `.prettierrc`.
 
-**No monorepo tooling** — frontend and backend are independent npm workspaces; run `npm install` separately in each directory.
+**Root setup:** A root-level `package.json` manages Husky git hooks and lint-staged. Run `npm install` at the project root to install these, and separately in `frontend/` and `backend/`.
+
+**Git hooks:** A pre-commit hook (via Husky + lint-staged) runs ESLint and Prettier checks on staged files in both `frontend/` and `backend/` before each commit.
+
+**CI/CD:** GitHub Actions workflow (`.github/workflows/ci-cd.yml`) runs ESLint and Prettier checks for both frontend and backend on every push and pull request.
 
 ## Environment
 
