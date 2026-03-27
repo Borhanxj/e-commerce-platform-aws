@@ -1,5 +1,7 @@
 import { useState } from 'react'
 import { Routes, Route, Navigate, useNavigate, useLocation } from 'react-router-dom'
+import AdminLoginPage from './pages/admin/AdminLoginPage'
+import AdminDashboard from './pages/admin/AdminDashboard'
 import LoginPage from './pages/auth/LoginPage'
 import RegisterPage from './pages/auth/RegisterPage'
 import ForgotPasswordPage from './pages/auth/ForgotPasswordPage'
@@ -30,6 +32,15 @@ function RequireAuth({ token, children }) {
   return children
 }
 
+function RequireAdmin({ adminToken, children }) {
+  if (!adminToken) return <Navigate to="/admin/login" replace />
+
+  const payload = decodeJwtPayload(adminToken)
+  if (!payload || payload.role !== 'admin') return <Navigate to="/admin/login" replace />
+
+  return children
+}
+
 function CategoryRoute() {
   const { state } = useLocation()
   const navigate = useNavigate()
@@ -53,6 +64,8 @@ function App() {
     }
     return { email: payload.email }
   })
+
+  const [adminToken, setAdminToken] = useState(() => localStorage.getItem('adminToken'))
   const navigate = useNavigate()
 
   function handleLogin(t) {
@@ -65,6 +78,18 @@ function App() {
     setToken(t)
     setUser({ email: payload.email })
     navigate('/')
+  }
+
+  function handleAdminLogin(t) {
+    localStorage.setItem('adminToken', t)
+    setAdminToken(t)
+    navigate('/admin')
+  }
+
+  function handleAdminLogout() {
+    localStorage.removeItem('adminToken')
+    setAdminToken(null)
+    navigate('/admin/login')
   }
 
   function requireAuth() {
@@ -81,63 +106,51 @@ function App() {
 
   return (
     <Routes>
-      <Route
-        path="/"
-        element={
-          <HomePage
-            isLoggedIn={!!token}
-            userEmail={user?.email}
-            onNavigate={handleNavigate}
-            onRequireAuth={requireAuth}
-            onLogout={() => {
-              localStorage.removeItem('token')
-              setToken(null)
-              setUser(null)
-              navigate('/')
-            }}
-          />
-        }
-      />
-      <Route
-        path="/login"
-        element={
-          <LoginPage
-            onLogin={handleLogin}
-            onRegister={() => navigate('/register')}
-            onForgotPassword={() => navigate('/forgot-password')}
-          />
-        }
-      />
-      <Route path="/register" element={<RegisterPage onBack={() => navigate('/login')} />} />
-      <Route
-        path="/forgot-password"
-        element={<ForgotPasswordPage onBack={() => navigate('/login')} />}
-      />
-      <Route
-        path="/reset-password"
-        element={<ResetPasswordPage onBack={() => navigate('/login')} />}
-      />
-      <Route path="/cart" element={<CartPage onBack={() => navigate(-1)} />} />
-      <Route path="/wishlist" element={<WishlistPage onBack={() => navigate(-1)} />} />
-      <Route path="/category" element={<CategoryRoute />} />
-      <Route
-        path="/account-settings"
-        element={
-          <RequireAuth token={token}>
-            <AccountSettingsPage onBack={() => navigate(-1)} token={token} />
-          </RequireAuth>
-        }
-      />
-      <Route
-        path="/orders"
-        element={
-          <RequireAuth token={token}>
-            <OrdersPage onBack={() => navigate(-1)} />
-          </RequireAuth>
-        }
-      />
-      <Route path="/help" element={<HelpPage onBack={() => navigate(-1)} />} />
-      <Route path="*" element={<Navigate to="/" replace />} />
+      <Route path="/" element={
+        <HomePage
+          isLoggedIn={!!token}
+          userEmail={user?.email}
+          onNavigate={handleNavigate}
+          onRequireAuth={requireAuth}
+          onLogout={() => { localStorage.removeItem('token'); setToken(null); setUser(null); navigate('/') }}
+        />
+      } />
+      <Route path="/login" element={
+        <LoginPage
+          onLogin={handleLogin}
+          onRegister={() => navigate('/register')}
+          onForgotPassword={() => navigate('/forgot-password')}
+        />
+      } />
+      <Route path="/register"        element={<RegisterPage onBack={() => navigate('/login')} />} />
+      <Route path="/forgot-password" element={<ForgotPasswordPage onBack={() => navigate('/login')} />} />
+      <Route path="/reset-password"  element={<ResetPasswordPage onBack={() => navigate('/login')} />} />
+      <Route path="/cart"             element={<CartPage onBack={() => navigate(-1)} />} />
+      <Route path="/wishlist"         element={<WishlistPage onBack={() => navigate(-1)} />} />
+      <Route path="/category"         element={<CategoryRoute />} />
+      <Route path="/account-settings" element={
+        <RequireAuth token={token}>
+          <AccountSettingsPage onBack={() => navigate(-1)} token={token} />
+        </RequireAuth>
+      } />
+      <Route path="/orders"           element={
+        <RequireAuth token={token}>
+          <OrdersPage onBack={() => navigate(-1)} />
+        </RequireAuth>
+      } />
+      <Route path="/help"             element={<HelpPage onBack={() => navigate(-1)} />} />
+
+      {/* Admin routes */}
+      <Route path="/admin/login" element={
+        adminToken ? <Navigate to="/admin" replace /> : <AdminLoginPage onLogin={handleAdminLogin} />
+      } />
+      <Route path="/admin" element={
+        <RequireAdmin adminToken={adminToken}>
+          <AdminDashboard token={adminToken} onLogout={handleAdminLogout} />
+        </RequireAdmin>
+      } />
+
+      <Route path="*"                 element={<Navigate to="/" replace />} />
     </Routes>
   )
 }

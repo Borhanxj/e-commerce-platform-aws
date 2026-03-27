@@ -9,7 +9,8 @@
     "format:check": "prettier --check .",
     "format": "prettier --write .",
     "migrate:up": "node-pg-migrate up --migrations-dir migrations/scripts",
-    "migrate:down": "node-pg-migrate down --migrations-dir migrations/scripts"
+    "migrate:down": "node-pg-migrate down --migrations-dir migrations/scripts",
+    "seed:admin": "node scripts/seed-admin.js"
   },
   "lint-staged": {
     "*.js": [
