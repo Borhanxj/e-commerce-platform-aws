@@ -19,8 +19,17 @@ function CategoryRoute() {
 }
 
 function App() {
-  const [token, setToken] = useState('dev')
+  const [token, setToken] = useState(null)
   const navigate = useNavigate()
+
+  function handleLogin(t) {
+    setToken(t)
+    navigate('/')
+  }
+
+  function requireAuth() {
+    navigate('/login')
+  }
 
   if (!token) {
     return (
@@ -29,7 +38,7 @@ function App() {
         <Route path="/forgot-password" element={<ForgotPasswordPage onBack={() => navigate('/login')} />} />
         <Route path="*" element={
           <LoginPage
-            onLogin={(t) => { setToken(t); navigate('/') }}
+            onLogin={handleLogin}
             onRegister={() => navigate('/register')}
             onForgotPassword={() => navigate('/forgot-password')}
           />
@@ -50,7 +59,9 @@ function App() {
     <Routes>
       <Route path="/" element={
         <HomePage
+          isLoggedIn={!!token}
           onNavigate={handleNavigate}
+          onRequireAuth={requireAuth}
           onLogout={() => { setToken(null); navigate('/login') }}
         />
       } />

@@ -40,7 +40,7 @@ const REVIEWS = [
   { id: 10, name: 'Isabella C.',  rating: 5, text: 'Customer service was brilliant when I needed to exchange a size. So easy.' },
 ]
 
-export default function HomePage({ onNavigate, onLogout }) {
+export default function HomePage({ isLoggedIn, onNavigate, onRequireAuth, onLogout }) {
   const [cartCount] = useState(0)
   const [wishlistCount] = useState(0)
   const [searchQuery, setSearchQuery] = useState('')
@@ -80,7 +80,9 @@ export default function HomePage({ onNavigate, onLogout }) {
       )}
 
       <Navbar
+        isLoggedIn={isLoggedIn}
         onNavigate={onNavigate}
+        onRequireAuth={onRequireAuth}
         onLogout={onLogout}
         cartCount={cartCount}
         wishlistCount={wishlistCount}

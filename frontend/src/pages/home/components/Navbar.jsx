@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react'
 import { CartIcon, WishlistIcon, SearchIcon, UserIcon, OrdersIcon, SettingsIcon, HelpIcon, LogoutIcon } from '../../../components/icons'
 
-export default function Navbar({ onNavigate, onLogout, cartCount, wishlistCount, searchQuery, setSearchQuery }) {
+export default function Navbar({ isLoggedIn, onNavigate, onRequireAuth, onLogout, cartCount, wishlistCount, searchQuery, setSearchQuery }) {
   const [avatarOpen, setAvatarOpen] = useState(false)
   const avatarRef = useRef(null)
 
@@ -32,11 +32,11 @@ export default function Navbar({ onNavigate, onLogout, cartCount, wishlistCount,
 
         <nav className="nav-actions">
           <button className="sale-nav-btn">SALE</button>
-          <button className="icon-btn" aria-label="Wishlist" onClick={() => onNavigate('wishlist')}>
+          <button className="icon-btn" aria-label="Wishlist" onClick={() => isLoggedIn ? onNavigate('wishlist') : onRequireAuth()}>
             <WishlistIcon />
             {wishlistCount > 0 && <span className="badge">{wishlistCount}</span>}
           </button>
-          <button className="icon-btn" aria-label="Shopping cart" onClick={() => onNavigate('cart')}>
+          <button className="icon-btn" aria-label="Shopping cart" onClick={() => isLoggedIn ? onNavigate('cart') : onRequireAuth()}>
             <CartIcon />
             {cartCount > 0 && <span className="badge">{cartCount}</span>}
           </button>
