@@ -16,7 +16,12 @@ import './App.css'
 function CategoryRoute() {
   const { state } = useLocation()
   const navigate = useNavigate()
-  return <CategoryPage category={state?.category} onBack={() => navigate(-1)} />
+
+  if (!state?.category) {
+    return <Navigate to="/" replace />
+  }
+
+  return <CategoryPage category={state.category} onBack={() => navigate(-1)} />
 }
 
 function App() {
