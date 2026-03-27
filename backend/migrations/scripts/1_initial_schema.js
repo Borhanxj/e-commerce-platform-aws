@@ -4,11 +4,13 @@ exports.up = (pgm) => {
   pgm.createType({ schema: 'auth', name: 'user_role' }, ['customer', 'sales_manager', 'product_manager']);
 
   pgm.createTable({ schema: 'auth', name: 'users' }, {
-    id:            { type: 'serial', primaryKey: true },
-    email:         { type: 'varchar(255)', notNull: true, unique: true },
-    password_hash: { type: 'varchar(255)', notNull: true },
-    role:          { type: 'auth.user_role', notNull: true, default: 'customer' },
-    created_at:    { type: 'timestamptz', notNull: true, default: pgm.func('NOW()') },
+    id:                     { type: 'serial', primaryKey: true },
+    email:                  { type: 'varchar(255)', notNull: true, unique: true },
+    password_hash:          { type: 'varchar(255)', notNull: true },
+    role:                   { type: 'auth.user_role', notNull: true, default: 'customer' },
+    reset_token:            { type: 'varchar(255)' },
+    reset_token_expires_at: { type: 'timestamptz' },
+    created_at:             { type: 'timestamptz', notNull: true, default: pgm.func('NOW()') },
   });
 
   pgm.createTable({ schema: 'auth', name: 'customers' }, {
