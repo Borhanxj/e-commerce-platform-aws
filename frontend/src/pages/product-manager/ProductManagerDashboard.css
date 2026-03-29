@@ -1,0 +1,54 @@
+/* ─── Comment status badge modifiers ─────────────── */
+.pm-status-pending {
+  background: rgba(245, 158, 11, 0.1);
+  color: #f59e0b;
+}
+
+.pm-status-approved {
+  background: rgba(16, 185, 129, 0.1);
+  color: #10b981;
+}
+
+.pm-status-rejected {
+  background: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+}
+
+/* ─── Inventory inline stock edit cell ───────────── */
+.pm-stock-cell {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.pm-stock-input {
+  width: 70px;
+  font: inherit;
+  font-size: 13px;
+  padding: 4px 8px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg);
+  color: var(--text-h);
+  outline: none;
+}
+
+.pm-stock-input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-bg);
+}
+
+/* ─── Approve / reject action buttons ────────────── */
+.um-btn-approve {
+  font-size: 12px;
+  padding: 5px 12px;
+  background: rgba(16, 185, 129, 0.1);
+  color: #10b981;
+  border-color: rgba(16, 185, 129, 0.3);
+}
+
+.um-btn-approve:hover:not(:disabled) {
+  background: rgba(16, 185, 129, 0.2);
+  color: #10b981;
+  border-color: #10b981;
+}

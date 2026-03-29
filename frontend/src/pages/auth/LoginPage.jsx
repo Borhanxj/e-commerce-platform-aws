@@ -1,11 +1,25 @@
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import './LoginPage.css'
+
+function decodeJwtPayload(token) {
+  try {
+    const parts = token.split('.')
+    if (parts.length < 3) return null
+    const base64 = parts[1].replace(/-/g, '+').replace(/_/g, '/')
+    const padded = base64 + '='.repeat((4 - (base64.length % 4)) % 4)
+    return JSON.parse(atob(padded))
+  } catch {
+    return null
+  }
+}
 
 function LoginPage({ onLogin, onForgotPassword, onRegister }) {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+  const navigate = useNavigate()
 
   async function handleSubmit(e) {
     e.preventDefault()
@@ -24,6 +38,8 @@ function LoginPage({ onLogin, onForgotPassword, onRegister }) {
         setError(data.error || 'Login failed')
       } else {
         onLogin(data.token)
+        const payload = decodeJwtPayload(data.token)
+        if (payload?.role === 'product_manager') navigate('/product-manager')
       }
     } catch {
       setError('Could not connect to server')

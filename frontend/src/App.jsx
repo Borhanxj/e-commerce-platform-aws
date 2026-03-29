@@ -13,6 +13,7 @@ import CategoryPage from './pages/category/CategoryPage'
 import AccountSettingsPage from './pages/account/AccountSettingsPage'
 import OrdersPage from './pages/orders/OrdersPage'
 import HelpPage from './pages/help/HelpPage'
+import ProductManagerDashboard from './pages/product-manager/ProductManagerDashboard'
 import './App.css'
 
 function decodeJwtPayload(token) {
@@ -29,6 +30,14 @@ function decodeJwtPayload(token) {
 
 function RequireAuth({ token, children }) {
   if (!token) return <Navigate to="/login" replace />
+  return children
+}
+
+function RequireProductManager({ children }) {
+  const t = localStorage.getItem('token')
+  if (!t) return <Navigate to="/login" replace />
+  const payload = decodeJwtPayload(t)
+  if (!payload || payload.role !== 'product_manager') return <Navigate to="/" replace />
   return children
 }
 
@@ -148,6 +157,14 @@ function App() {
         <RequireAdmin adminToken={adminToken}>
           <AdminDashboard token={adminToken} onLogout={handleAdminLogout} />
         </RequireAdmin>
+      } />
+
+      <Route path="/product-manager" element={
+        <RequireProductManager>
+          <ProductManagerDashboard token={token} onLogout={() => {
+            localStorage.removeItem('token'); setToken(null); setUser(null); navigate('/login')
+          }} />
+        </RequireProductManager>
       } />
 
       <Route path="*"                 element={<Navigate to="/" replace />} />
