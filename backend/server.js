@@ -13,6 +13,7 @@ const adminRouter = require('./routes/admin');
 const adminProductsRouter = require('./routes/admin-products');
 const adminOrdersRouter = require('./routes/admin-orders');
 const adminSettingsRouter = require('./routes/admin-settings');
+const productManagerRouter = require('./routes/product-manager');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -22,6 +23,7 @@ app.use(cors());
 app.use(express.json());
 
 app.use('/api/auth', authRouter);
+app.use('/api/product-manager', productManagerRouter);
 app.use('/api/admin/products', adminProductsRouter);
 app.use('/api/admin/orders', adminOrdersRouter);
 app.use('/api/admin/settings', adminSettingsRouter);
