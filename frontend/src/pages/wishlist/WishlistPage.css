@@ -37,7 +37,9 @@
   cursor: pointer;
   padding: 6px 10px;
   border-radius: 8px;
-  transition: background 0.15s, color 0.15s;
+  transition:
+    background 0.15s,
+    color 0.15s;
 }
 
 .wishlist-header .back-btn:hover {

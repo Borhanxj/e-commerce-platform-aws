@@ -54,7 +54,9 @@ function ResetPasswordPage({ onBack }) {
           <p style={{ marginBottom: '24px', color: 'var(--text)' }}>
             This password reset link is invalid or has expired. Please request a new one.
           </p>
-          <button className="login-btn" onClick={onBack}>Back to sign in</button>
+          <button className="login-btn" onClick={onBack}>
+            Back to sign in
+          </button>
         </div>
       </div>
     )
@@ -68,7 +70,9 @@ function ResetPasswordPage({ onBack }) {
           <p style={{ marginBottom: '24px', color: 'var(--text)' }}>
             Your password has been reset successfully. You can now sign in with your new password.
           </p>
-          <button className="login-btn" onClick={onBack}>Sign in</button>
+          <button className="login-btn" onClick={onBack}>
+            Sign in
+          </button>
         </div>
       </div>
     )
@@ -106,7 +110,11 @@ function ResetPasswordPage({ onBack }) {
               placeholder="••••••••"
             />
           </div>
-          {error && <p className="login-error" role="alert">{error}</p>}
+          {error && (
+            <p className="login-error" role="alert">
+              {error}
+            </p>
+          )}
           <button type="submit" className="login-btn" disabled={loading}>
             {loading ? 'Resetting…' : 'Reset password'}
           </button>

@@ -48,7 +48,9 @@ function RegisterPage({ onBack }) {
           <p style={{ marginBottom: '24px', color: 'var(--text)' }}>
             Your account has been created. You can now sign in.
           </p>
-          <button className="login-btn" onClick={onBack}>Back to sign in</button>
+          <button className="login-btn" onClick={onBack}>
+            Back to sign in
+          </button>
         </div>
       </div>
     )
@@ -107,7 +109,11 @@ function RegisterPage({ onBack }) {
               placeholder="••••••••"
             />
           </div>
-          {error && <p className="login-error" role="alert">{error}</p>}
+          {error && (
+            <p className="login-error" role="alert">
+              {error}
+            </p>
+          )}
           <button type="submit" className="login-btn" disabled={loading}>
             {loading ? 'Creating account…' : 'Create account'}
           </button>

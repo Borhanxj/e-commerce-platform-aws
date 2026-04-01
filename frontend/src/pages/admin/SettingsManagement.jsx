@@ -28,7 +28,7 @@ function SettingsManagement({ token }) {
   }, [token])
 
   function handleChange(key, value) {
-    setSettings((prev) => prev.map((s) => s.key === key ? { ...s, value } : s))
+    setSettings((prev) => prev.map((s) => (s.key === key ? { ...s, value } : s)))
     setSuccess('')
   }
 
@@ -80,7 +80,9 @@ function SettingsManagement({ token }) {
                     onChange={(e) => handleChange(s.key, e.target.checked ? 'true' : 'false')}
                   />
                   <span className="sm-toggle-slider" />
-                  <span className="sm-toggle-text">{s.value === 'true' ? 'Enabled' : 'Disabled'}</span>
+                  <span className="sm-toggle-text">
+                    {s.value === 'true' ? 'Enabled' : 'Disabled'}
+                  </span>
                 </label>
               ) : s.type === 'number' ? (
                 <input

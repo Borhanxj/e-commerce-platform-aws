@@ -70,12 +70,20 @@ function AdminLoginPage({ onLogin }) {
               placeholder="••••••••"
             />
           </div>
-          {error && <p className="admin-login-error" role="alert">{error}</p>}
+          {error && (
+            <p className="admin-login-error" role="alert">
+              {error}
+            </p>
+          )}
           <button type="submit" className="admin-login-btn" disabled={loading}>
             {loading ? 'Signing in…' : 'Sign in'}
           </button>
         </form>
-        <button type="button" className="admin-login-back" onClick={() => window.location.href = '/'}>
+        <button
+          type="button"
+          className="admin-login-back"
+          onClick={() => (window.location.href = '/')}
+        >
           Back to store
         </button>
       </div>

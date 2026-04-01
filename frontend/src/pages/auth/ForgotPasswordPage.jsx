@@ -38,10 +38,12 @@ function ForgotPasswordPage({ onBack }) {
         <div className="login-card">
           <h1>Check your email</h1>
           <p style={{ marginBottom: '24px', color: 'var(--text)' }}>
-            If an account exists for <strong>{email}</strong>, you'll receive a
-            password reset link shortly.
+            If an account exists for <strong>{email}</strong>, you'll receive a password reset link
+            shortly.
           </p>
-          <button className="login-btn" onClick={onBack}>Back to sign in</button>
+          <button className="login-btn" onClick={onBack}>
+            Back to sign in
+          </button>
         </div>
       </div>
     )
@@ -67,7 +69,11 @@ function ForgotPasswordPage({ onBack }) {
               placeholder="you@example.com"
             />
           </div>
-          {error && <p className="login-error" role="alert">{error}</p>}
+          {error && (
+            <p className="login-error" role="alert">
+              {error}
+            </p>
+          )}
           <button type="submit" className="login-btn" disabled={loading}>
             {loading ? 'Sending…' : 'Send reset link'}
           </button>

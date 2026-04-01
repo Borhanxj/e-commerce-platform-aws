@@ -1,8 +1,20 @@
 import { useState, useEffect } from 'react'
 
 const API = 'http://localhost:3000/api/admin/settings/stats'
-const STATUS_LABELS = { pending: 'Pending', processing: 'Processing', shipped: 'Shipped', delivered: 'Delivered', cancelled: 'Cancelled' }
-const STATUS_COLORS = { pending: '#3b82f6', processing: '#f59e0b', shipped: '#8b5cf6', delivered: '#10b981', cancelled: '#ef4444' }
+const STATUS_LABELS = {
+  pending: 'Pending',
+  processing: 'Processing',
+  shipped: 'Shipped',
+  delivered: 'Delivered',
+  cancelled: 'Cancelled',
+}
+const STATUS_COLORS = {
+  pending: '#3b82f6',
+  processing: '#f59e0b',
+  shipped: '#8b5cf6',
+  delivered: '#10b981',
+  cancelled: '#ef4444',
+}
 
 function DashboardHome({ token, onNavigate }) {
   const [stats, setStats] = useState(null)
@@ -45,7 +57,9 @@ function DashboardHome({ token, onNavigate }) {
           <span className="dh-kpi-label">Total Orders</span>
         </button>
         <div className="dh-kpi dh-kpi-revenue">
-          <span className="dh-kpi-value">${stats.totalRevenue.toLocaleString('en-US', { minimumFractionDigits: 2 })}</span>
+          <span className="dh-kpi-value">
+            ${stats.totalRevenue.toLocaleString('en-US', { minimumFractionDigits: 2 })}
+          </span>
           <span className="dh-kpi-label">Total Revenue</span>
         </div>
       </div>
@@ -91,10 +105,7 @@ function DashboardHome({ token, onNavigate }) {
                     <span className="dh-recent-email">{o.user_email}</span>
                   </div>
                   <div className="dh-recent-meta">
-                    <span
-                      className="dh-recent-status"
-                      style={{ color: STATUS_COLORS[o.status] }}
-                    >
+                    <span className="dh-recent-status" style={{ color: STATUS_COLORS[o.status] }}>
                       {STATUS_LABELS[o.status]}
                     </span>
                     <span className="dh-recent-total">${parseFloat(o.total).toFixed(2)}</span>

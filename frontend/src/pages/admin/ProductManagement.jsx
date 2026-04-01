@@ -13,25 +13,32 @@ function ProductManagement({ token }) {
 
   const authHeaders = { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' }
 
-  const fetchProducts = useCallback(async (page = 1) => {
-    setLoading(true)
-    setError('')
-    try {
-      const params = new URLSearchParams({ page, limit: 10 })
-      if (search) params.set('search', search)
-      const res = await fetch(`${API}?${params}`, { headers: { Authorization: `Bearer ${token}` } })
-      if (!res.ok) throw new Error('Failed to fetch products')
-      const data = await res.json()
-      setProducts(data.products)
-      setPagination(data.pagination)
-    } catch (err) {
-      setError(err.message)
-    } finally {
-      setLoading(false)
-    }
-  }, [token, search])
+  const fetchProducts = useCallback(
+    async (page = 1) => {
+      setLoading(true)
+      setError('')
+      try {
+        const params = new URLSearchParams({ page, limit: 10 })
+        if (search) params.set('search', search)
+        const res = await fetch(`${API}?${params}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        })
+        if (!res.ok) throw new Error('Failed to fetch products')
+        const data = await res.json()
+        setProducts(data.products)
+        setPagination(data.pagination)
+      } catch (err) {
+        setError(err.message)
+      } finally {
+        setLoading(false)
+      }
+    },
+    [token, search]
+  )
 
-  useEffect(() => { fetchProducts(1) }, [fetchProducts])
+  useEffect(() => {
+    fetchProducts(1)
+  }, [fetchProducts])
 
   function handleSearch(e) {
     e.preventDefault()
@@ -39,7 +46,11 @@ function ProductManagement({ token }) {
   }
 
   async function handleCreate(formData) {
-    const res = await fetch(API, { method: 'POST', headers: authHeaders, body: JSON.stringify(formData) })
+    const res = await fetch(API, {
+      method: 'POST',
+      headers: authHeaders,
+      body: JSON.stringify(formData),
+    })
     const data = await res.json()
     if (!res.ok) throw new Error(data.error || 'Failed to create product')
     setModal(null)
@@ -47,7 +58,11 @@ function ProductManagement({ token }) {
   }
 
   async function handleUpdate(productId, formData) {
-    const res = await fetch(`${API}/${productId}`, { method: 'PUT', headers: authHeaders, body: JSON.stringify(formData) })
+    const res = await fetch(`${API}/${productId}`, {
+      method: 'PUT',
+      headers: authHeaders,
+      body: JSON.stringify(formData),
+    })
     const data = await res.json()
     if (!res.ok) throw new Error(data.error || 'Failed to update product')
     setModal(null)
@@ -80,7 +95,9 @@ function ProductManagement({ token }) {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
-          <button type="submit" className="um-btn um-btn-search">Search</button>
+          <button type="submit" className="um-btn um-btn-search">
+            Search
+          </button>
         </form>
         <button className="um-btn um-btn-create" onClick={() => setModal({ mode: 'create' })}>
           + New Product
@@ -104,36 +121,69 @@ function ProductManagement({ token }) {
           </thead>
           <tbody>
             {loading ? (
-              <tr><td colSpan="7" className="um-empty">Loading…</td></tr>
-            ) : products.length === 0 ? (
-              <tr><td colSpan="7" className="um-empty">No products found</td></tr>
-            ) : products.map((p) => (
-              <tr key={p.id}>
-                <td>{p.id}</td>
-                <td>{p.name}</td>
-                <td>{p.category || '—'}</td>
-                <td>${parseFloat(p.price).toFixed(2)}</td>
-                <td>
-                  <span className={`um-role-badge ${parseInt(p.stock) === 0 ? 'um-role-admin' : parseInt(p.stock) < 10 ? 'um-role-product_manager' : 'um-role-sales_manager'}`}>
-                    {p.stock}
-                  </span>
-                </td>
-                <td>{new Date(p.created_at).toLocaleDateString()}</td>
-                <td className="um-actions">
-                  <button className="um-btn um-btn-edit" onClick={() => setModal({ mode: 'edit', product: p })}>Edit</button>
-                  <button className="um-btn um-btn-delete" onClick={() => setDeleteConfirm(p)}>Delete</button>
+              <tr>
+                <td colSpan="7" className="um-empty">
+                  Loading…
                 </td>
               </tr>
-            ))}
+            ) : products.length === 0 ? (
+              <tr>
+                <td colSpan="7" className="um-empty">
+                  No products found
+                </td>
+              </tr>
+            ) : (
+              products.map((p) => (
+                <tr key={p.id}>
+                  <td>{p.id}</td>
+                  <td>{p.name}</td>
+                  <td>{p.category || '—'}</td>
+                  <td>${parseFloat(p.price).toFixed(2)}</td>
+                  <td>
+                    <span
+                      className={`um-role-badge ${parseInt(p.stock) === 0 ? 'um-role-admin' : parseInt(p.stock) < 10 ? 'um-role-product_manager' : 'um-role-sales_manager'}`}
+                    >
+                      {p.stock}
+                    </span>
+                  </td>
+                  <td>{new Date(p.created_at).toLocaleDateString()}</td>
+                  <td className="um-actions">
+                    <button
+                      className="um-btn um-btn-edit"
+                      onClick={() => setModal({ mode: 'edit', product: p })}
+                    >
+                      Edit
+                    </button>
+                    <button className="um-btn um-btn-delete" onClick={() => setDeleteConfirm(p)}>
+                      Delete
+                    </button>
+                  </td>
+                </tr>
+              ))
+            )}
           </tbody>
         </table>
       </div>
 
       {pagination.totalPages > 1 && (
         <div className="um-pagination">
-          <button className="um-btn" disabled={pagination.page <= 1} onClick={() => fetchProducts(pagination.page - 1)}>Previous</button>
-          <span className="um-page-info">Page {pagination.page} of {pagination.totalPages} ({pagination.total} products)</span>
-          <button className="um-btn" disabled={pagination.page >= pagination.totalPages} onClick={() => fetchProducts(pagination.page + 1)}>Next</button>
+          <button
+            className="um-btn"
+            disabled={pagination.page <= 1}
+            onClick={() => fetchProducts(pagination.page - 1)}
+          >
+            Previous
+          </button>
+          <span className="um-page-info">
+            Page {pagination.page} of {pagination.totalPages} ({pagination.total} products)
+          </span>
+          <button
+            className="um-btn"
+            disabled={pagination.page >= pagination.totalPages}
+            onClick={() => fetchProducts(pagination.page + 1)}
+          >
+            Next
+          </button>
         </div>
       )}
 
@@ -151,10 +201,20 @@ function ProductManagement({ token }) {
         <div className="um-overlay" onClick={() => setDeleteConfirm(null)}>
           <div className="um-modal" onClick={(e) => e.stopPropagation()}>
             <h2>Delete Product</h2>
-            <p>Are you sure you want to delete <strong>{deleteConfirm.name}</strong>? This action cannot be undone.</p>
+            <p>
+              Are you sure you want to delete <strong>{deleteConfirm.name}</strong>? This action
+              cannot be undone.
+            </p>
             <div className="um-modal-actions">
-              <button className="um-btn" onClick={() => setDeleteConfirm(null)}>Cancel</button>
-              <button className="um-btn um-btn-danger" onClick={() => handleDelete(deleteConfirm.id)}>Delete</button>
+              <button className="um-btn" onClick={() => setDeleteConfirm(null)}>
+                Cancel
+              </button>
+              <button
+                className="um-btn um-btn-danger"
+                onClick={() => handleDelete(deleteConfirm.id)}
+              >
+                Delete
+              </button>
             </div>
           </div>
         </div>
@@ -179,7 +239,14 @@ function ProductModal({ mode, product, onClose, onCreate, onUpdate }) {
     setSaving(true)
     try {
       const parsedStock = parseInt(stock, 10)
-      const body = { name, description, price: parseFloat(price), stock: Number.isNaN(parsedStock) ? 0 : parsedStock, category, image_url: imageUrl }
+      const body = {
+        name,
+        description,
+        price: parseFloat(price),
+        stock: Number.isNaN(parsedStock) ? 0 : parsedStock,
+        category,
+        image_url: imageUrl,
+      }
       if (mode === 'create') {
         await onCreate(body)
       } else {
@@ -199,33 +266,70 @@ function ProductModal({ mode, product, onClose, onCreate, onUpdate }) {
         <form onSubmit={handleSubmit}>
           <div className="um-field">
             <label>Name</label>
-            <input type="text" value={name} onChange={(e) => setName(e.target.value)} required placeholder="Product name" />
+            <input
+              type="text"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              required
+              placeholder="Product name"
+            />
           </div>
           <div className="um-field">
             <label>Description</label>
-            <input type="text" value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Brief description" />
+            <input
+              type="text"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              placeholder="Brief description"
+            />
           </div>
           <div className="um-field-row">
             <div className="um-field">
               <label>Price ($)</label>
-              <input type="number" step="0.01" min="0" value={price} onChange={(e) => setPrice(e.target.value)} required placeholder="0.00" />
+              <input
+                type="number"
+                step="0.01"
+                min="0"
+                value={price}
+                onChange={(e) => setPrice(e.target.value)}
+                required
+                placeholder="0.00"
+              />
             </div>
             <div className="um-field">
               <label>Stock</label>
-              <input type="number" min="0" value={stock} onChange={(e) => setStock(e.target.value)} placeholder="0" />
+              <input
+                type="number"
+                min="0"
+                value={stock}
+                onChange={(e) => setStock(e.target.value)}
+                placeholder="0"
+              />
             </div>
           </div>
           <div className="um-field">
             <label>Category</label>
-            <input type="text" value={category} onChange={(e) => setCategory(e.target.value)} placeholder="e.g. Footwear" />
+            <input
+              type="text"
+              value={category}
+              onChange={(e) => setCategory(e.target.value)}
+              placeholder="e.g. Footwear"
+            />
           </div>
           <div className="um-field">
             <label>Image URL</label>
-            <input type="text" value={imageUrl} onChange={(e) => setImageUrl(e.target.value)} placeholder="https://…" />
+            <input
+              type="text"
+              value={imageUrl}
+              onChange={(e) => setImageUrl(e.target.value)}
+              placeholder="https://…"
+            />
           </div>
           {error && <p className="um-error">{error}</p>}
           <div className="um-modal-actions">
-            <button type="button" className="um-btn" onClick={onClose}>Cancel</button>
+            <button type="button" className="um-btn" onClick={onClose}>
+              Cancel
+            </button>
             <button type="submit" className="um-btn um-btn-create" disabled={saving}>
               {saving ? 'Saving…' : mode === 'create' ? 'Create' : 'Save Changes'}
             </button>
