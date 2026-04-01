@@ -24,9 +24,13 @@ node server.js        # Start Express server (default port 3000)
 npm run lint          # ESLint
 npm run format        # Prettier auto-fix
 npm run format:check  # Prettier validation (used in CI)
+npm test              # Jest
 ```
 
-No test runner is configured yet in either package.
+### Frontend (`frontend/`)
+```bash
+npm test              # Vitest
+```
 
 ### Docker
 ```bash

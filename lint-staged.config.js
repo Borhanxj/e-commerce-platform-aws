@@ -1,10 +1,10 @@
 module.exports = {
-  'frontend/src/**/*.{js,jsx}': () => [
-    'npm run lint --prefix frontend',
-    'npm run format:check --prefix frontend',
+  'frontend/src/**/*.{js,jsx}': (files) => [
+    `npx --prefix frontend eslint ${files.join(' ')}`,
+    `npx --prefix frontend prettier --check ${files.join(' ')}`,
   ],
-  'backend/**/*.js': () => [
-    'npm run lint --prefix backend',
-    'npm run format:check --prefix backend',
+  'backend/**/*.js': (files) => [
+    `npx --prefix backend eslint ${files.join(' ')}`,
+    `npx --prefix backend prettier --check ${files.join(' ')}`,
   ],
 }

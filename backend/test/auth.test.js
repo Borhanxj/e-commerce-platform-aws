@@ -87,4 +87,20 @@ describe('POST /api/auth/login', () => {
     expect(res.status).toBe(401)
     expect(res.body.error).toBe('Invalid credentials')
   })
+
+  it('returns 200 with a token on successful login', async () => {
+    const bcrypt = require('bcrypt')
+    const hash = await bcrypt.hash('password123', 10)
+
+    pool.query.mockResolvedValueOnce({
+      rows: [{ id: 1, email: 'user@example.com', password_hash: hash, role: 'customer' }],
+    })
+
+    const res = await request(app)
+      .post('/api/auth/login')
+      .send({ email: 'user@example.com', password: 'password123' })
+
+    expect(res.status).toBe(200)
+    expect(res.body).toHaveProperty('token')
+  })
 })

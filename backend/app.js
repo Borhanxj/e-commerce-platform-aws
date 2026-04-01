@@ -18,4 +18,10 @@ app.use('/api/admin/orders', adminOrdersRouter)
 app.use('/api/admin/settings', adminSettingsRouter)
 app.use('/api/admin', adminRouter)
 
+// Global error handler — catches unhandled errors from async route handlers
+app.use((err, req, res, _next) => {
+  console.error(err)
+  res.status(500).json({ error: 'Internal server error' })
+})
+
 module.exports = app
