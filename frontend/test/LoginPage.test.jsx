@@ -36,7 +36,7 @@ describe('LoginPage', () => {
   })
 
   it('shows an error message when login fails', async () => {
-    global.fetch = vi.fn().mockResolvedValue({
+    globalThis.fetch = vi.fn().mockResolvedValue({
       ok: false,
       json: async () => ({ error: 'Invalid credentials' }),
     })
@@ -52,7 +52,7 @@ describe('LoginPage', () => {
 
   it('calls onLogin with token on successful login', async () => {
     const onLogin = vi.fn()
-    global.fetch = vi.fn().mockResolvedValue({
+    globalThis.fetch = vi.fn().mockResolvedValue({
       ok: true,
       json: async () => ({ token: 'fake-jwt-token' }),
     })
