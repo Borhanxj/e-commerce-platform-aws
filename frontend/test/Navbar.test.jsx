@@ -53,9 +53,7 @@ describe('Navbar', () => {
   })
 
   it('shows user email in dropdown when logged in', async () => {
-    render(
-      <Navbar {...defaultProps} isLoggedIn={true} userEmail="test@example.com" />
-    )
+    render(<Navbar {...defaultProps} isLoggedIn={true} userEmail="test@example.com" />)
 
     await userEvent.click(screen.getByRole('button', { name: /account menu/i }))
 
