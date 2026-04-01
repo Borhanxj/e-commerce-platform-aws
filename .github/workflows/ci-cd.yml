@@ -47,3 +47,7 @@ jobs:
       - name: Backend Prettier
         run: npm run format:check
         working-directory: backend
+
+      - name: Backend Tests
+        run: npm test
+        working-directory: backend
