@@ -16,6 +16,8 @@ npm run lint          # ESLint
 npm run preview       # Preview production build
 npm run format        # Prettier auto-fix
 npm run format:check  # Prettier validation (used in CI)
+npm test              # Vitest (single run)
+npm run test:watch    # Vitest (watch mode)
 ```
 
 ### Backend (`backend/`)
@@ -24,12 +26,16 @@ node server.js        # Start Express server (default port 3000)
 npm run lint          # ESLint
 npm run format        # Prettier auto-fix
 npm run format:check  # Prettier validation (used in CI)
-npm test              # Jest
+npm test              # Jest (single run)
 ```
 
-### Frontend (`frontend/`)
+### Running a single test
 ```bash
-npm test              # Vitest
+# Frontend — pass a filename pattern
+cd frontend && npx vitest run LoginPage
+
+# Backend — pass a test name pattern
+cd backend && npx jest --testNamePattern "returns 201"
 ```
 
 ### Docker
@@ -80,17 +86,75 @@ To add a new migration, create `backend/migrations/scripts/<N>_description.js` (
 
 The runner tracks applied migrations in a `pgmigrations` table in the database. Never edit a migration file that has already been applied — write a new one instead.
 
+### Seeding an admin user
+
+```bash
+ADMIN_EMAIL=admin@example.com ADMIN_PASSWORD=yourpassword node backend/scripts/seed-admin.js
+```
+
+Both env vars are required — the script exits if either is missing.
+
 ## Architecture
 
-**Frontend:** React 19 + Vite. Entry point: `src/main.jsx` → `src/App.jsx`. Styling via CSS custom properties in `src/index.css` (supports light/dark mode). ESLint uses the modern flat config format (`eslint.config.js`).
+### Backend
 
-**Backend:** Express 5 server (`server.js`). PostgreSQL connection via `db.js` (uses `DATABASE_URL`). Auth routes live in `routes/auth.js` — `POST /api/auth/register` and `POST /api/auth/login` — using `bcrypt` for password hashing and `jsonwebtoken` for JWT issuance. `GET /` is a health-check that also verifies DB connectivity. ESLint uses the modern flat config format (`eslint.config.mjs`). Prettier config in `.prettierrc`.
+`server.js` is the entry point: it loads `.env`, validates `JWT_SECRET`, then calls `app.listen()`. All Express setup lives in `app.js` (middleware, route mounting, global error handler) and is exported without starting a server — this separation makes the app importable in tests without binding a port.
 
-**Root setup:** A root-level `package.json` manages Husky git hooks and lint-staged. Run `npm install` at the project root to install these, and separately in `frontend/` and `backend/`.
+`db.js` exports a single `pg.Pool` instance connected via `DATABASE_URL`.
 
-**Git hooks:** A pre-commit hook (via Husky + lint-staged) runs ESLint and Prettier checks on staged files in both `frontend/` and `backend/` before each commit.
+Route files live in `backend/routes/`:
+- `auth.js` — `POST /api/auth/register`, `POST /api/auth/login`, and password reset endpoints
+- `admin.js` — user CRUD at `/api/admin/users` and `GET /api/admin/me`
+- `admin-products.js` — product CRUD at `/api/admin/products`
+- `admin-orders.js` — order management at `/api/admin/orders`
+- `admin-settings.js` — system settings + dashboard stats at `/api/admin/settings`
 
-**CI/CD:** GitHub Actions workflow (`.github/workflows/ci-cd.yml`) runs ESLint and Prettier checks for both frontend and backend on every push and pull request.
+Middleware in `backend/middleware/`:
+- `auth.js` — verifies Bearer JWT and sets `req.user` (`{ userId, email, role }`)
+- `admin.js` — requires `req.user.role === 'admin'`; all admin routes stack both middlewares
+
+All admin routes use `router.use(authenticate); router.use(requireAdmin)` at the top of their file.
+
+JWT payload shape: `{ userId, email, role }`. Tokens expire in 7 days.
+
+### Frontend
+
+`src/main.jsx` wraps `<App>` in `<BrowserRouter>`. All routing is in `src/App.jsx` using React Router v7.
+
+Auth state (`token`, `user`) and admin auth state (`adminToken`) are held in `App` state, initialised from `localStorage`. The JWT payload is decoded client-side with a local `decodeJwtPayload` helper (no library) to extract email and role — this is used both for initialising state and for the `RequireAdmin` route guard.
+
+**Two separate auth sessions:**
+- Regular users: `localStorage.token` → `RequireAuth` guard
+- Admin: `localStorage.adminToken` → `RequireAdmin` guard (also checks `payload.role === 'admin'`)
+
+`src/api.js` exports `API_BASE` read from `import.meta.env.VITE_API_BASE_URL`, falling back to `http://localhost:3000`. Every admin page imports this; set `VITE_API_BASE_URL` in `frontend/.env` when deploying.
+
+Pages are colocated with their CSS under `src/pages/<section>/`. Admin pages live in `src/pages/admin/` and are self-contained (own CSS, inline SVG icons).
+
+### Database schema
+
+All user/auth tables live in the `auth` schema (`auth.users`, `auth.customers`, `auth.sales_managers`, `auth.product_managers`). Product and order tables are in `public` (`products`, `orders`, `order_items`, `system_settings`).
+
+User roles are a PostgreSQL enum `auth.user_role`: `customer`, `sales_manager`, `product_manager`, `admin`.
+
+### Testing
+
+**Frontend** — Vitest + React Testing Library. Test files live in `frontend/test/`. Setup in `frontend/test/setup.js` imports `@testing-library/jest-dom` and sets `globalThis.React`. Globals (`describe`, `it`, `expect`, `vi`) are enabled via `vite.config.js`.
+
+**Backend** — Jest + Supertest. Test files live in `backend/test/`. The DB pool is always mocked (`jest.mock('../db', ...)`) so tests run without a real database.
+
+### CI/CD
+
+`.github/workflows/ci-cd.yml` runs three independent jobs on every push/PR:
+1. **Lint & Format** — ESLint + Prettier for both packages
+2. **Test** — Vitest (frontend) + Jest (backend); no database service needed since backend tests mock the DB
+3. **Build** — `npm run build` in `frontend/`
+
+### Root setup
+
+`package.json` at the repo root installs Husky and lint-staged only. Run `npm install` at the root to set up git hooks, then separately in `frontend/` and `backend/`.
+
+The pre-commit hook runs lint-staged, which lints and checks formatting on staged `.js`/`.jsx` files only (scoped per package so each uses its own ESLint config and node_modules).
 
 ## Environment
 
@@ -102,4 +166,8 @@ DATABASE_URL=postgres://postgres:password@localhost:5432/ecommerce
 JWT_SECRET=your_secret_here
 ```
 
-`PORT` defaults to `3000` if not set.
+`PORT` defaults to `3000` if not set. For frontend API URL override, create `frontend/.env`:
+
+```
+VITE_API_BASE_URL=https://your-backend-host.com
+```
