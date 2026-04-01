@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react'
+import API_BASE from '../../api'
 
-const API = 'http://localhost:3000/api/admin'
+const API = `${API_BASE}/api/admin`
 const ROLES = ['customer', 'sales_manager', 'product_manager', 'admin']
 const ROLE_LABELS = {
   customer: 'Customer',

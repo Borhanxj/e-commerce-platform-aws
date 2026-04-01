@@ -4,6 +4,10 @@ import { vi } from 'vitest'
 import LoginPage from '../src/pages/auth/LoginPage'
 
 describe('LoginPage', () => {
+  afterEach(() => {
+    vi.unstubAllGlobals()
+  })
+
   it('renders email and password fields', () => {
     render(<LoginPage onLogin={vi.fn()} onForgotPassword={vi.fn()} onRegister={vi.fn()} />)
 

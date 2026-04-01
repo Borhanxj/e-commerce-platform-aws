@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
+import API_BASE from '../../api'
 
-const API = 'http://localhost:3000/api/admin/settings'
+const API = `${API_BASE}/api/admin/settings`
 
 function SettingsManagement({ token }) {
   const [settings, setSettings] = useState([])

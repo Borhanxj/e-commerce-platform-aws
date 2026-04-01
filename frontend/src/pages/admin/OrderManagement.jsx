@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react'
+import API_BASE from '../../api'
 
-const API = 'http://localhost:3000/api/admin/orders'
+const API = `${API_BASE}/api/admin/orders`
 const STATUSES = ['pending', 'processing', 'shipped', 'delivered', 'cancelled']
 const STATUS_LABELS = {
   pending: 'Pending',

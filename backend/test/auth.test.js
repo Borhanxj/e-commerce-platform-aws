@@ -68,16 +68,11 @@ describe('POST /api/auth/login', () => {
   })
 
   it('returns 401 when password is incorrect', async () => {
-    // bcrypt hash of a different password
+    const bcrypt = require('bcrypt')
+    const hash = await bcrypt.hash('correctpassword', 10)
+
     pool.query.mockResolvedValueOnce({
-      rows: [
-        {
-          id: 1,
-          email: 'user@example.com',
-          password_hash: '$2b$10$invalidhashvalue',
-          role: 'customer',
-        },
-      ],
+      rows: [{ id: 1, email: 'user@example.com', password_hash: hash, role: 'customer' }],
     })
 
     const res = await request(app)

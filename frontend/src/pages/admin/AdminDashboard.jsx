@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import API_BASE from '../../api'
 import UserManagement from './UserManagement'
 import ProductManagement from './ProductManagement'
 import OrderManagement from './OrderManagement'
@@ -15,7 +16,7 @@ function AdminDashboard({ token, onLogout }) {
   useEffect(() => {
     async function fetchAdmin() {
       try {
-        const res = await fetch('http://localhost:3000/api/admin/me', {
+        const res = await fetch(`${API_BASE}/api/admin/me`, {
           headers: { Authorization: `Bearer ${token}` },
         })
         if (!res.ok) {

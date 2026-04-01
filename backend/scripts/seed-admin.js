@@ -2,8 +2,13 @@ require('dotenv').config()
 const bcrypt = require('bcrypt')
 const pool = require('../db')
 
-const EMAIL = process.env.ADMIN_EMAIL || 'admin@example.com'
-const PASSWORD = process.env.ADMIN_PASSWORD || 'admin123456'
+const EMAIL = process.env.ADMIN_EMAIL
+const PASSWORD = process.env.ADMIN_PASSWORD
+
+if (!EMAIL || !PASSWORD) {
+  console.error('Error: ADMIN_EMAIL and ADMIN_PASSWORD environment variables must be set.')
+  process.exit(1)
+}
 
 async function seedAdmin() {
   try {
