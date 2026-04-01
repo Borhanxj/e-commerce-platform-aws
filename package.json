@@ -5,5 +5,15 @@
   },
   "scripts": {
     "prepare": "husky"
+  },
+  "lint-staged": {
+    "frontend/src/**/*.{js,jsx}": [
+      "eslint --max-warnings=0",
+      "prettier --check"
+    ],
+    "backend/**/*.js": [
+      "eslint --max-warnings=0",
+      "prettier --check"
+    ]
   }
 }

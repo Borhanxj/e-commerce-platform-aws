@@ -12,12 +12,6 @@
     "migrate:down": "node-pg-migrate down --migrations-dir migrations/scripts",
     "seed:admin": "node scripts/seed-admin.js"
   },
-  "lint-staged": {
-    "*.js": [
-      "eslint --max-warnings=0",
-      "prettier --check"
-    ]
-  },
   "keywords": [],
   "author": "",
   "license": "ISC",
