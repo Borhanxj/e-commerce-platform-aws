@@ -186,7 +186,7 @@ function DeliveryTimeline({ status }) {
           <div key={step.key} className="relative flex min-w-[80px] flex-1 flex-col items-center">
             {i > 0 && (
               <div
-                className={`absolute top-[13px] right-1/2 z-0 h-0.5 w-full ${i <= activeIdx ? 'bg-purple-400' : 'bg-white/15'}`}
+                className={`absolute top-[13px] right-1/2 z-0 h-0.5 w-full ${i <= activeIdx ? 'bg-purple-400' : 'bg-[var(--border)]'}`}
               />
             )}
             <div
@@ -194,8 +194,8 @@ function DeliveryTimeline({ status }) {
                 done
                   ? 'border-purple-400 bg-purple-400 text-white'
                   : current
-                    ? 'border-purple-400 bg-[#100d1e] text-[rgba(190,178,215,0.82)] shadow-[0_0_0_4px_rgba(192,132,252,0.12)]'
-                    : 'border-white/15 bg-[#100d1e] text-[rgba(190,178,215,0.82)]'
+                    ? 'border-purple-400 bg-[var(--bg)] text-[var(--text)] shadow-[0_0_0_4px_rgba(192,132,252,0.12)]'
+                    : 'border-[var(--border)] bg-[var(--bg)] text-[var(--text)]'
               }`}
             >
               {done ? (
@@ -205,7 +205,7 @@ function DeliveryTimeline({ status }) {
               ) : null}
             </div>
             <span
-              className={`mt-2 text-center text-[11px] leading-[1.3] font-medium ${done || current ? 'font-semibold text-[#eeeaff]' : 'text-[rgba(190,178,215,0.82)]'}`}
+              className={`mt-2 text-center text-[11px] leading-[1.3] font-medium ${done || current ? 'font-semibold text-[var(--text-h)]' : 'text-[var(--text)]'}`}
             >
               {step.label}
             </span>
@@ -234,17 +234,17 @@ function TrackingRow({ code, carrier }) {
   }
 
   return (
-    <div className="mb-5 flex items-center justify-between gap-3 rounded-lg border border-white/15 bg-white/4 px-4 py-3">
+    <div className="mb-5 flex items-center justify-between gap-3 rounded-lg border border-[var(--border)] bg-[var(--bg)] px-4 py-3">
       <div className="flex flex-col gap-0.5">
-        <span className="text-[11px] font-bold tracking-[1.5px] text-[rgba(190,178,215,0.82)] uppercase">
+        <span className="text-[11px] font-bold tracking-[1.5px] text-[var(--text)] uppercase">
           {carrier}
         </span>
-        <span className="font-mono text-[15px] font-bold tracking-[1px] text-[#eeeaff]">
+        <span className="font-mono text-[15px] font-bold tracking-[1px] text-[var(--text-h)]">
           {code}
         </span>
       </div>
       <button
-        className="flex cursor-pointer items-center gap-1.5 rounded-[7px] border border-white/15 bg-transparent px-3 py-1.5 text-xs font-semibold whitespace-nowrap text-[rgba(190,178,215,0.82)] transition-colors hover:border-purple-400 hover:text-purple-400"
+        className="flex cursor-pointer items-center gap-1.5 rounded-[7px] border border-[var(--border)] bg-transparent px-3 py-1.5 text-xs font-semibold whitespace-nowrap text-[var(--text)] transition-colors hover:border-purple-400 hover:text-purple-400"
         onClick={copy}
         aria-label="Copy tracking code"
       >
@@ -266,14 +266,14 @@ function OrderItems({ items }) {
       {items.map((item, i) => (
         <li key={i} className="flex items-center gap-3.5">
           <div
-            className="flex h-[52px] w-[52px] shrink-0 items-center justify-center rounded-lg border border-white/15"
+            className="flex h-[52px] w-[52px] shrink-0 items-center justify-center rounded-lg border border-[var(--border)]"
             style={{
-              background: `linear-gradient(160deg, hsl(${item.hue},35%,12%) 0%, hsl(${item.hue},45%,20%) 100%)`,
+              background: `linear-gradient(160deg, hsl(${item.hue},35%,var(--cat-bg-l,12%)) 0%, hsl(${item.hue},45%,var(--cat-bg-l2,20%)) 100%)`,
             }}
           >
             <span
               style={{
-                color: `hsl(${item.hue},70%,70%)`,
+                color: `hsl(${item.hue},70%,var(--cat-text-l,70%))`,
                 fontSize: 18,
                 fontWeight: 700,
                 opacity: 0.5,
@@ -283,12 +283,12 @@ function OrderItems({ items }) {
             </span>
           </div>
           <div className="flex flex-1 flex-col gap-0.5">
-            <span className="text-sm font-semibold text-[#eeeaff]">{item.name}</span>
-            <span className="text-xs text-[rgba(190,178,215,0.82)]">
+            <span className="text-sm font-semibold text-[var(--text-h)]">{item.name}</span>
+            <span className="text-xs text-[var(--text)]">
               {item.variant} · Qty {item.qty}
             </span>
           </div>
-          <span className="shrink-0 text-sm font-bold text-[#eeeaff]">
+          <span className="shrink-0 text-sm font-bold text-[var(--text-h)]">
             ${(item.price * item.qty).toFixed(2)}
           </span>
         </li>
@@ -307,48 +307,48 @@ export default function OrdersPage({ onBack }) {
   }
 
   return (
-    <div className="flex min-h-svh w-full flex-col bg-[#100d1e] pt-16">
-      <header className="fixed top-0 right-0 left-0 z-[1000] border-b border-white/15 bg-[rgba(16,13,30,0.75)] px-6 backdrop-blur-[20px]">
+    <div className="flex min-h-svh w-full flex-col bg-[var(--bg)] pt-16 transition-colors duration-300">
+      <header className="fixed top-0 right-0 left-0 z-[1000] border-b border-[var(--border)] bg-[rgba(var(--background),0.75)] px-6 backdrop-blur-[20px]">
         <div className="mx-auto flex h-16 max-w-[1280px] items-center gap-4">
           <button
-            className="flex cursor-pointer items-center gap-1.5 rounded-lg border-none bg-transparent px-2.5 py-1.5 text-sm text-[rgba(190,178,215,0.82)] transition-colors hover:bg-purple-400/12 hover:text-purple-400"
+            className="flex cursor-pointer items-center gap-1.5 rounded-lg border-none bg-transparent px-2.5 py-1.5 text-sm text-[var(--text)] transition-colors hover:bg-purple-400/12 hover:text-purple-400"
             onClick={onBack}
           >
             <BackIcon /> Back
           </button>
-          <span className="ml-auto text-[22px] font-bold tracking-[4px] text-[#eeeaff]">MODÉ</span>
+          <span className="ml-auto text-[22px] font-bold tracking-[4px] text-[var(--text-h)]">
+            MODÉ
+          </span>
         </div>
       </header>
 
       <main className="mx-auto box-border w-full max-w-[860px] px-6 pt-12 pb-20">
-        <h1 className="mb-10 text-[32px] font-extrabold tracking-[-0.5px] text-[#eeeaff]">
+        <h1 className="mb-10 text-[32px] font-extrabold tracking-[-0.5px] text-[var(--text-h)]">
           My Orders
         </h1>
 
         {/* ── Current Orders ── */}
         <section className="mb-14">
-          <h2 className="mb-5 text-[20px] font-bold text-[#eeeaff]">Current Orders</h2>
+          <h2 className="mb-5 text-[20px] font-bold text-[var(--text-h)]">Current Orders</h2>
 
           {CURRENT_ORDERS.length === 0 ? (
-            <p className="text-sm text-[rgba(190,178,215,0.82)]">No active orders.</p>
+            <p className="text-sm text-[var(--text)]">No active orders.</p>
           ) : (
             CURRENT_ORDERS.map((order) => (
               <div
                 key={order.id}
-                className="mb-5 rounded-2xl border border-purple-400 bg-white/8 p-6 shadow-[0_0_0_1px_rgba(192,132,252,0.2),0_8px_32px_rgba(0,0,0,0.4)] backdrop-blur-xl"
+                className="mb-5 rounded-2xl border border-purple-400 bg-[var(--card-bg)] p-6 shadow-[0_0_0_1px_rgba(192,132,252,0.2),var(--shadow)] backdrop-blur-xl"
               >
                 {/* Card header */}
                 <div className="mb-7 flex flex-wrap items-start justify-between gap-3 max-[600px]:flex-col">
                   <div className="flex flex-col gap-1">
-                    <span className="text-[15px] font-bold text-[#eeeaff]">{order.id}</span>
-                    <span className="text-xs text-[rgba(190,178,215,0.82)]">
-                      Placed {order.placedDate}
-                    </span>
+                    <span className="text-[15px] font-bold text-[var(--text-h)]">{order.id}</span>
+                    <span className="text-xs text-[var(--text)]">Placed {order.placedDate}</span>
                   </div>
                   <div className="flex flex-col items-end gap-1.5 max-[600px]:items-start">
-                    <span className="text-[13px] text-[rgba(190,178,215,0.82)]">
+                    <span className="text-[13px] text-[var(--text)]">
                       Est. delivery{' '}
-                      <strong className="text-[#eeeaff]">{order.estimatedDelivery}</strong>
+                      <strong className="text-[var(--text-h)]">{order.estimatedDelivery}</strong>
                     </span>
                     <span className={statusPillClass(order.status)}>
                       {TIMELINE_STEPS[STATUS_INDEX[order.status]]?.label}
@@ -366,9 +366,9 @@ export default function OrdersPage({ onBack }) {
                 <OrderItems items={order.items} />
 
                 {/* Total */}
-                <div className="flex items-center justify-between border-t border-white/15 pt-3.5 text-sm text-[rgba(190,178,215,0.82)]">
+                <div className="flex items-center justify-between border-t border-[var(--border)] pt-3.5 text-sm text-[var(--text)]">
                   <span>Order Total</span>
-                  <span className="text-[16px] font-bold text-[#eeeaff]">
+                  <span className="text-[16px] font-bold text-[var(--text-h)]">
                     ${order.total.toFixed(2)}
                   </span>
                 </div>
@@ -380,33 +380,33 @@ export default function OrdersPage({ onBack }) {
         {/* ── Past Orders ── */}
         <section className="mb-14">
           <div className="mb-5 flex items-baseline gap-2.5">
-            <h2 className="m-0 text-[20px] font-bold text-[#eeeaff]">Past Orders</h2>
-            <span className="text-[13px] text-[rgba(190,178,215,0.82)]">Last 30 days</span>
+            <h2 className="m-0 text-[20px] font-bold text-[var(--text-h)]">Past Orders</h2>
+            <span className="text-[13px] text-[var(--text)]">Last 30 days</span>
           </div>
 
           {PAST_ORDERS.length === 0 ? (
-            <p className="text-sm text-[rgba(190,178,215,0.82)]">No orders in the last 30 days.</p>
+            <p className="text-sm text-[var(--text)]">No orders in the last 30 days.</p>
           ) : (
-            <div className="overflow-hidden rounded-2xl border border-white/15 bg-white/8 shadow-[0_4px_12px_rgba(0,0,0,0.2),inset_0_1px_0_rgba(255,255,255,0.14)] backdrop-blur-xl">
+            <div className="overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--card-bg)] shadow-[var(--shadow)] backdrop-blur-xl">
               {PAST_ORDERS.map((order) => (
-                <div key={order.id} className="border-b border-white/9 last:border-b-0">
+                <div key={order.id} className="border-b border-[var(--border)] last:border-b-0">
                   <button
-                    className="flex w-full cursor-pointer items-center justify-between gap-3 border-none bg-transparent px-5 py-4 text-left transition-colors hover:bg-white/4"
+                    className="flex w-full cursor-pointer items-center justify-between gap-3 border-none bg-transparent px-5 py-4 text-left transition-colors hover:bg-[var(--border)]"
                     onClick={() => togglePast(order.id)}
                     aria-expanded={expandedPast === order.id}
                   >
                     <div className="flex flex-col gap-0.5">
-                      <span className="text-[15px] font-bold text-[#eeeaff]">{order.id}</span>
-                      <span className="text-xs text-[rgba(190,178,215,0.82)]">{order.date}</span>
+                      <span className="text-[15px] font-bold text-[var(--text-h)]">{order.id}</span>
+                      <span className="text-xs text-[var(--text)]">{order.date}</span>
                     </div>
                     <div className="flex shrink-0 items-center gap-3 max-[600px]:gap-2">
-                      <span className="text-[13px] text-[rgba(190,178,215,0.82)] max-[600px]:hidden">
+                      <span className="text-[13px] text-[var(--text)] max-[600px]:hidden">
                         {order.items.length} item{order.items.length !== 1 ? 's' : ''}
                         &nbsp;·&nbsp;${order.total.toFixed(2)}
                       </span>
                       <span className={statusPillClass('delivered')}>Delivered</span>
                       <span
-                        className={`flex items-center text-[rgba(190,178,215,0.82)] transition-transform duration-200 ${expandedPast === order.id ? 'rotate-180' : ''}`}
+                        className={`flex items-center text-[var(--text)] transition-transform duration-200 ${expandedPast === order.id ? 'rotate-180' : ''}`}
                       >
                         <ChevronDownIcon />
                       </span>
@@ -414,13 +414,13 @@ export default function OrdersPage({ onBack }) {
                   </button>
 
                   {expandedPast === order.id && (
-                    <div className="animate-[expand-in_0.15s_ease] border-t border-white/9 bg-white/4 px-5 pb-4">
+                    <div className="animate-[expand-in_0.15s_ease] border-t border-[var(--border)] bg-[var(--bg)] px-5 pb-4">
                       <div className="pt-4">
                         <OrderItems items={order.items} />
                       </div>
-                      <div className="flex items-center justify-between border-t border-white/15 pt-3.5 text-sm text-[rgba(190,178,215,0.82)]">
+                      <div className="flex items-center justify-between border-t border-[var(--border)] pt-3.5 text-sm text-[var(--text)]">
                         <span>Order Total</span>
-                        <span className="text-[16px] font-bold text-[#eeeaff]">
+                        <span className="text-[16px] font-bold text-[var(--text-h)]">
                           ${order.total.toFixed(2)}
                         </span>
                       </div>

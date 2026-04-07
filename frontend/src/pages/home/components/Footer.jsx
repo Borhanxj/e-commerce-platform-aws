@@ -1,25 +1,25 @@
 export default function Footer() {
   const linkCls =
-    'cursor-pointer text-[13px] text-[rgba(190,178,215,0.82)] transition-colors hover:text-purple-400'
+    'cursor-pointer text-[13px] text-[var(--text)] transition-colors hover:text-purple-400'
 
   return (
-    <footer className="relative z-[1] mt-auto bg-[rgba(14,11,28,0.9)] backdrop-blur-xl">
+    <footer className="relative z-[1] mt-auto bg-[rgba(var(--background),0.9)] backdrop-blur-xl transition-colors duration-300">
       <div className="mx-auto flex max-w-[1280px] gap-16 px-6 pt-14 pb-10 max-lg:flex-col max-lg:gap-10">
         {/* Brand + newsletter */}
         <div className="flex flex-col gap-3 max-lg:flex-none lg:w-[260px]">
-          <span className="text-[22px] font-bold tracking-[4px] text-[#eeeaff]">MODÉ</span>
-          <p className="m-0 text-[13px] leading-relaxed text-[rgba(190,178,215,0.82)]">
+          <span className="text-[22px] font-bold tracking-[4px] text-[var(--text-h)]">MODÉ</span>
+          <p className="m-0 text-[13px] leading-relaxed text-[var(--text)]">
             Curated fashion for every occasion.
           </p>
           <form
-            className="mt-1 flex overflow-hidden rounded-lg border border-white/9"
+            className="mt-1 flex overflow-hidden rounded-lg border border-[var(--border)]"
             onSubmit={(e) => e.preventDefault()}
           >
             <input
               type="email"
               placeholder="Your email address"
               aria-label="Email for newsletter"
-              className="min-w-0 flex-1 border-none bg-transparent px-3 py-[9px] text-[13px] text-[#eeeaff] outline-none placeholder:text-[rgba(190,178,215,0.82)]"
+              className="min-w-0 flex-1 border-none bg-transparent px-3 py-[9px] text-[13px] text-[var(--text-h)] outline-none placeholder:text-[var(--text)]"
             />
             <button
               type="submit"
@@ -61,7 +61,7 @@ export default function Footer() {
             },
           ].map(({ heading, links }) => (
             <div key={heading}>
-              <h4 className="mt-0 mb-4 text-xs font-bold tracking-[2px] text-[#eeeaff] uppercase">
+              <h4 className="mt-0 mb-4 text-xs font-bold tracking-[2px] text-[var(--text-h)] uppercase">
                 {heading}
               </h4>
               <ul className="m-0 flex list-none flex-col gap-2.5 p-0">
@@ -77,9 +77,9 @@ export default function Footer() {
       </div>
 
       {/* Bottom bar */}
-      <div className="border-t border-white/9">
+      <div className="border-t border-[var(--border)]">
         <div className="mx-auto flex max-w-[1280px] items-center justify-between gap-4 px-6 py-[18px] max-sm:flex-col max-sm:items-start max-sm:gap-3">
-          <p className="m-0 text-xs text-[rgba(190,178,215,0.82)]">
+          <p className="m-0 text-xs text-[var(--text)]">
             © {new Date().getFullYear()} MODÉ. All rights reserved. &nbsp;·&nbsp;
             <span className="cursor-pointer transition-colors hover:text-purple-400">
               Privacy Policy
@@ -103,7 +103,7 @@ export default function Footer() {
                 key={label}
                 href="#"
                 aria-label={label}
-                className="flex items-center text-[rgba(190,178,215,0.82)] transition-colors hover:text-purple-400"
+                className="flex items-center text-[var(--text)] transition-colors hover:text-purple-400"
               >
                 <svg
                   width="18"

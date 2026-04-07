@@ -112,13 +112,13 @@ export default function HomePage({
   }
 
   return (
-    <div className="flex min-h-svh w-full flex-col bg-[#100d1e] text-left">
+    <div className="flex min-h-svh w-full flex-col bg-[var(--bg)] text-left transition-colors duration-300">
       {/* Ambient background */}
       <div
         className="pointer-events-none fixed inset-0 z-0 overflow-hidden"
         style={{
           background:
-            'linear-gradient(170deg,#0e0b1c 0%,#160f2a 18%,#1a1035 32%,#150e2e 48%,#19102f 62%,#120c24 78%,#0e0b1c 100%)',
+            'linear-gradient(170deg, var(--bg) 0%, var(--bg-gradient-to) 25%, var(--accent-bg) 50%, var(--bg-gradient-to) 75%, var(--bg) 100%)',
         }}
         aria-hidden="true"
       />
@@ -140,7 +140,7 @@ export default function HomePage({
       {/* ── Category grid ── */}
       <main className={`${sectionCls} ${sectionDividerCls}`}>
         <div className="mb-8 flex items-end justify-between">
-          <h2 className="m-0 text-[28px] font-bold tracking-[-0.5px] text-[#eeeaff]">
+          <h2 className="m-0 text-[28px] font-bold tracking-[-0.5px] text-[var(--text-h)]">
             Browse Categories
           </h2>
           <button className="shrink-0 cursor-pointer border-none bg-transparent p-1 text-[13px] font-semibold tracking-[0.3px] text-purple-400 transition-opacity hover:opacity-75">
@@ -152,25 +152,25 @@ export default function HomePage({
           {CATEGORIES.map((cat) => (
             <button
               key={cat.id}
-              className="flex cursor-pointer flex-col overflow-hidden rounded-2xl border border-white/14 bg-white/8 p-0 text-left shadow-[0_4px_12px_rgba(0,0,0,0.2),inset_0_1px_0_rgba(255,255,255,0.14)] backdrop-blur-xl transition-[box-shadow,transform,border-color] duration-[250ms] hover:-translate-y-1 hover:border-purple-400/40 hover:shadow-[0_8px_24px_rgba(0,0,0,0.3),0_0_0_1px_rgba(192,132,252,0.35),inset_0_1px_0_rgba(255,255,255,0.18)]"
+              className="flex cursor-pointer flex-col overflow-hidden rounded-2xl border border-[var(--glass-border)] bg-[var(--card-bg)] p-0 text-left shadow-[var(--shadow)] backdrop-blur-xl transition-[box-shadow,transform,border-color] duration-[250ms] hover:-translate-y-1 hover:border-purple-400/40 hover:shadow-[0_8px_24px_rgba(0,0,0,0.15),0_0_0_1px_rgba(192,132,252,0.35),inset_0_1px_0_rgba(255,255,255,0.18)]"
               onClick={() => onNavigate('category', cat)}
             >
               <div
-                className="flex aspect-[3/4] w-full items-center justify-center border-b border-white/9"
+                className="flex aspect-[3/4] w-full items-center justify-center border-b border-[var(--glass-border)]"
                 style={{
-                  background: `linear-gradient(160deg, hsl(${cat.hue},35%,10%) 0%, hsl(${cat.hue},45%,17%) 100%)`,
+                  background: `linear-gradient(160deg, hsl(${cat.hue},35%,var(--cat-bg-l,10%)) 0%, hsl(${cat.hue},45%,var(--cat-bg-l2,17%)) 100%)`,
                 }}
               >
                 <span
                   className="text-[64px] font-bold opacity-35 select-none"
-                  style={{ color: `hsl(${cat.hue},70%,70%)` }}
+                  style={{ color: `hsl(${cat.hue},70%,var(--cat-text-l,70%))` }}
                 >
                   {cat.title[0]}
                 </span>
               </div>
               <div className="flex flex-col gap-1 p-4">
-                <span className="text-[15px] font-semibold text-[#eeeaff]">{cat.title}</span>
-                <span className="text-[13px] text-[rgba(190,178,215,0.82)]">{cat.subtitle}</span>
+                <span className="text-[15px] font-semibold text-[var(--text-h)]">{cat.title}</span>
+                <span className="text-[13px] text-[var(--text)]">{cat.subtitle}</span>
               </div>
             </button>
           ))}
@@ -184,7 +184,7 @@ export default function HomePage({
             <p className="m-0 mb-1.5 text-[11px] font-bold tracking-[4px] text-purple-400 uppercase">
               Just Dropped
             </p>
-            <h2 className="m-0 text-[28px] font-bold tracking-[-0.5px] text-[#eeeaff]">
+            <h2 className="m-0 text-[28px] font-bold tracking-[-0.5px] text-[var(--text-h)]">
               New Releases
             </h2>
           </div>
@@ -192,7 +192,7 @@ export default function HomePage({
             {[-1, 1].map((dir) => (
               <button
                 key={dir}
-                className="flex h-9 w-9 cursor-pointer items-center justify-center rounded-full border border-white/14 bg-white/7 text-[#eeeaff] backdrop-blur-xl transition-[background,border-color,color] hover:border-purple-400/40 hover:bg-purple-400/18 hover:text-purple-400"
+                className="flex h-9 w-9 cursor-pointer items-center justify-center rounded-full border border-[var(--glass-border)] bg-[var(--card-bg)] text-[var(--text-h)] backdrop-blur-xl transition-[background,border-color,color] hover:border-purple-400/40 hover:bg-purple-400/18 hover:text-purple-400"
                 onClick={() => scrollReleases(dir)}
                 aria-label={dir === -1 ? 'Scroll left' : 'Scroll right'}
               >
@@ -227,26 +227,26 @@ export default function HomePage({
           {NEW_RELEASES.map((product) => (
             <div
               key={product.id}
-              className="flex w-[210px] shrink-0 [scroll-snap-align:start] flex-col overflow-hidden rounded-2xl border border-white/14 bg-white/8 shadow-[0_4px_12px_rgba(0,0,0,0.2),inset_0_1px_0_rgba(255,255,255,0.14)] backdrop-blur-xl transition-[box-shadow,transform,border-color] duration-[250ms] hover:-translate-y-1 hover:border-purple-400/40 hover:shadow-[0_8px_24px_rgba(0,0,0,0.3),0_0_0_1px_rgba(192,132,252,0.35),inset_0_1px_0_rgba(255,255,255,0.18)]"
+              className="flex w-[210px] shrink-0 [scroll-snap-align:start] flex-col overflow-hidden rounded-2xl border border-[var(--glass-border)] bg-[var(--card-bg)] shadow-[var(--shadow)] backdrop-blur-xl transition-[box-shadow,transform,border-color] duration-[250ms] hover:-translate-y-1 hover:border-purple-400/40 hover:shadow-[0_8px_24px_rgba(0,0,0,0.15),0_0_0_1px_rgba(192,132,252,0.35),inset_0_1px_0_rgba(255,255,255,0.18)]"
             >
               <div
-                className="relative flex aspect-[2/3] w-full items-center justify-center border-b border-white/9"
+                className="relative flex aspect-[2/3] w-full items-center justify-center border-b border-[var(--glass-border)]"
                 style={{
-                  background: `linear-gradient(160deg, hsl(${product.hue},35%,10%) 0%, hsl(${product.hue},50%,20%) 100%)`,
+                  background: `linear-gradient(160deg, hsl(${product.hue},35%,var(--cat-bg-l,10%)) 0%, hsl(${product.hue},50%,var(--cat-bg-l2,20%)) 100%)`,
                 }}
               >
                 <span
                   className="text-[56px] font-bold opacity-40 select-none"
-                  style={{ color: `hsl(${product.hue},70%,70%)` }}
+                  style={{ color: `hsl(${product.hue},70%,var(--cat-text-l,70%))` }}
                 >
                   {product.name[0]}
                 </span>
               </div>
               <div className="flex flex-col gap-[3px] px-3.5 pt-3 pb-3.5">
-                <span className="text-[11px] font-semibold tracking-[1.5px] text-[rgba(190,178,215,0.82)] uppercase">
+                <span className="text-[11px] font-semibold tracking-[1.5px] text-[var(--text)] uppercase">
                   {product.category}
                 </span>
-                <span className="text-[13px] leading-[1.3] font-semibold text-[#eeeaff]">
+                <span className="text-[13px] leading-[1.3] font-semibold text-[var(--text-h)]">
                   {product.name}
                 </span>
                 <div className="mt-2 flex items-center justify-between">
@@ -254,7 +254,7 @@ export default function HomePage({
                     ${product.price.toFixed(2)}
                   </span>
                   <button
-                    className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-lg border border-white/9 bg-transparent text-[rgba(190,178,215,0.82)] transition-[background,color,border-color] hover:border-purple-400 hover:bg-purple-400 hover:text-white"
+                    className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-lg border border-[var(--glass-border)] bg-transparent text-[var(--text)] transition-[background,color,border-color] hover:border-purple-400 hover:bg-purple-400 hover:text-white"
                     aria-label="Add to cart"
                     onClick={() => onAddToCart && onAddToCart(product)}
                   >
@@ -274,7 +274,7 @@ export default function HomePage({
             <p className="m-0 mb-1.5 text-[11px] font-bold tracking-[4px] text-purple-400 uppercase">
               Testimonials
             </p>
-            <h2 className="m-0 text-[28px] font-bold tracking-[-0.5px] text-[#eeeaff]">
+            <h2 className="m-0 text-[28px] font-bold tracking-[-0.5px] text-[var(--text-h)]">
               What Our Customers Say
             </h2>
           </div>
@@ -285,10 +285,10 @@ export default function HomePage({
             {[...REVIEWS, ...REVIEWS].map((review, i) => (
               <div
                 key={i}
-                className="flex w-[280px] shrink-0 flex-col gap-3 rounded-2xl border border-white/14 bg-white/8 p-5 shadow-[0_8px_32px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.14)] backdrop-blur-xl"
+                className="flex w-[280px] shrink-0 flex-col gap-3 rounded-2xl border border-[var(--glass-border)] bg-[var(--card-bg)] p-5 shadow-[var(--shadow)] backdrop-blur-xl"
               >
                 <StarRating rating={review.rating} />
-                <p className="m-0 flex-1 text-[13px] leading-relaxed text-[rgba(190,178,215,0.82)]">
+                <p className="m-0 flex-1 text-[13px] leading-relaxed text-[var(--text)]">
                   "{review.text}"
                 </p>
                 <div className="flex items-center gap-2.5">
@@ -296,10 +296,10 @@ export default function HomePage({
                     {review.name[0]}
                   </div>
                   <div>
-                    <p className="m-0 text-[13px] font-semibold text-[#eeeaff]">{review.name}</p>
-                    <p className="m-0 text-[11px] text-[rgba(190,178,215,0.82)]">
-                      Verified Purchase
+                    <p className="m-0 text-[13px] font-semibold text-[var(--text-h)]">
+                      {review.name}
                     </p>
+                    <p className="m-0 text-[11px] text-[var(--text)]">Verified Purchase</p>
                   </div>
                 </div>
               </div>

@@ -30,17 +30,18 @@ const STATUS_BADGE_CLASS = {
 }
 
 const btnBase =
-  'font-[inherit] text-[13px] font-medium px-4 py-2 border border-white/10 rounded-[10px] bg-white/5 text-[#eeeaff] cursor-pointer transition-all duration-150 whitespace-nowrap disabled:opacity-45 disabled:cursor-not-allowed hover:not-disabled:border-purple-400 hover:not-disabled:text-purple-400'
+  'font-[inherit] text-[13px] font-medium px-4 py-2 border border-[var(--border)] rounded-[10px] bg-[var(--card-bg)] text-[var(--text-h)] cursor-pointer transition-all duration-150 whitespace-nowrap disabled:opacity-45 disabled:cursor-not-allowed hover:not-disabled:border-purple-400 hover:not-disabled:text-purple-400'
 const btnSearch =
   'font-[inherit] text-[13px] font-medium px-4 py-2 border border-purple-400/30 rounded-[10px] bg-purple-400/12 text-purple-400 cursor-pointer transition-all duration-150 whitespace-nowrap'
 const btnEdit =
-  'font-[inherit] text-[12px] font-medium px-3 py-1 border border-white/10 rounded-[10px] bg-white/5 text-[#eeeaff] cursor-pointer transition-all duration-150 hover:border-purple-400 hover:text-purple-400'
+  'font-[inherit] text-[12px] font-medium px-3 py-1 border border-[var(--border)] rounded-[10px] bg-[var(--card-bg)] text-[var(--text-h)] cursor-pointer transition-all duration-150 hover:border-purple-400 hover:text-purple-400'
 const btnDelete =
   'font-[inherit] text-[12px] font-medium px-3 py-1 border border-red-500/20 rounded-[10px] bg-red-500/10 text-red-400 cursor-pointer transition-all duration-150 hover:bg-red-500/20 hover:border-red-500'
 const btnDanger =
   'font-[inherit] text-[13px] font-medium px-4 py-2 rounded-[10px] bg-red-500 text-white border-none cursor-pointer transition-opacity duration-150 hover:opacity-90'
 
 function OrderManagement({ token }) {
+  // ... rest of state stays same ...
   const [orders, setOrders] = useState([])
   const [pagination, setPagination] = useState({ page: 1, limit: 10, total: 0, totalPages: 0 })
   const [search, setSearch] = useState('')
@@ -138,13 +139,13 @@ function OrderManagement({ token }) {
         <form className="flex min-w-0 flex-1 gap-2" onSubmit={handleSearch}>
           <Input
             type="text"
-            className="min-w-[140px] flex-1 border-white/10 bg-white/5 text-[#eeeaff] placeholder:text-white/30"
+            className="min-w-[140px] flex-1 border-[var(--border)] bg-[var(--card-bg)] text-[var(--text-h)] placeholder:text-[var(--text)]/40"
             placeholder="Search by customer email…"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
           <select
-            className="cursor-pointer rounded-[10px] border border-white/10 bg-white/5 px-3 py-2 font-[inherit] text-sm text-[#eeeaff] transition-all duration-150 outline-none"
+            className="cursor-pointer rounded-[10px] border border-[var(--border)] bg-[var(--card-bg)] px-3 py-2 font-[inherit] text-sm text-[var(--text-h)] transition-all duration-150 outline-none"
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
           >
@@ -164,61 +165,64 @@ function OrderManagement({ token }) {
       {error && <p className="mb-4 text-sm text-red-400">{error}</p>}
 
       {/* Table */}
-      <div className="overflow-hidden rounded-2xl border border-white/15 bg-white/8 shadow-[0_4px_12px_rgba(0,0,0,0.2),inset_0_1px_0_rgba(255,255,255,0.14)] backdrop-blur-xl">
+      <div className="overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--card-bg)] shadow-[var(--shadow)] backdrop-blur-xl">
         <Table>
           <TableHeader>
-            <TableRow className="border-white/9 hover:bg-transparent">
-              <TableHead className="bg-purple-400/12 text-xs tracking-wide text-[rgba(190,178,215,0.82)] uppercase">
+            <TableRow className="border-[var(--border)] hover:bg-transparent">
+              <TableHead className="bg-purple-400/12 text-xs tracking-wide text-[var(--text)] uppercase">
                 Order ID
               </TableHead>
-              <TableHead className="bg-purple-400/12 text-xs tracking-wide text-[rgba(190,178,215,0.82)] uppercase">
+              <TableHead className="bg-purple-400/12 text-xs tracking-wide text-[var(--text)] uppercase">
                 Customer
               </TableHead>
-              <TableHead className="bg-purple-400/12 text-xs tracking-wide text-[rgba(190,178,215,0.82)] uppercase">
+              <TableHead className="bg-purple-400/12 text-xs tracking-wide text-[var(--text)] uppercase">
                 Status
               </TableHead>
-              <TableHead className="bg-purple-400/12 text-xs tracking-wide text-[rgba(190,178,215,0.82)] uppercase">
+              <TableHead className="bg-purple-400/12 text-xs tracking-wide text-[var(--text)] uppercase">
                 Total
               </TableHead>
-              <TableHead className="bg-purple-400/12 text-xs tracking-wide text-[rgba(190,178,215,0.82)] uppercase">
+              <TableHead className="bg-purple-400/12 text-xs tracking-wide text-[var(--text)] uppercase">
                 Date
               </TableHead>
-              <TableHead className="bg-purple-400/12 text-xs tracking-wide text-[rgba(190,178,215,0.82)] uppercase">
+              <TableHead className="bg-purple-400/12 text-xs tracking-wide text-[var(--text)] uppercase">
                 Actions
               </TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {loading ? (
-              <TableRow className="border-white/9">
-                <TableCell colSpan={6} className="py-8 text-center text-[rgba(190,178,215,0.82)]">
+              <TableRow className="border-[var(--border)]">
+                <TableCell colSpan={6} className="py-8 text-center text-[var(--text)]">
                   Loading…
                 </TableCell>
               </TableRow>
             ) : orders.length === 0 ? (
-              <TableRow className="border-white/9">
-                <TableCell colSpan={6} className="py-8 text-center text-[rgba(190,178,215,0.82)]">
+              <TableRow className="border-[var(--border)]">
+                <TableCell colSpan={6} className="py-8 text-center text-[var(--text)]">
                   No orders found
                 </TableCell>
               </TableRow>
             ) : (
               orders.map((o) => (
-                <TableRow key={o.id} className="border-white/9 hover:bg-purple-400/5">
-                  <TableCell className="text-[#eeeaff]">#{o.id}</TableCell>
-                  <TableCell className="text-[#eeeaff]">{o.user_email}</TableCell>
+                <TableRow
+                  key={o.id}
+                  className="border-[var(--border)] transition-colors hover:bg-purple-400/5"
+                >
+                  <TableCell className="font-mono text-xs text-[var(--text-h)]">#{o.id}</TableCell>
+                  <TableCell className="text-[var(--text-h)]">{o.user_email}</TableCell>
                   <TableCell>
                     <Badge
                       className={
-                        STATUS_BADGE_CLASS[o.status] || 'border-0 bg-white/10 text-[#eeeaff]'
+                        STATUS_BADGE_CLASS[o.status] || 'border-0 bg-white/10 text-[var(--text-h)]'
                       }
                     >
                       {STATUS_LABELS[o.status]}
                     </Badge>
                   </TableCell>
-                  <TableCell className="text-[#eeeaff]">
+                  <TableCell className="text-[var(--text-h)]">
                     ${parseFloat(o.total).toFixed(2)}
                   </TableCell>
-                  <TableCell className="text-[#eeeaff]">
+                  <TableCell className="text-[var(--text-h)]">
                     {new Date(o.created_at).toLocaleDateString()}
                   </TableCell>
                   <TableCell>
@@ -248,7 +252,7 @@ function OrderManagement({ token }) {
           >
             Previous
           </button>
-          <span className="text-[13px] text-[rgba(190,178,215,0.82)]">
+          <span className="text-[13px] text-[var(--text)]">
             Page {pagination.page} of {pagination.totalPages} ({pagination.total} orders)
           </span>
           <button
@@ -263,25 +267,27 @@ function OrderManagement({ token }) {
 
       {/* Order Detail Modal */}
       <Dialog open={!!detail} onOpenChange={(open) => !open && setDetail(null)}>
-        <DialogContent className="max-w-[560px] rounded-2xl border border-white/15 bg-[rgba(25,20,45,0.95)] shadow-[0_20px_40px_rgba(0,0,0,0.4)] backdrop-blur-xl">
+        <DialogContent className="max-w-[560px] rounded-2xl border border-[var(--glass-border)] bg-[var(--card-bg)] shadow-[var(--shadow)] backdrop-blur-xl transition-colors duration-300">
           <DialogHeader>
-            <DialogTitle className="text-xl text-[#eeeaff]">Order #{detail?.order.id}</DialogTitle>
+            <DialogTitle className="text-xl text-[var(--text-h)]">
+              Order #{detail?.order.id}
+            </DialogTitle>
           </DialogHeader>
           {detail && (
             <>
               <div className="mb-5 grid grid-cols-2 gap-4">
                 <div className="flex flex-col gap-1">
-                  <span className="text-[12px] font-semibold tracking-wide text-[rgba(190,178,215,0.82)] uppercase">
+                  <span className="text-[12px] font-semibold tracking-wide text-[var(--text)] uppercase">
                     Customer
                   </span>
-                  <span className="text-[#eeeaff]">{detail.order.user_email}</span>
+                  <span className="text-[var(--text-h)]">{detail.order.user_email}</span>
                 </div>
                 <div className="flex flex-col gap-1">
-                  <span className="text-[12px] font-semibold tracking-wide text-[rgba(190,178,215,0.82)] uppercase">
+                  <span className="text-[12px] font-semibold tracking-wide text-[var(--text)] uppercase">
                     Status
                   </span>
                   <select
-                    className="cursor-pointer rounded-md border border-white/10 bg-white/5 px-3 py-2 font-[inherit] text-sm text-[#eeeaff] transition-all duration-150 outline-none"
+                    className="cursor-pointer rounded-md border border-[var(--border)] bg-[var(--bg)] px-3 py-2 font-[inherit] text-sm text-[var(--text-h)] transition-all duration-150 outline-none"
                     value={detail.order.status}
                     onChange={(e) => updateStatus(detail.order.id, e.target.value)}
                   >
@@ -293,61 +299,66 @@ function OrderManagement({ token }) {
                   </select>
                 </div>
                 <div className="flex flex-col gap-1">
-                  <span className="text-[12px] font-semibold tracking-wide text-[rgba(190,178,215,0.82)] uppercase">
+                  <span className="text-[12px] font-semibold tracking-wide text-[var(--text)] uppercase">
                     Total
                   </span>
-                  <span className="text-[#eeeaff]">
+                  <span className="text-[var(--text-h)]">
                     ${parseFloat(detail.order.total).toFixed(2)}
                   </span>
                 </div>
                 <div className="flex flex-col gap-1">
-                  <span className="text-[12px] font-semibold tracking-wide text-[rgba(190,178,215,0.82)] uppercase">
+                  <span className="text-[12px] font-semibold tracking-wide text-[var(--text)] uppercase">
                     Date
                   </span>
-                  <span className="text-[#eeeaff]">
+                  <span className="text-[var(--text-h)]">
                     {new Date(detail.order.created_at).toLocaleString()}
                   </span>
                 </div>
                 {detail.order.address && (
                   <div className="col-span-2 flex flex-col gap-1">
-                    <span className="text-[12px] font-semibold tracking-wide text-[rgba(190,178,215,0.82)] uppercase">
+                    <span className="text-[12px] font-semibold tracking-wide text-[var(--text)] uppercase">
                       Address
                     </span>
-                    <span className="text-[#eeeaff]">{detail.order.address}</span>
+                    <span className="text-[var(--text-h)]">{detail.order.address}</span>
                   </div>
                 )}
               </div>
 
               {detail.items.length > 0 && (
                 <>
-                  <h3 className="m-0 mb-3 text-[15px] font-medium text-[#eeeaff]">Items</h3>
-                  <div className="mb-5 overflow-hidden rounded-xl border border-white/15 bg-white/8">
+                  <h3 className="m-0 mb-3 text-[15px] font-medium text-[var(--text-h)]">Items</h3>
+                  <div className="mb-5 overflow-hidden rounded-xl border border-[var(--border)] bg-[var(--bg)]">
                     <Table>
                       <TableHeader>
-                        <TableRow className="border-white/9 hover:bg-transparent">
-                          <TableHead className="bg-purple-400/12 text-xs tracking-wide text-[rgba(190,178,215,0.82)] uppercase">
+                        <TableRow className="border-[var(--border)] hover:bg-transparent">
+                          <TableHead className="bg-purple-400/12 text-xs tracking-wide text-[var(--text)] uppercase">
                             Product
                           </TableHead>
-                          <TableHead className="bg-purple-400/12 text-xs tracking-wide text-[rgba(190,178,215,0.82)] uppercase">
+                          <TableHead className="bg-purple-400/12 text-xs tracking-wide text-[var(--text)] uppercase">
                             Qty
                           </TableHead>
-                          <TableHead className="bg-purple-400/12 text-xs tracking-wide text-[rgba(190,178,215,0.82)] uppercase">
+                          <TableHead className="bg-purple-400/12 text-xs tracking-wide text-[var(--text)] uppercase">
                             Price
                           </TableHead>
-                          <TableHead className="bg-purple-400/12 text-xs tracking-wide text-[rgba(190,178,215,0.82)] uppercase">
+                          <TableHead className="bg-purple-400/12 text-xs tracking-wide text-[var(--text)] uppercase">
                             Subtotal
                           </TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody>
                         {detail.items.map((item) => (
-                          <TableRow key={item.id} className="border-white/9 hover:bg-purple-400/5">
-                            <TableCell className="text-[#eeeaff]">{item.product_name}</TableCell>
-                            <TableCell className="text-[#eeeaff]">{item.quantity}</TableCell>
-                            <TableCell className="text-[#eeeaff]">
+                          <TableRow
+                            key={item.id}
+                            className="border-[var(--border)] transition-colors hover:bg-purple-400/5"
+                          >
+                            <TableCell className="text-[var(--text-h)]">
+                              {item.product_name}
+                            </TableCell>
+                            <TableCell className="text-[var(--text-h)]">{item.quantity}</TableCell>
+                            <TableCell className="text-[var(--text-h)]">
                               ${parseFloat(item.price).toFixed(2)}
                             </TableCell>
-                            <TableCell className="text-[#eeeaff]">
+                            <TableCell className="text-[var(--text-h)]">
                               ${(item.quantity * parseFloat(item.price)).toFixed(2)}
                             </TableCell>
                           </TableRow>
@@ -370,14 +381,14 @@ function OrderManagement({ token }) {
 
       {/* Delete Confirmation */}
       <Dialog open={!!deleteConfirm} onOpenChange={(open) => !open && setDeleteConfirm(null)}>
-        <DialogContent className="max-w-md rounded-2xl border border-white/15 bg-[rgba(25,20,45,0.95)] shadow-[0_20px_40px_rgba(0,0,0,0.4)] backdrop-blur-xl">
+        <DialogContent className="max-w-md rounded-2xl border border-[var(--glass-border)] bg-[var(--card-bg)] shadow-[var(--shadow)] backdrop-blur-xl transition-colors duration-300">
           <DialogHeader>
-            <DialogTitle className="text-xl text-[#eeeaff]">Delete Order</DialogTitle>
+            <DialogTitle className="text-xl text-[var(--text-h)]">Delete Order</DialogTitle>
           </DialogHeader>
-          <p className="mb-5 leading-relaxed text-[rgba(190,178,215,0.82)]">
+          <p className="mb-5 leading-relaxed text-[var(--text)]">
             Are you sure you want to delete order{' '}
-            <strong className="text-[#eeeaff]">#{deleteConfirm?.id}</strong>? This will also remove
-            all associated items.
+            <strong className="text-[var(--text-h)]">#{deleteConfirm?.id}</strong>? This will also
+            remove all associated items.
           </p>
           <div className="flex justify-end gap-2">
             <button className={btnBase} onClick={() => setDeleteConfirm(null)}>

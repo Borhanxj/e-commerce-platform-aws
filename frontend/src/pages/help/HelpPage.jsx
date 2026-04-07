@@ -288,22 +288,22 @@ function ChevronDownIcon() {
 function FaqItem({ question, answer }) {
   const [open, setOpen] = useState(false)
   return (
-    <div className={`border-b border-white/9 last:border-b-0${open ? ' faq-open' : ''}`}>
+    <div className={`border-b border-[var(--border)] last:border-b-0${open ? ' faq-open' : ''}`}>
       <button
-        className={`flex w-full cursor-pointer items-center justify-between gap-4 border-none bg-transparent px-5 py-[18px] text-left text-sm font-semibold transition-colors ${open ? 'bg-purple-400/12 text-purple-400' : 'text-[#eeeaff] hover:bg-white/4'}`}
+        className={`flex w-full cursor-pointer items-center justify-between gap-4 border-none bg-transparent px-5 py-[18px] text-left text-sm font-semibold transition-colors ${open ? 'bg-purple-400/12 text-purple-400' : 'text-[var(--text-h)] hover:bg-[var(--border)]'}`}
         onClick={() => setOpen((o) => !o)}
         aria-expanded={open}
       >
         <span>{question}</span>
         <span
-          className={`ease flex shrink-0 items-center transition-transform duration-250 ${open ? 'rotate-180 text-purple-400' : 'text-[rgba(190,178,215,0.82)]'}`}
+          className={`ease flex shrink-0 items-center transition-transform duration-250 ${open ? 'rotate-180 text-purple-400' : 'text-[var(--text)]'}`}
         >
           <ChevronDownIcon />
         </span>
       </button>
       {open && (
-        <div className="animate-[faq-expand_0.2s_ease] bg-white/4 px-5 pb-[18px]">
-          <p className="m-0 border-t border-white/9 pt-4 text-sm leading-[1.75] text-[rgba(190,178,215,0.82)]">
+        <div className="animate-[faq-expand_0.2s_ease] bg-[var(--bg)] px-5 pb-[18px]">
+          <p className="m-0 border-t border-[var(--border)] pt-4 text-sm leading-[1.75] text-[var(--text)]">
             {answer}
           </p>
         </div>
@@ -331,32 +331,34 @@ export default function HelpPage({ onBack }) {
   }, [search, activeCategory])
 
   return (
-    <div className="flex min-h-svh w-full flex-col bg-[#100d1e] pt-16">
-      <header className="fixed top-0 right-0 left-0 z-[1000] border-b border-white/15 bg-[rgba(16,13,30,0.75)] px-6 backdrop-blur-[20px]">
+    <div className="flex min-h-svh w-full flex-col bg-[var(--bg)] pt-16 transition-colors duration-300">
+      <header className="fixed top-0 right-0 left-0 z-[1000] border-b border-[var(--border)] bg-[rgba(var(--background),0.75)] px-6 backdrop-blur-[20px]">
         <div className="mx-auto flex h-16 max-w-[1280px] items-center gap-4">
           <button
-            className="flex cursor-pointer items-center gap-1.5 rounded-lg border-none bg-transparent px-2.5 py-1.5 text-sm text-[rgba(190,178,215,0.82)] transition-colors hover:bg-purple-400/12 hover:text-purple-400"
+            className="flex cursor-pointer items-center gap-1.5 rounded-lg border-none bg-transparent px-2.5 py-1.5 text-sm text-[var(--text)] transition-colors hover:bg-purple-400/12 hover:text-purple-400"
             onClick={onBack}
           >
             <BackIcon /> Back
           </button>
-          <span className="ml-auto text-[22px] font-bold tracking-[4px] text-[#eeeaff]">MODÉ</span>
+          <span className="ml-auto text-[22px] font-bold tracking-[4px] text-[var(--text-h)]">
+            MODÉ
+          </span>
         </div>
       </header>
 
       {/* Hero */}
-      <div className="flex flex-col items-center gap-3 bg-[linear-gradient(135deg,#0d0d1a_0%,#1a1030_50%,#0d1a2e_100%)] px-6 py-16 text-center">
+      <div className="flex flex-col items-center gap-3 bg-[linear-gradient(135deg,var(--bg)_0%,var(--bg-gradient-to)_50%,var(--accent-bg)_100%)] px-6 py-16 text-center transition-colors duration-300">
         <p className="m-0 text-[11px] font-bold tracking-[5px] text-purple-400 uppercase">
           Support
         </p>
-        <h1 className="m-0 text-[48px] leading-[1.1] font-extrabold tracking-[-1.5px] text-white max-[600px]:text-[34px]">
+        <h1 className="m-0 text-[48px] leading-[1.1] font-extrabold tracking-[-1.5px] text-[var(--text-h)] max-[600px]:text-[34px]">
           How can we help?
         </h1>
-        <p className="m-0 mb-2 text-[15px] text-white/55">
+        <p className="m-0 mb-2 text-[15px] text-[var(--text)] opacity-80">
           Browse answers below, or search for a specific topic.
         </p>
         <div className="relative mt-1 w-full max-w-[520px]">
-          <span className="pointer-events-none absolute top-1/2 left-3.5 flex -translate-y-1/2 text-white/40">
+          <span className="pointer-events-none absolute top-1/2 left-3.5 flex -translate-y-1/2 text-[var(--text)] opacity-50">
             <SearchIcon />
           </span>
           <input
@@ -365,11 +367,11 @@ export default function HelpPage({ onBack }) {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             aria-label="Search FAQs"
-            className="box-border w-full rounded-[10px] border border-white/15 bg-white/8 py-3.5 pr-11 pl-11 text-[15px] text-white transition-colors outline-none placeholder:text-white/35 focus:border-purple-400 focus:bg-white/12"
+            className="box-border w-full rounded-[10px] border border-[var(--border)] bg-[var(--card-bg)] py-3.5 pr-11 pl-11 text-[15px] text-[var(--text-h)] transition-colors outline-none placeholder:text-[var(--text)]/40 focus:border-purple-400 focus:bg-[var(--bg)]"
           />
           {search && (
             <button
-              className="absolute top-1/2 right-3 -translate-y-1/2 cursor-pointer border-none bg-none p-1 text-[20px] leading-none text-white/50 transition-colors hover:text-white"
+              className="absolute top-1/2 right-3 -translate-y-1/2 cursor-pointer border-none bg-none p-1 text-[20px] leading-none text-[var(--text)] transition-colors hover:text-[var(--text-h)]"
               onClick={() => setSearch('')}
               aria-label="Clear search"
             >
@@ -383,7 +385,7 @@ export default function HelpPage({ onBack }) {
         {/* Category tabs */}
         <div className="mb-10 flex flex-wrap gap-2">
           <button
-            className={`flex cursor-pointer items-center gap-1.5 rounded-full border px-4 py-2 text-[13px] font-medium whitespace-nowrap transition-colors ${activeCategory === 'all' ? 'border-purple-400 bg-purple-400 text-white hover:text-white' : 'border-white/15 bg-transparent text-[rgba(190,178,215,0.82)] hover:border-purple-400 hover:text-[#eeeaff]'}`}
+            className={`flex cursor-pointer items-center gap-1.5 rounded-full border px-4 py-2 text-[13px] font-medium whitespace-nowrap transition-colors ${activeCategory === 'all' ? 'border-purple-400 bg-purple-400 text-white hover:text-white' : 'border-[var(--border)] bg-transparent text-[var(--text)] hover:border-purple-400 hover:text-[var(--text-h)]'}`}
             onClick={() => setActiveCategory('all')}
           >
             All Topics
@@ -391,7 +393,7 @@ export default function HelpPage({ onBack }) {
           {FAQ_CATEGORIES.map((cat) => (
             <button
               key={cat.id}
-              className={`flex cursor-pointer items-center gap-1.5 rounded-full border px-4 py-2 text-[13px] font-medium whitespace-nowrap transition-colors ${activeCategory === cat.id ? 'border-purple-400 bg-purple-400 text-white hover:text-white' : 'border-white/15 bg-transparent text-[rgba(190,178,215,0.82)] hover:border-purple-400 hover:text-[#eeeaff]'}`}
+              className={`flex cursor-pointer items-center gap-1.5 rounded-full border px-4 py-2 text-[13px] font-medium whitespace-nowrap transition-colors ${activeCategory === cat.id ? 'border-purple-400 bg-purple-400 text-white hover:text-white' : 'border-[var(--border)] bg-transparent text-[var(--text)] hover:border-purple-400 hover:text-[var(--text-h)]'}`}
               onClick={() => setActiveCategory(cat.id)}
             >
               {cat.icon}
@@ -403,10 +405,10 @@ export default function HelpPage({ onBack }) {
         {/* FAQ sections */}
         {filtered.length === 0 ? (
           <div className="px-6 py-16 text-center">
-            <p className="m-0 mb-2 text-[18px] font-semibold text-[#eeeaff]">
+            <p className="m-0 mb-2 text-[18px] font-semibold text-[var(--text-h)]">
               No results for &ldquo;{search}&rdquo;
             </p>
-            <p className="m-0 text-sm text-[rgba(190,178,215,0.82)]">
+            <p className="m-0 text-sm text-[var(--text)]">
               Try different keywords, or{' '}
               <button
                 className="cursor-pointer border-none bg-none p-0 text-sm text-purple-400 underline underline-offset-[3px]"
@@ -422,9 +424,9 @@ export default function HelpPage({ onBack }) {
             <section key={cat.id} className="mb-12">
               <div className="mb-4 flex items-center gap-2.5 border-b-2 border-purple-400 pb-3.5">
                 <span className="flex items-center text-purple-400">{cat.icon}</span>
-                <h2 className="m-0 text-[19px] font-bold text-[#eeeaff]">{cat.label}</h2>
+                <h2 className="m-0 text-[19px] font-bold text-[var(--text-h)]">{cat.label}</h2>
               </div>
-              <div className="flex flex-col overflow-hidden rounded-2xl border border-white/15 bg-white/8 shadow-[0_4px_12px_rgba(0,0,0,0.2),inset_0_1px_0_rgba(255,255,255,0.14)] backdrop-blur-xl">
+              <div className="flex flex-col overflow-hidden rounded-2xl border border-[var(--glass-border)] bg-[var(--card-bg)] shadow-[var(--shadow)] backdrop-blur-xl">
                 {cat.items.map((item, i) => (
                   <FaqItem key={i} question={item.q} answer={item.a} />
                 ))}
@@ -434,10 +436,10 @@ export default function HelpPage({ onBack }) {
         )}
 
         {/* Contact strip */}
-        <div className="mt-4 flex flex-wrap items-center justify-between gap-6 rounded-[14px] bg-[linear-gradient(135deg,#0d0d1a_0%,#1a1030_50%,#0d1a2e_100%)] px-8 py-7 max-[600px]:flex-col max-[600px]:items-start max-[600px]:px-6">
+        <div className="mt-4 flex flex-wrap items-center justify-between gap-6 rounded-[14px] border border-[var(--border)] bg-[linear-gradient(135deg,var(--bg)_0%,var(--bg-gradient-to)_50%,var(--accent-bg)_100%)] px-8 py-7 transition-colors duration-300 max-[600px]:flex-col max-[600px]:items-start max-[600px]:px-6">
           <div>
-            <p className="m-0 mb-1 text-[17px] font-bold text-white">Still need help?</p>
-            <p className="m-0 text-[13px] text-white/50">
+            <p className="m-0 mb-1 text-[17px] font-bold text-[var(--text-h)]">Still need help?</p>
+            <p className="m-0 text-[13px] text-[var(--text)] opacity-70">
               Our support team is available Monday–Friday, 9 am–6 pm GMT.
             </p>
           </div>
@@ -445,7 +447,7 @@ export default function HelpPage({ onBack }) {
             <button className="cursor-pointer rounded-lg border border-purple-400 bg-purple-400 px-5 py-2.5 text-[13px] font-semibold text-white transition-opacity hover:opacity-85">
               Live Chat
             </button>
-            <button className="cursor-pointer rounded-lg border border-white/25 bg-transparent px-5 py-2.5 text-[13px] font-semibold text-white transition-opacity hover:opacity-85">
+            <button className="cursor-pointer rounded-lg border border-[var(--border)] bg-[var(--card-bg)] px-5 py-2.5 text-[13px] font-semibold text-[var(--text-h)] transition-opacity hover:opacity-85">
               Email Us
             </button>
           </div>

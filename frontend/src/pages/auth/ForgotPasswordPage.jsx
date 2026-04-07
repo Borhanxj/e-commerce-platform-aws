@@ -2,17 +2,20 @@ import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { useTheme } from '../../context/ThemeContext'
+import { SunIcon, MoonIcon } from '../../components/icons'
 
 const wrapperCls =
-  'flex min-h-svh items-center justify-center p-6 bg-[linear-gradient(170deg,#0e0b1c_0%,#160f2a_40%,#1a1035_70%,#100d1e_100%)]'
+  'flex min-h-svh items-center justify-center p-6 bg-[var(--bg)] transition-colors duration-300'
 const cardCls =
-  'w-full max-w-sm rounded-[20px] border border-white/15 bg-white/8 p-10 shadow-[0_4px_12px_rgba(0,0,0,0.2),inset_0_1px_0_rgba(255,255,255,0.14)] backdrop-blur-xl'
+  'relative z-10 w-full max-w-sm rounded-[20px] border border-[var(--glass-border)] bg-[var(--card-bg)] p-10 shadow-[var(--shadow)] backdrop-blur-xl'
 
 function ForgotPasswordPage({ onBack }) {
   const [email, setEmail] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
   const [submitted, setSubmitted] = useState(false)
+  const { theme, toggleTheme } = useTheme()
 
   async function handleSubmit(e) {
     e.preventDefault()
@@ -39,19 +42,41 @@ function ForgotPasswordPage({ onBack }) {
     }
   }
 
+  const ambientBg = (
+    <div
+      className="pointer-events-none fixed inset-0 z-0 overflow-hidden"
+      style={{
+        background:
+          'linear-gradient(170deg, var(--bg) 0%, var(--bg-gradient-to) 25%, var(--accent-bg) 50%, var(--bg-gradient-to) 75%, var(--bg) 100%)',
+      }}
+      aria-hidden="true"
+    />
+  )
+
+  const themeToggle = (
+    <button
+      onClick={toggleTheme}
+      className="fixed top-6 right-6 z-[200] flex h-10 w-10 cursor-pointer items-center justify-center rounded-lg border border-[var(--border)] bg-[var(--card-bg)] text-[var(--text-h)] shadow-[var(--shadow)] backdrop-blur-xl transition-all hover:border-purple-400/40 hover:bg-purple-400/12 hover:text-purple-400"
+      aria-label={theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+    >
+      {theme === 'dark' ? <SunIcon /> : <MoonIcon />}
+    </button>
+  )
+
   if (submitted) {
     return (
       <div className={wrapperCls}>
+        {ambientBg}
+        {themeToggle}
         <div className={cardCls}>
-          <h1 className="mb-7 text-center text-3xl font-medium text-[#eeeaff]">Check your email</h1>
-          <p className="mb-6 text-[rgba(190,178,215,0.82)]">
+          <h1 className="mb-7 text-center text-3xl font-medium text-[var(--text-h)]">
+            Check your email
+          </h1>
+          <p className="mb-6 text-[var(--text)]">
             If an account exists for <strong>{email}</strong>, you'll receive a password reset link
             shortly.
           </p>
-          <Button
-            onClick={onBack}
-            className="w-full bg-purple-400 text-[#100d1e] hover:bg-purple-300"
-          >
+          <Button onClick={onBack} className="w-full bg-purple-400 text-white hover:bg-purple-300">
             Back to sign in
           </Button>
         </div>
@@ -61,15 +86,19 @@ function ForgotPasswordPage({ onBack }) {
 
   return (
     <div className={wrapperCls}>
+      {ambientBg}
+      {themeToggle}
       <div className={cardCls}>
-        <h1 className="mb-7 text-center text-3xl font-medium text-[#eeeaff]">Reset password</h1>
-        <p className="mb-6 text-left text-[rgba(190,178,215,0.82)]">
+        <h1 className="mb-7 text-center text-3xl font-medium text-[var(--text-h)]">
+          Reset password
+        </h1>
+        <p className="mb-6 text-left text-[var(--text)]">
           Enter your email and we'll send you a link to reset your password.
         </p>
 
         <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-4">
           <div className="flex flex-col gap-1.5">
-            <Label htmlFor="forgot-email" className="text-[#eeeaff]">
+            <Label htmlFor="forgot-email" className="text-[var(--text-h)]">
               Email
             </Label>
             <Input
@@ -80,7 +109,7 @@ function ForgotPasswordPage({ onBack }) {
               onChange={(e) => setEmail(e.target.value)}
               required
               placeholder="you@example.com"
-              className="border-white/10 bg-white/5 text-[#eeeaff] placeholder:text-white/30 focus-visible:border-purple-400 focus-visible:ring-purple-400/40"
+              className="border-[var(--border)] bg-[var(--bg)] text-[var(--text-h)] placeholder:text-[var(--text)]/40 focus-visible:border-purple-400 focus-visible:ring-purple-400/40"
             />
           </div>
 
@@ -93,7 +122,7 @@ function ForgotPasswordPage({ onBack }) {
           <Button
             type="submit"
             disabled={loading}
-            className="mt-1 w-full bg-purple-400 text-[#100d1e] hover:bg-purple-300 disabled:opacity-55"
+            className="mt-1 w-full bg-purple-400 text-white hover:bg-purple-300 disabled:opacity-55"
           >
             {loading ? 'Sending…' : 'Send reset link'}
           </Button>

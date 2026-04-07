@@ -36,8 +36,8 @@ function DashboardHome({ token, onNavigate }) {
     fetchStats()
   }, [token])
 
-  if (loading) return <p className="text-[rgba(190,178,215,0.82)]">Loading dashboard…</p>
-  if (!stats) return <p className="text-[rgba(190,178,215,0.82)]">Could not load dashboard data.</p>
+  if (loading) return <p className="text-[var(--text)]">Loading dashboard…</p>
+  if (!stats) return <p className="text-[var(--text)]">Could not load dashboard data.</p>
 
   const maxStatusCount = Math.max(1, ...stats.ordersByStatus.map((s) => parseInt(s.count)))
 
@@ -46,43 +46,43 @@ function DashboardHome({ token, onNavigate }) {
       {/* ─── KPI Cards ─────────────────────────────── */}
       <div className="mb-7 grid grid-cols-[repeat(auto-fill,minmax(200px,1fr))] gap-4">
         <button
-          className="flex cursor-pointer flex-col gap-1 rounded-[10px] border border-white/9 bg-[#100d1e] px-5 py-6 text-left font-[inherit] transition-all duration-150 hover:border-purple-400 hover:bg-purple-400/12"
+          className="flex cursor-pointer flex-col gap-1 rounded-[10px] border border-[var(--border)] bg-[var(--card-bg)] px-5 py-6 text-left font-[inherit] shadow-[var(--shadow)] transition-all duration-150 hover:border-purple-400 hover:bg-purple-400/12"
           onClick={() => onNavigate('users')}
         >
-          <span className="text-[28px] font-semibold tracking-tight text-[#eeeaff]">
+          <span className="text-[28px] font-semibold tracking-tight text-[var(--text-h)]">
             {stats.totalUsers}
           </span>
-          <span className="text-[13px] tracking-wide text-[rgba(190,178,215,0.82)] uppercase">
+          <span className="text-[13px] tracking-wide text-[var(--text)] uppercase opacity-70">
             Total Users
           </span>
         </button>
         <button
-          className="flex cursor-pointer flex-col gap-1 rounded-[10px] border border-white/9 bg-[#100d1e] px-5 py-6 text-left font-[inherit] transition-all duration-150 hover:border-purple-400 hover:bg-purple-400/12"
+          className="flex cursor-pointer flex-col gap-1 rounded-[10px] border border-[var(--border)] bg-[var(--card-bg)] px-5 py-6 text-left font-[inherit] shadow-[var(--shadow)] transition-all duration-150 hover:border-purple-400 hover:bg-purple-400/12"
           onClick={() => onNavigate('products')}
         >
-          <span className="text-[28px] font-semibold tracking-tight text-[#eeeaff]">
+          <span className="text-[28px] font-semibold tracking-tight text-[var(--text-h)]">
             {stats.totalProducts}
           </span>
-          <span className="text-[13px] tracking-wide text-[rgba(190,178,215,0.82)] uppercase">
+          <span className="text-[13px] tracking-wide text-[var(--text)] uppercase opacity-70">
             Total Products
           </span>
         </button>
         <button
-          className="flex cursor-pointer flex-col gap-1 rounded-[10px] border border-white/9 bg-[#100d1e] px-5 py-6 text-left font-[inherit] transition-all duration-150 hover:border-purple-400 hover:bg-purple-400/12"
+          className="flex cursor-pointer flex-col gap-1 rounded-[10px] border border-[var(--border)] bg-[var(--card-bg)] px-5 py-6 text-left font-[inherit] shadow-[var(--shadow)] transition-all duration-150 hover:border-purple-400 hover:bg-purple-400/12"
           onClick={() => onNavigate('orders')}
         >
-          <span className="text-[28px] font-semibold tracking-tight text-[#eeeaff]">
+          <span className="text-[28px] font-semibold tracking-tight text-[var(--text-h)]">
             {stats.totalOrders}
           </span>
-          <span className="text-[13px] tracking-wide text-[rgba(190,178,215,0.82)] uppercase">
+          <span className="text-[13px] tracking-wide text-[var(--text)] uppercase opacity-70">
             Total Orders
           </span>
         </button>
-        <div className="flex flex-col gap-1 rounded-[10px] border border-white/9 bg-[#100d1e] px-5 py-6">
-          <span className="text-[28px] font-semibold tracking-tight text-[#eeeaff]">
+        <div className="flex flex-col gap-1 rounded-[10px] border border-[var(--border)] bg-[var(--card-bg)] px-5 py-6 shadow-[var(--shadow)]">
+          <span className="text-[28px] font-semibold tracking-tight text-[var(--text-h)]">
             ${stats.totalRevenue.toLocaleString('en-US', { minimumFractionDigits: 2 })}
           </span>
-          <span className="text-[13px] tracking-wide text-[rgba(190,178,215,0.82)] uppercase">
+          <span className="text-[13px] tracking-wide text-[var(--text)] uppercase opacity-70">
             Total Revenue
           </span>
         </div>
@@ -90,15 +90,15 @@ function DashboardHome({ token, onNavigate }) {
 
       <div className="grid grid-cols-2 gap-5 max-[900px]:grid-cols-1">
         {/* ─── Orders by Status Chart ──────────────── */}
-        <div className="rounded-[10px] border border-white/9 p-6">
-          <h3 className="m-0 mb-4 text-base font-medium text-[#eeeaff]">Orders by Status</h3>
+        <div className="rounded-[10px] border border-[var(--border)] bg-[var(--card-bg)] p-6 shadow-[var(--shadow)]">
+          <h3 className="m-0 mb-4 text-base font-medium text-[var(--text-h)]">Orders by Status</h3>
           {stats.ordersByStatus.length === 0 ? (
-            <p className="text-sm text-[rgba(190,178,215,0.82)]">No orders yet</p>
+            <p className="text-sm text-[var(--text)]">No orders yet</p>
           ) : (
             <div className="flex flex-col gap-3">
               {stats.ordersByStatus.map((s) => (
                 <div key={s.status} className="flex items-center gap-2.5">
-                  <span className="w-[85px] shrink-0 text-[13px] text-[rgba(190,178,215,0.82)]">
+                  <span className="w-[85px] shrink-0 text-[13px] text-[var(--text)]">
                     {STATUS_LABELS[s.status] || s.status}
                   </span>
                   <div className="h-6 flex-1 overflow-hidden rounded bg-purple-400/12">
@@ -110,7 +110,7 @@ function DashboardHome({ token, onNavigate }) {
                       }}
                     />
                   </div>
-                  <span className="w-8 shrink-0 text-right text-sm font-medium text-[#eeeaff]">
+                  <span className="w-8 shrink-0 text-right text-sm font-medium text-[var(--text-h)]">
                     {s.count}
                   </span>
                 </div>
@@ -120,22 +120,20 @@ function DashboardHome({ token, onNavigate }) {
         </div>
 
         {/* ─── Recent Orders ───────────────────────── */}
-        <div className="rounded-[10px] border border-white/9 p-6">
-          <h3 className="m-0 mb-4 text-base font-medium text-[#eeeaff]">Recent Orders</h3>
+        <div className="rounded-[10px] border border-[var(--border)] bg-[var(--card-bg)] p-6 shadow-[var(--shadow)]">
+          <h3 className="m-0 mb-4 text-base font-medium text-[var(--text-h)]">Recent Orders</h3>
           {stats.recentOrders.length === 0 ? (
-            <p className="text-sm text-[rgba(190,178,215,0.82)]">No orders yet</p>
+            <p className="text-sm text-[var(--text)]">No orders yet</p>
           ) : (
             <div className="flex flex-col">
               {stats.recentOrders.map((o) => (
                 <div
                   key={o.id}
-                  className="flex items-center justify-between border-b border-white/9 py-2.5 last:border-b-0"
+                  className="flex items-center justify-between border-b border-[var(--border)] py-2.5 last:border-b-0"
                 >
                   <div className="flex items-center gap-2.5">
-                    <span className="text-[13px] font-semibold text-[#eeeaff]">#{o.id}</span>
-                    <span className="text-[13px] text-[rgba(190,178,215,0.82)]">
-                      {o.user_email}
-                    </span>
+                    <span className="text-[13px] font-semibold text-[var(--text-h)]">#{o.id}</span>
+                    <span className="text-[13px] text-[var(--text)]">{o.user_email}</span>
                   </div>
                   <div className="flex items-center gap-3.5">
                     <span
@@ -144,7 +142,7 @@ function DashboardHome({ token, onNavigate }) {
                     >
                       {STATUS_LABELS[o.status]}
                     </span>
-                    <span className="text-sm font-medium text-[#eeeaff]">
+                    <span className="text-sm font-medium text-[var(--text-h)]">
                       ${parseFloat(o.total).toFixed(2)}
                     </span>
                   </div>

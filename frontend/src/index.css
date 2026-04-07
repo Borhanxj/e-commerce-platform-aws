@@ -3,6 +3,7 @@
 @import "shadcn/tailwind.css";
 
 @custom-variant dark (&:is(.dark *));
+@custom-variant light (&:is(.light *));
 
 /* ── Design tokens ─────────────────────────────────────────── */
 :root {
@@ -58,6 +59,10 @@
   --text: rgba(190, 178, 215, 0.82);
   --text-h: #eeeaff;
   --bg: #100d1e;
+  --bg-gradient-to: #160f2a;
+  --cat-bg-l: 10%;
+  --cat-bg-l2: 17%;
+  --cat-text-l: 70%;
   --code-bg: rgba(255, 255, 255, 0.05);
   --app-accent: #c084fc;
   --accent-bg: rgba(192, 132, 252, 0.12);
@@ -84,6 +89,44 @@
   @media (max-width: 1024px) {
     font-size: 16px;
   }
+}
+
+:root.light {
+  color-scheme: light;
+  --background: oklch(0.98 0.01 292);
+  --foreground: oklch(0.2 0.047 292);
+
+  --card: oklch(1 0 0 / 80%);
+  --card-foreground: oklch(0.2 0.047 292);
+
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.2 0.047 292);
+
+  --secondary: oklch(0.94 0.02 292);
+  --secondary-foreground: oklch(0.2 0.047 292);
+
+  --muted: oklch(0.96 0.01 292);
+  --muted-foreground: oklch(0.45 0.05 292);
+
+  --border: oklch(0 0 0 / 10%);
+  --input: oklch(0 0 0 / 8%);
+
+  /* legacy custom variables for light mode – with a more subtle white/gray feel */
+  --text: #4b5563; /* gray-600 */
+  --text-h: #111827; /* gray-900 */
+  --bg: #ffffff;
+  --bg-gradient-to: #f3f4f6; /* gray-100 */
+  --cat-bg-l: 96%;
+  --cat-bg-l2: 92%;
+  --cat-text-l: 30%;
+  --code-bg: rgba(0, 0, 0, 0.04);
+  --accent-bg: #f9fafb; /* gray-50 */
+  --accent-border: rgba(0, 0, 0, 0.1);
+  --social-bg: rgba(0, 0, 0, 0.03);
+  --shadow: 0 4px 12px rgba(0, 0, 0, 0.06), 0 0 0 1px rgba(0, 0, 0, 0.03);
+  --card-bg: #ffffff;
+  --glass-border: rgba(0, 0, 0, 0.08);
+  --glass-shadow: 0 4px 12px rgba(0, 0, 0, 0.04), inset 0 1px 0 rgba(255, 255, 255, 1);
 }
 
 @theme inline {

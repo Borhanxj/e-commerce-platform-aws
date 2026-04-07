@@ -24,12 +24,10 @@ function Section({ title, description, children }) {
   return (
     <div className="mb-10">
       <div className="mb-3.5">
-        <h2 className="m-0 mb-1 text-[17px] font-bold text-[#eeeaff]">{title}</h2>
-        {description && (
-          <p className="m-0 text-[13px] text-[rgba(190,178,215,0.82)]">{description}</p>
-        )}
+        <h2 className="m-0 mb-1 text-[17px] font-bold text-[var(--text-h)]">{title}</h2>
+        {description && <p className="m-0 text-[13px] text-[var(--text)]">{description}</p>}
       </div>
-      <div className="rounded-2xl border border-white/15 bg-white/8 p-6 shadow-[0_4px_12px_rgba(0,0,0,0.2),inset_0_1px_0_rgba(255,255,255,0.14)] backdrop-blur-xl">
+      <div className="rounded-2xl border border-[var(--glass-border)] bg-[var(--card-bg)] p-6 shadow-[var(--shadow)] backdrop-blur-xl">
         {children}
       </div>
     </div>
@@ -38,12 +36,12 @@ function Section({ title, description, children }) {
 
 function Toggle({ checked, onChange, label }) {
   return (
-    <label className="flex cursor-pointer items-center justify-between border-b border-white/9 py-3 first:pt-0 last:border-b-0 last:pb-0">
-      <span className="text-sm text-[#eeeaff]">{label}</span>
+    <label className="flex cursor-pointer items-center justify-between border-b border-[var(--border)] py-3 first:pt-0 last:border-b-0 last:pb-0">
+      <span className="text-sm text-[var(--text-h)]">{label}</span>
       <button
         role="switch"
         aria-checked={checked}
-        className={`relative h-6 w-11 shrink-0 cursor-pointer rounded-full border-none transition-colors ${checked ? 'bg-purple-400' : 'bg-white/15'}`}
+        className={`relative h-6 w-11 shrink-0 cursor-pointer rounded-full border-none transition-colors ${checked ? 'bg-purple-400' : 'bg-[var(--border)]'}`}
         onClick={() => onChange(!checked)}
         type="button"
       >
@@ -56,6 +54,7 @@ function Toggle({ checked, onChange, label }) {
 }
 
 export default function AccountSettingsPage({ onBack, token }) {
+  // ... rest of state stays same ...
   // Profile
   const [name, setName] = useState('Jane Smith')
   const [email, setEmail] = useState('user@example.com')
@@ -104,7 +103,7 @@ export default function AccountSettingsPage({ onBack, token }) {
     setPwLoading(true)
     try {
       const res = await fetch('http://localhost:3000/api/auth/change-password', {
-        method: 'PUT',
+        method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
@@ -136,41 +135,43 @@ export default function AccountSettingsPage({ onBack, token }) {
   }
 
   return (
-    <div className="flex min-h-svh w-full flex-col bg-[#100d1e] pt-16">
-      <header className="fixed top-0 right-0 left-0 z-[1000] border-b border-white/15 bg-[rgba(16,13,30,0.75)] px-6 backdrop-blur-[20px]">
+    <div className="flex min-h-svh w-full flex-col bg-[var(--bg)] pt-16 transition-colors duration-300">
+      <header className="fixed top-0 right-0 left-0 z-[1000] border-b border-[var(--border)] bg-[rgba(var(--background),0.75)] px-6 backdrop-blur-[20px]">
         <div className="mx-auto flex h-16 max-w-[1280px] items-center gap-4">
           <button
-            className="flex cursor-pointer items-center gap-1.5 rounded-lg border-none bg-transparent px-2.5 py-1.5 text-sm text-[rgba(190,178,215,0.82)] transition-colors hover:bg-purple-400/12 hover:text-purple-400"
+            className="flex cursor-pointer items-center gap-1.5 rounded-lg border-none bg-transparent px-2.5 py-1.5 text-sm text-[var(--text)] transition-colors hover:bg-purple-400/12 hover:text-purple-400"
             onClick={onBack}
           >
             <BackIcon /> Back
           </button>
-          <span className="ml-auto text-[22px] font-bold tracking-[4px] text-[#eeeaff]">MODÉ</span>
+          <span className="ml-auto text-[22px] font-bold tracking-[4px] text-[var(--text-h)]">
+            MODÉ
+          </span>
         </div>
       </header>
 
       <main className="mx-auto box-border w-full max-w-[760px] px-6 pt-12 pb-20">
-        <h1 className="mb-10 text-[32px] font-extrabold tracking-[-0.5px] text-[#eeeaff]">
+        <h1 className="mb-10 text-[32px] font-extrabold tracking-[-0.5px] text-[var(--text-h)]">
           Account Settings
         </h1>
 
         {/* Profile */}
         <Section title="Profile" description="Update your display name and email address.">
           <form onSubmit={handleProfileSave}>
-            <div className="mb-5 flex items-center gap-4 border-b border-white/15 pb-5">
+            <div className="mb-5 flex items-center gap-4 border-b border-[var(--border)] pb-5">
               <div className="flex h-[52px] w-[52px] shrink-0 items-center justify-center rounded-full bg-purple-400/12 text-[22px] font-bold text-purple-400">
                 {name ? name[0].toUpperCase() : '?'}
               </div>
               <div>
-                <p className="m-0 mb-0.5 text-[15px] font-semibold text-[#eeeaff]">
+                <p className="m-0 mb-0.5 text-[15px] font-semibold text-[var(--text-h)]">
                   {name || 'Your Name'}
                 </p>
-                <p className="m-0 text-[13px] text-[rgba(190,178,215,0.82)]">{email}</p>
+                <p className="m-0 text-[13px] text-[var(--text)]">{email}</p>
               </div>
             </div>
             <div className="grid grid-cols-2 gap-4 max-[600px]:grid-cols-1">
               <div className="mb-4 flex flex-col gap-1.5">
-                <Label htmlFor="acc-name" className="text-[13px] text-[#eeeaff]">
+                <Label htmlFor="acc-name" className="text-[13px] text-[var(--text-h)]">
                   Full Name
                 </Label>
                 <Input
@@ -179,11 +180,11 @@ export default function AccountSettingsPage({ onBack, token }) {
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   placeholder="Jane Smith"
-                  className="border-white/10 bg-white/5 text-[#eeeaff] placeholder:text-white/30 focus-visible:border-purple-400 focus-visible:ring-purple-400/40"
+                  className="border-[var(--border)] bg-[var(--bg)] text-[var(--text-h)] placeholder:text-[var(--text)]/40 focus-visible:border-purple-400 focus-visible:ring-purple-400/40"
                 />
               </div>
               <div className="mb-4 flex flex-col gap-1.5">
-                <Label htmlFor="acc-email" className="text-[13px] text-[#eeeaff]">
+                <Label htmlFor="acc-email" className="text-[13px] text-[var(--text-h)]">
                   Email Address
                 </Label>
                 <Input
@@ -192,7 +193,7 @@ export default function AccountSettingsPage({ onBack, token }) {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="you@example.com"
-                  className="border-white/10 bg-white/5 text-[#eeeaff] placeholder:text-white/30 focus-visible:border-purple-400 focus-visible:ring-purple-400/40"
+                  className="border-[var(--border)] bg-[var(--bg)] text-[var(--text-h)] placeholder:text-[var(--text)]/40 focus-visible:border-purple-400 focus-visible:ring-purple-400/40"
                 />
               </div>
             </div>
@@ -202,7 +203,7 @@ export default function AccountSettingsPage({ onBack, token }) {
               )}
               <button
                 type="submit"
-                className="cursor-pointer rounded-lg border-none bg-purple-400 px-5 py-2.5 text-[13px] font-semibold text-[#100d1e] transition-opacity hover:opacity-88"
+                className="cursor-pointer rounded-lg border-none bg-purple-400 px-5 py-2.5 text-[13px] font-semibold text-white transition-opacity hover:opacity-88"
               >
                 Save Profile
               </button>
@@ -214,7 +215,7 @@ export default function AccountSettingsPage({ onBack, token }) {
         <Section title="Password" description="Choose a strong password you don't use elsewhere.">
           <form onSubmit={handlePasswordSave}>
             <div className="mb-4 flex flex-col gap-1.5">
-              <Label htmlFor="pw-current" className="text-[13px] text-[#eeeaff]">
+              <Label htmlFor="pw-current" className="text-[13px] text-[var(--text-h)]">
                 Current Password
               </Label>
               <Input
@@ -223,12 +224,12 @@ export default function AccountSettingsPage({ onBack, token }) {
                 value={currentPw}
                 onChange={(e) => setCurrentPw(e.target.value)}
                 placeholder="••••••••"
-                className="border-white/10 bg-white/5 text-[#eeeaff] placeholder:text-white/30 focus-visible:border-purple-400 focus-visible:ring-purple-400/40"
+                className="border-[var(--border)] bg-[var(--bg)] text-[var(--text-h)] placeholder:text-[var(--text)]/40 focus-visible:border-purple-400 focus-visible:ring-purple-400/40"
               />
             </div>
             <div className="grid grid-cols-2 gap-4 max-[600px]:grid-cols-1">
               <div className="mb-4 flex flex-col gap-1.5">
-                <Label htmlFor="pw-new" className="text-[13px] text-[#eeeaff]">
+                <Label htmlFor="pw-new" className="text-[13px] text-[var(--text-h)]">
                   New Password
                 </Label>
                 <Input
@@ -237,11 +238,11 @@ export default function AccountSettingsPage({ onBack, token }) {
                   value={newPw}
                   onChange={(e) => setNewPw(e.target.value)}
                   placeholder="••••••••"
-                  className="border-white/10 bg-white/5 text-[#eeeaff] placeholder:text-white/30 focus-visible:border-purple-400 focus-visible:ring-purple-400/40"
+                  className="border-[var(--border)] bg-[var(--bg)] text-[var(--text-h)] placeholder:text-[var(--text)]/40 focus-visible:border-purple-400 focus-visible:ring-purple-400/40"
                 />
               </div>
               <div className="mb-4 flex flex-col gap-1.5">
-                <Label htmlFor="pw-confirm" className="text-[13px] text-[#eeeaff]">
+                <Label htmlFor="pw-confirm" className="text-[13px] text-[var(--text-h)]">
                   Confirm New Password
                 </Label>
                 <Input
@@ -250,7 +251,7 @@ export default function AccountSettingsPage({ onBack, token }) {
                   value={confirmPw}
                   onChange={(e) => setConfirmPw(e.target.value)}
                   placeholder="••••••••"
-                  className="border-white/10 bg-white/5 text-[#eeeaff] placeholder:text-white/30 focus-visible:border-purple-400 focus-visible:ring-purple-400/40"
+                  className="border-[var(--border)] bg-[var(--bg)] text-[var(--text-h)] placeholder:text-[var(--text)]/40 focus-visible:border-purple-400 focus-visible:ring-purple-400/40"
                 />
               </div>
             </div>
@@ -261,7 +262,7 @@ export default function AccountSettingsPage({ onBack, token }) {
               )}
               <button
                 type="submit"
-                className="cursor-pointer rounded-lg border-none bg-purple-400 px-5 py-2.5 text-[13px] font-semibold text-[#100d1e] transition-opacity hover:opacity-88 disabled:opacity-60"
+                className="cursor-pointer rounded-lg border-none bg-purple-400 px-5 py-2.5 text-[13px] font-semibold text-white transition-opacity hover:opacity-88 disabled:opacity-60"
                 disabled={pwLoading}
               >
                 {pwLoading ? 'Updating…' : 'Update Password'}
@@ -294,7 +295,7 @@ export default function AccountSettingsPage({ onBack, token }) {
         <Section title="Shipping Address" description="Your default delivery address.">
           <form onSubmit={handleAddressSave}>
             <div className="mb-4 flex flex-col gap-1.5">
-              <Label htmlFor="addr-line1" className="text-[13px] text-[#eeeaff]">
+              <Label htmlFor="addr-line1" className="text-[13px] text-[var(--text-h)]">
                 Address Line 1
               </Label>
               <Input
@@ -303,13 +304,12 @@ export default function AccountSettingsPage({ onBack, token }) {
                 value={line1}
                 onChange={(e) => setLine1(e.target.value)}
                 placeholder="123 Example Street"
-                className="border-white/10 bg-white/5 text-[#eeeaff] placeholder:text-white/30 focus-visible:border-purple-400 focus-visible:ring-purple-400/40"
+                className="border-[var(--border)] bg-[var(--bg)] text-[var(--text-h)] placeholder:text-[var(--text)]/40 focus-visible:border-purple-400 focus-visible:ring-purple-400/40"
               />
             </div>
             <div className="mb-4 flex flex-col gap-1.5">
-              <Label htmlFor="addr-line2" className="text-[13px] text-[#eeeaff]">
-                Address Line 2{' '}
-                <span className="font-normal text-[rgba(190,178,215,0.82)]">(optional)</span>
+              <Label htmlFor="addr-line2" className="text-[13px] text-[var(--text-h)]">
+                Address Line 2 <span className="font-normal text-[var(--text)]">(optional)</span>
               </Label>
               <Input
                 id="addr-line2"
@@ -317,12 +317,12 @@ export default function AccountSettingsPage({ onBack, token }) {
                 value={line2}
                 onChange={(e) => setLine2(e.target.value)}
                 placeholder="Apartment, suite, etc."
-                className="border-white/10 bg-white/5 text-[#eeeaff] placeholder:text-white/30 focus-visible:border-purple-400 focus-visible:ring-purple-400/40"
+                className="border-[var(--border)] bg-[var(--bg)] text-[var(--text-h)] placeholder:text-[var(--text)]/40 focus-visible:border-purple-400 focus-visible:ring-purple-400/40"
               />
             </div>
             <div className="grid grid-cols-2 gap-4 max-[600px]:grid-cols-1">
               <div className="mb-4 flex flex-col gap-1.5">
-                <Label htmlFor="addr-city" className="text-[13px] text-[#eeeaff]">
+                <Label htmlFor="addr-city" className="text-[13px] text-[var(--text-h)]">
                   City
                 </Label>
                 <Input
@@ -331,11 +331,11 @@ export default function AccountSettingsPage({ onBack, token }) {
                   value={city}
                   onChange={(e) => setCity(e.target.value)}
                   placeholder="London"
-                  className="border-white/10 bg-white/5 text-[#eeeaff] placeholder:text-white/30 focus-visible:border-purple-400 focus-visible:ring-purple-400/40"
+                  className="border-[var(--border)] bg-[var(--bg)] text-[var(--text-h)] placeholder:text-[var(--text)]/40 focus-visible:border-purple-400 focus-visible:ring-purple-400/40"
                 />
               </div>
               <div className="mb-4 flex flex-col gap-1.5">
-                <Label htmlFor="addr-postcode" className="text-[13px] text-[#eeeaff]">
+                <Label htmlFor="addr-postcode" className="text-[13px] text-[var(--text-h)]">
                   Postcode
                 </Label>
                 <Input
@@ -344,12 +344,12 @@ export default function AccountSettingsPage({ onBack, token }) {
                   value={postcode}
                   onChange={(e) => setPostcode(e.target.value)}
                   placeholder="SW1A 1AA"
-                  className="border-white/10 bg-white/5 text-[#eeeaff] placeholder:text-white/30 focus-visible:border-purple-400 focus-visible:ring-purple-400/40"
+                  className="border-[var(--border)] bg-[var(--bg)] text-[var(--text-h)] placeholder:text-[var(--text)]/40 focus-visible:border-purple-400 focus-visible:ring-purple-400/40"
                 />
               </div>
             </div>
             <div className="mb-4 flex flex-col gap-1.5">
-              <Label htmlFor="addr-country" className="text-[13px] text-[#eeeaff]">
+              <Label htmlFor="addr-country" className="text-[13px] text-[var(--text-h)]">
                 Country
               </Label>
               <Input
@@ -358,7 +358,7 @@ export default function AccountSettingsPage({ onBack, token }) {
                 value={country}
                 onChange={(e) => setCountry(e.target.value)}
                 placeholder="United Kingdom"
-                className="border-white/10 bg-white/5 text-[#eeeaff] placeholder:text-white/30 focus-visible:border-purple-400 focus-visible:ring-purple-400/40"
+                className="border-[var(--border)] bg-[var(--bg)] text-[var(--text-h)] placeholder:text-[var(--text)]/40 focus-visible:border-purple-400 focus-visible:ring-purple-400/40"
               />
             </div>
             <div className="mt-2 flex items-center justify-end gap-3.5">
@@ -367,7 +367,7 @@ export default function AccountSettingsPage({ onBack, token }) {
               )}
               <button
                 type="submit"
-                className="cursor-pointer rounded-lg border-none bg-purple-400 px-5 py-2.5 text-[13px] font-semibold text-[#100d1e] transition-opacity hover:opacity-88"
+                className="cursor-pointer rounded-lg border-none bg-purple-400 px-5 py-2.5 text-[13px] font-semibold text-white transition-opacity hover:opacity-88"
               >
                 Save Address
               </button>
@@ -380,7 +380,7 @@ export default function AccountSettingsPage({ onBack, token }) {
           <div className="flex items-center justify-between gap-6 max-[600px]:flex-col max-[600px]:items-start">
             <div>
               <p className="m-0 mb-1 text-sm font-semibold text-red-500">Delete Account</p>
-              <p className="m-0 text-[13px] text-[rgba(190,178,215,0.82)]">
+              <p className="m-0 text-[13px] text-[var(--text)]">
                 Permanently remove your account and all associated data. This cannot be undone.
               </p>
             </div>

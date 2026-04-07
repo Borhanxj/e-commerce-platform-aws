@@ -15,21 +15,22 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 const API = `${API_BASE}/api/admin/products`
 
 const btnBase =
-  'font-[inherit] text-[13px] font-medium px-4 py-2 border border-white/10 rounded-[10px] bg-white/5 text-[#eeeaff] cursor-pointer transition-all duration-150 whitespace-nowrap disabled:opacity-45 disabled:cursor-not-allowed hover:not-disabled:border-purple-400 hover:not-disabled:text-purple-400'
+  'font-[inherit] text-[13px] font-medium px-4 py-2 border border-[var(--border)] rounded-[10px] bg-[var(--card-bg)] text-[var(--text-h)] cursor-pointer transition-all duration-150 whitespace-nowrap disabled:opacity-45 disabled:cursor-not-allowed hover:not-disabled:border-purple-400 hover:not-disabled:text-purple-400'
 const btnCreate =
-  'font-[inherit] text-[13px] font-medium px-4 py-2 rounded-[10px] bg-purple-400 text-[#100d1e] border-none cursor-pointer transition-opacity duration-150 hover:opacity-90 disabled:opacity-45 disabled:cursor-not-allowed'
+  'font-[inherit] text-[13px] font-medium px-4 py-2 rounded-[10px] bg-purple-400 text-white border-none cursor-pointer transition-opacity duration-150 hover:opacity-90 disabled:opacity-45 disabled:cursor-not-allowed'
 const btnSearch =
   'font-[inherit] text-[13px] font-medium px-4 py-2 border border-purple-400/30 rounded-[10px] bg-purple-400/12 text-purple-400 cursor-pointer transition-all duration-150 whitespace-nowrap'
 const btnEdit =
-  'font-[inherit] text-[12px] font-medium px-3 py-1 border border-white/10 rounded-[10px] bg-white/5 text-[#eeeaff] cursor-pointer transition-all duration-150 hover:border-purple-400 hover:text-purple-400'
+  'font-[inherit] text-[12px] font-medium px-3 py-1 border border-[var(--border)] rounded-[10px] bg-[var(--card-bg)] text-[var(--text-h)] cursor-pointer transition-all duration-150 hover:border-purple-400 hover:text-purple-400'
 const btnDelete =
   'font-[inherit] text-[12px] font-medium px-3 py-1 border border-red-500/20 rounded-[10px] bg-red-500/10 text-red-400 cursor-pointer transition-all duration-150 hover:bg-red-500/20 hover:border-red-500'
 const btnDanger =
   'font-[inherit] text-[13px] font-medium px-4 py-2 rounded-[10px] bg-red-500 text-white border-none cursor-pointer transition-opacity duration-150 hover:opacity-90'
 const fieldInputClass =
-  'w-full font-[inherit] text-sm py-2.5 px-3 border border-white/10 rounded-md bg-[#100d1e] text-[#eeeaff] outline-none transition-all duration-150 focus:border-purple-400 focus:shadow-[0_0_0_3px_rgba(192,132,252,0.12)]'
+  'w-full font-[inherit] text-sm py-2.5 px-3 border border-[var(--border)] rounded-md bg-[var(--bg)] text-[var(--text-h)] outline-none transition-all duration-150 focus:border-purple-400 focus:shadow-[0_0_0_3px_rgba(192,132,252,0.12)]'
 
 function ProductManagement({ token }) {
+  // ... rest of state stays same ...
   const [products, setProducts] = useState([])
   const [pagination, setPagination] = useState({ page: 1, limit: 10, total: 0, totalPages: 0 })
   const [search, setSearch] = useState('')
@@ -125,7 +126,7 @@ function ProductManagement({ token }) {
         <form className="flex min-w-0 flex-1 gap-2" onSubmit={handleSearch}>
           <Input
             type="text"
-            className="min-w-[140px] flex-1 border-white/10 bg-white/5 text-[#eeeaff] placeholder:text-white/30"
+            className="min-w-[140px] flex-1 border-[var(--border)] bg-[var(--card-bg)] text-[var(--text-h)] placeholder:text-[var(--text)]/40"
             placeholder="Search by name…"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
@@ -142,59 +143,62 @@ function ProductManagement({ token }) {
       {error && <p className="mb-4 text-sm text-red-400">{error}</p>}
 
       {/* Table */}
-      <div className="overflow-hidden rounded-2xl border border-white/15 bg-white/8 shadow-[0_4px_12px_rgba(0,0,0,0.2),inset_0_1px_0_rgba(255,255,255,0.14)] backdrop-blur-xl">
+      <div className="overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--card-bg)] shadow-[var(--shadow)] backdrop-blur-xl">
         <Table>
           <TableHeader>
-            <TableRow className="border-white/9 hover:bg-transparent">
-              <TableHead className="bg-purple-400/12 text-xs tracking-wide text-[rgba(190,178,215,0.82)] uppercase">
+            <TableRow className="border-[var(--border)] hover:bg-transparent">
+              <TableHead className="bg-purple-400/12 text-xs tracking-wide text-[var(--text)] uppercase">
                 ID
               </TableHead>
-              <TableHead className="bg-purple-400/12 text-xs tracking-wide text-[rgba(190,178,215,0.82)] uppercase">
+              <TableHead className="bg-purple-400/12 text-xs tracking-wide text-[var(--text)] uppercase">
                 Name
               </TableHead>
-              <TableHead className="bg-purple-400/12 text-xs tracking-wide text-[rgba(190,178,215,0.82)] uppercase">
+              <TableHead className="bg-purple-400/12 text-xs tracking-wide text-[var(--text)] uppercase">
                 Category
               </TableHead>
-              <TableHead className="bg-purple-400/12 text-xs tracking-wide text-[rgba(190,178,215,0.82)] uppercase">
+              <TableHead className="bg-purple-400/12 text-xs tracking-wide text-[var(--text)] uppercase">
                 Price
               </TableHead>
-              <TableHead className="bg-purple-400/12 text-xs tracking-wide text-[rgba(190,178,215,0.82)] uppercase">
+              <TableHead className="bg-purple-400/12 text-xs tracking-wide text-[var(--text)] uppercase">
                 Stock
               </TableHead>
-              <TableHead className="bg-purple-400/12 text-xs tracking-wide text-[rgba(190,178,215,0.82)] uppercase">
+              <TableHead className="bg-purple-400/12 text-xs tracking-wide text-[var(--text)] uppercase">
                 Created
               </TableHead>
-              <TableHead className="bg-purple-400/12 text-xs tracking-wide text-[rgba(190,178,215,0.82)] uppercase">
+              <TableHead className="bg-purple-400/12 text-xs tracking-wide text-[var(--text)] uppercase">
                 Actions
               </TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {loading ? (
-              <TableRow className="border-white/9">
-                <TableCell colSpan={7} className="py-8 text-center text-[rgba(190,178,215,0.82)]">
+              <TableRow className="border-[var(--border)]">
+                <TableCell colSpan={7} className="py-8 text-center text-[var(--text)]">
                   Loading…
                 </TableCell>
               </TableRow>
             ) : products.length === 0 ? (
-              <TableRow className="border-white/9">
-                <TableCell colSpan={7} className="py-8 text-center text-[rgba(190,178,215,0.82)]">
+              <TableRow className="border-[var(--border)]">
+                <TableCell colSpan={7} className="py-8 text-center text-[var(--text)]">
                   No products found
                 </TableCell>
               </TableRow>
             ) : (
               products.map((p) => (
-                <TableRow key={p.id} className="border-white/9 hover:bg-purple-400/5">
-                  <TableCell className="text-[#eeeaff]">{p.id}</TableCell>
-                  <TableCell className="text-[#eeeaff]">{p.name}</TableCell>
-                  <TableCell className="text-[#eeeaff]">{p.category || '—'}</TableCell>
-                  <TableCell className="text-[#eeeaff]">
+                <TableRow
+                  key={p.id}
+                  className="border-[var(--border)] transition-colors hover:bg-purple-400/5"
+                >
+                  <TableCell className="font-mono text-xs text-[var(--text-h)]">{p.id}</TableCell>
+                  <TableCell className="text-[var(--text-h)]">{p.name}</TableCell>
+                  <TableCell className="text-[var(--text-h)]">{p.category || '—'}</TableCell>
+                  <TableCell className="text-[var(--text-h)]">
                     ${parseFloat(p.price).toFixed(2)}
                   </TableCell>
                   <TableCell>
                     <Badge className={stockBadgeClass(p.stock)}>{p.stock}</Badge>
                   </TableCell>
-                  <TableCell className="text-[#eeeaff]">
+                  <TableCell className="text-[var(--text-h)]">
                     {new Date(p.created_at).toLocaleDateString()}
                   </TableCell>
                   <TableCell>
@@ -227,7 +231,7 @@ function ProductManagement({ token }) {
           >
             Previous
           </button>
-          <span className="text-[13px] text-[rgba(190,178,215,0.82)]">
+          <span className="text-[13px] text-[var(--text)]">
             Page {pagination.page} of {pagination.totalPages} ({pagination.total} products)
           </span>
           <button
@@ -253,14 +257,14 @@ function ProductManagement({ token }) {
 
       {/* Delete Confirmation */}
       <Dialog open={!!deleteConfirm} onOpenChange={(open) => !open && setDeleteConfirm(null)}>
-        <DialogContent className="max-w-md rounded-2xl border border-white/15 bg-[rgba(25,20,45,0.95)] shadow-[0_20px_40px_rgba(0,0,0,0.4)] backdrop-blur-xl">
+        <DialogContent className="max-w-md rounded-2xl border border-[var(--glass-border)] bg-[var(--card-bg)] shadow-[var(--shadow)] backdrop-blur-xl transition-colors duration-300">
           <DialogHeader>
-            <DialogTitle className="text-xl text-[#eeeaff]">Delete Product</DialogTitle>
+            <DialogTitle className="text-xl text-[var(--text-h)]">Delete Product</DialogTitle>
           </DialogHeader>
-          <p className="mb-5 leading-relaxed text-[rgba(190,178,215,0.82)]">
+          <p className="mb-5 leading-relaxed text-[var(--text)]">
             Are you sure you want to delete{' '}
-            <strong className="text-[#eeeaff]">{deleteConfirm?.name}</strong>? This action cannot be
-            undone.
+            <strong className="text-[var(--text-h)]">{deleteConfirm?.name}</strong>? This action
+            cannot be undone.
           </p>
           <div className="flex justify-end gap-2">
             <button className={btnBase} onClick={() => setDeleteConfirm(null)}>
@@ -277,6 +281,7 @@ function ProductManagement({ token }) {
 }
 
 function ProductModal({ mode, product, onClose, onCreate, onUpdate }) {
+  // ... rest of state stays same ...
   const [name, setName] = useState(product?.name || '')
   const [description, setDescription] = useState(product?.description || '')
   const [price, setPrice] = useState(product?.price || '')
@@ -314,15 +319,15 @@ function ProductModal({ mode, product, onClose, onCreate, onUpdate }) {
 
   return (
     <Dialog open onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="max-w-md rounded-2xl border border-white/15 bg-[rgba(25,20,45,0.95)] shadow-[0_20px_40px_rgba(0,0,0,0.4)] backdrop-blur-xl">
+      <DialogContent className="max-w-md rounded-2xl border border-[var(--glass-border)] bg-[var(--card-bg)] shadow-[var(--shadow)] backdrop-blur-xl transition-colors duration-300">
         <DialogHeader>
-          <DialogTitle className="text-xl text-[#eeeaff]">
+          <DialogTitle className="text-xl text-[var(--text-h)]">
             {mode === 'create' ? 'Create Product' : 'Edit Product'}
           </DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit}>
           <div className="mb-4 flex flex-col gap-1.5">
-            <label className="text-[13px] font-medium text-[#eeeaff]">Name</label>
+            <label className="text-[13px] font-medium text-[var(--text-h)]">Name</label>
             <input
               type="text"
               className={fieldInputClass}
@@ -333,7 +338,7 @@ function ProductModal({ mode, product, onClose, onCreate, onUpdate }) {
             />
           </div>
           <div className="mb-4 flex flex-col gap-1.5">
-            <label className="text-[13px] font-medium text-[#eeeaff]">Description</label>
+            <label className="text-[13px] font-medium text-[var(--text-h)]">Description</label>
             <input
               type="text"
               className={fieldInputClass}
@@ -344,7 +349,7 @@ function ProductModal({ mode, product, onClose, onCreate, onUpdate }) {
           </div>
           <div className="mb-4 flex gap-3">
             <div className="flex flex-1 flex-col gap-1.5">
-              <label className="text-[13px] font-medium text-[#eeeaff]">Price ($)</label>
+              <label className="text-[13px] font-medium text-[var(--text-h)]">Price ($)</label>
               <input
                 type="number"
                 step="0.01"
@@ -357,7 +362,7 @@ function ProductModal({ mode, product, onClose, onCreate, onUpdate }) {
               />
             </div>
             <div className="flex flex-1 flex-col gap-1.5">
-              <label className="text-[13px] font-medium text-[#eeeaff]">Stock</label>
+              <label className="text-[13px] font-medium text-[var(--text-h)]">Stock</label>
               <input
                 type="number"
                 min="0"
@@ -369,7 +374,7 @@ function ProductModal({ mode, product, onClose, onCreate, onUpdate }) {
             </div>
           </div>
           <div className="mb-4 flex flex-col gap-1.5">
-            <label className="text-[13px] font-medium text-[#eeeaff]">Category</label>
+            <label className="text-[13px] font-medium text-[var(--text-h)]">Category</label>
             <input
               type="text"
               className={fieldInputClass}
@@ -379,7 +384,7 @@ function ProductModal({ mode, product, onClose, onCreate, onUpdate }) {
             />
           </div>
           <div className="mb-4 flex flex-col gap-1.5">
-            <label className="text-[13px] font-medium text-[#eeeaff]">Image URL</label>
+            <label className="text-[13px] font-medium text-[var(--text-h)]">Image URL</label>
             <input
               type="text"
               className={fieldInputClass}

@@ -27,7 +27,7 @@ export default function HeroBanner() {
   }, [])
 
   return (
-    <section className="relative isolate z-[1] flex h-svh items-center justify-center overflow-hidden bg-[#100d1e] px-6 pt-[72px] after:pointer-events-none after:absolute after:inset-0 after:[background:radial-gradient(ellipse_at_center,transparent_40%,rgba(0,0,0,0.4)_100%),linear-gradient(to_bottom,transparent_55%,rgba(16,13,30,0.6)_78%,#100d1e_100%)]">
+    <section className="light:before:opacity-100 relative isolate z-[1] flex h-svh items-center justify-center overflow-hidden bg-[#100d1e] px-6 pt-[72px] transition-colors duration-300 before:pointer-events-none before:absolute before:inset-x-0 before:top-0 before:z-[2] before:h-40 before:bg-gradient-to-b before:from-white/30 before:to-transparent before:opacity-0 after:pointer-events-none after:absolute after:inset-0 after:[background:radial-gradient(ellipse_at_center,transparent_40%,rgba(0,0,0,0.4)_100%),linear-gradient(to_bottom,transparent_55%,rgba(16,13,30,0.6)_78%,#100d1e_100%)]">
       {/* Spline 3D background */}
       <div
         className="pointer-events-none absolute -top-[20%] right-0 bottom-0 left-0 z-[-1] overflow-hidden"
