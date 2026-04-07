@@ -3,7 +3,7 @@
   min-height: 100svh;
   display: flex;
   flex-direction: column;
-  background: var(--bg);
+  background: linear-gradient(170deg, #0e0b1c 0%, #160f2a 40%, #1a1035 70%, #100d1e 100%);
 }
 
 /* ── Header ── */
@@ -11,7 +11,9 @@
   position: sticky;
   top: 0;
   z-index: 100;
-  background: var(--bg);
+  background: rgba(16, 13, 30, 0.75);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
   border-bottom: 1px solid var(--border);
   padding: 0 24px;
 }
@@ -95,10 +97,13 @@
 }
 
 .settings-card {
-  border: 1px solid var(--border);
-  border-radius: 12px;
+  background: var(--card-bg);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--glass-border);
+  border-radius: 16px;
+  box-shadow: var(--glass-shadow);
   padding: 24px;
-  background: var(--bg);
 }
 
 /* ── Avatar display ── */

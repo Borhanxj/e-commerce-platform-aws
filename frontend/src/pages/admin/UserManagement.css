@@ -20,17 +20,18 @@
   font-size: 14px;
   padding: 8px 12px;
   border: 1px solid var(--border);
-  border-radius: 6px;
-  background: var(--bg);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.05);
   color: var(--text-h);
   outline: none;
   flex: 1;
   min-width: 140px;
-  transition: border-color 0.15s;
+  transition: border-color 0.15s, background 0.15s;
 }
 
 .um-search:focus {
   border-color: var(--accent);
+  background: rgba(255, 255, 255, 0.08);
   box-shadow: 0 0 0 3px var(--accent-bg);
 }
 
@@ -39,11 +40,12 @@
   font-size: 14px;
   padding: 8px 12px;
   border: 1px solid var(--border);
-  border-radius: 6px;
-  background: var(--bg);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.05);
   color: var(--text-h);
   outline: none;
   cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
 }
 
 /* ─── Buttons ─────────────────────────────────── */
@@ -53,8 +55,8 @@
   font-weight: 500;
   padding: 8px 16px;
   border: 1px solid var(--border);
-  border-radius: 6px;
-  background: var(--bg);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.05);
   color: var(--text-h);
   cursor: pointer;
   transition:
@@ -124,9 +126,13 @@
 
 /* ─── Table ───────────────────────────────────── */
 .um-table-wrap {
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  overflow-x: auto;
+  background: var(--card-bg);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--glass-border);
+  border-radius: 16px;
+  box-shadow: var(--glass-shadow);
+  overflow: hidden;
 }
 
 .um-table {
@@ -228,7 +234,9 @@
 .um-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.45);
+  background: rgba(10, 8, 20, 0.6);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -237,13 +245,15 @@
 }
 
 .um-modal {
-  background: var(--bg);
-  border: 1px solid var(--border);
-  border-radius: 12px;
+  background: rgba(25, 20, 45, 0.95);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--glass-border);
+  border-radius: 20px;
   padding: 32px;
   width: 100%;
   max-width: 440px;
-  box-shadow: var(--shadow);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
 }
 
 .um-modal h2 {
