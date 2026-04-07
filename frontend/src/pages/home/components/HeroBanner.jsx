@@ -1,11 +1,33 @@
-import Spline from '@splinetool/react-spline'
+import { Suspense, lazy, useState, useEffect } from 'react'
+
+const Spline = lazy(() => import('@splinetool/react-spline'))
+
+function HeroFallback() {
+  return <div className="hero-spline-fallback" aria-hidden="true" />
+}
 
 export default function HeroBanner() {
+  const [shouldLoad3D, setShouldLoad3D] = useState(
+    () => !window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  )
+
+  useEffect(() => {
+    const motionQuery = window.matchMedia('(prefers-reduced-motion: reduce)')
+    const handler = (e) => setShouldLoad3D(!e.matches)
+    motionQuery.addEventListener('change', handler)
+    return () => motionQuery.removeEventListener('change', handler)
+  }, [])
+
   return (
     <section className="hero-banner">
-      {/* Spline 3D background */}
       <div className="hero-spline-bg" aria-hidden="true">
-        <Spline scene="https://prod.spline.design/smuAGxLA0AM6n8JN/scene.splinecode" />
+        {shouldLoad3D ? (
+          <Suspense fallback={<HeroFallback />}>
+            <Spline scene="https://prod.spline.design/smuAGxLA0AM6n8JN/scene.splinecode" />
+          </Suspense>
+        ) : (
+          <HeroFallback />
+        )}
       </div>
 
       <div className="hero-text">

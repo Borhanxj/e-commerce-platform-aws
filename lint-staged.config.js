@@ -5,14 +5,14 @@ module.exports = {
     const rel = files.map((f) => path.relative('frontend', f)).join(' ')
     return [
       `sh -c 'cd frontend && npx eslint ${rel}'`,
-      `sh -c 'cd frontend && npx prettier --check ${rel}'`,
+      `sh -c 'cd frontend && npx prettier --write ${rel}'`,
     ]
   },
   'backend/**/*.js': (files) => {
     const rel = files.map((f) => path.relative('backend', f)).join(' ')
     return [
       `sh -c 'cd backend && npx eslint ${rel}'`,
-      `sh -c 'cd backend && npx prettier --check ${rel}'`,
+      `sh -c 'cd backend && npx prettier --write ${rel}'`,
     ]
   },
 }

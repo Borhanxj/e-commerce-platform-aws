@@ -39,114 +39,6 @@
   );
 }
 
-.home-bg__orb {
-  position: absolute;
-  border-radius: 50%;
-  filter: blur(140px);
-  opacity: 0.15;
-  will-change: transform;
-}
-
-.home-bg__orb--a {
-  width: 80vw;
-  height: 70vh;
-  background: radial-gradient(ellipse at center, #8060c0 0%, transparent 70%);
-  top: -20vh;
-  left: -20vw;
-  animation: orb-drift-a 24s ease-in-out infinite alternate;
-}
-
-.home-bg__orb--b {
-  width: 60vw;
-  height: 60vh;
-  background: radial-gradient(ellipse at center, #6a4aaa 0%, transparent 70%);
-  top: 15vh;
-  right: -15vw;
-  animation: orb-drift-b 30s ease-in-out infinite alternate;
-}
-
-.home-bg__orb--c {
-  width: 65vw;
-  height: 55vh;
-  background: radial-gradient(ellipse at center, #9068c0 0%, transparent 70%);
-  bottom: 10vh;
-  left: 15vw;
-  animation: orb-drift-c 36s ease-in-out infinite alternate;
-}
-
-.home-bg__orb--d {
-  width: 45vw;
-  height: 45vh;
-  background: radial-gradient(ellipse at center, #7858b8 0%, transparent 70%);
-  bottom: -15vh;
-  right: 5vw;
-  animation: orb-drift-d 28s ease-in-out infinite alternate;
-}
-
-.home-bg__orb--e {
-  width: 50vw;
-  height: 40vh;
-  background: radial-gradient(ellipse at center, #a070bc 0%, transparent 70%);
-  top: 50vh;
-  left: -10vw;
-  animation: orb-drift-e 32s ease-in-out infinite alternate;
-}
-
-@keyframes orb-drift-a {
-  0% {
-    transform: translate(0, 0) scale(1);
-  }
-  50% {
-    transform: translate(5vw, 4vh) scale(1.04);
-  }
-  100% {
-    transform: translate(2vw, 9vh) scale(0.97);
-  }
-}
-@keyframes orb-drift-b {
-  0% {
-    transform: translate(0, 0) scale(1);
-  }
-  50% {
-    transform: translate(-4vw, 5vh) scale(1.03);
-  }
-  100% {
-    transform: translate(-8vw, 2vh) scale(1.05);
-  }
-}
-@keyframes orb-drift-c {
-  0% {
-    transform: translate(0, 0) scale(1);
-  }
-  40% {
-    transform: translate(3vw, -5vh) scale(0.97);
-  }
-  100% {
-    transform: translate(-3vw, -9vh) scale(1.03);
-  }
-}
-@keyframes orb-drift-d {
-  0% {
-    transform: translate(0, 0) scale(1);
-  }
-  60% {
-    transform: translate(-5vw, -4vh) scale(1.05);
-  }
-  100% {
-    transform: translate(3vw, -6vh) scale(0.96);
-  }
-}
-@keyframes orb-drift-e {
-  0% {
-    transform: translate(0, 0) scale(1);
-  }
-  50% {
-    transform: translate(6vw, 3vh) scale(1.04);
-  }
-  100% {
-    transform: translate(4vw, -5vh) scale(0.98);
-  }
-}
 
 /* ── Navbar ── */
 .navbar {
@@ -408,6 +300,13 @@
   z-index: 1;
 }
 
+/* Instant CSS fallback — visible before JS loads and if Spline fails */
+.hero-spline-fallback {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 60% 40%, #2e1065 0%, #0f0a24 55%, #020617 100%);
+}
+
 /* Spline 3D background layer — top shifted up to crop the empty space */
 .hero-spline-bg {
   position: absolute;
@@ -514,17 +413,7 @@
     height: 100svh;
     padding: 56px 24px;
   }
-  .decor-circle-1 {
-    width: 300px;
-    height: 300px;
-  }
-  .decor-circle-2 {
-    width: 220px;
-    height: 220px;
-  }
-  .decor-diamond-1 {
-    display: none;
-  }
+
 }
 
 /* ── Shared section layout ── */
