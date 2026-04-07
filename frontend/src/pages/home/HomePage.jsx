@@ -111,13 +111,7 @@ export default function HomePage({
   return (
     <div className="home">
       {/* Liquid glass ambient background */}
-      <div className="home-bg" aria-hidden="true">
-        <div className="home-bg__orb home-bg__orb--a" />
-        <div className="home-bg__orb home-bg__orb--b" />
-        <div className="home-bg__orb home-bg__orb--c" />
-        <div className="home-bg__orb home-bg__orb--d" />
-        <div className="home-bg__orb home-bg__orb--e" />
-      </div>
+      <div className="home-bg" aria-hidden="true" />
 
       <Navbar
         isLoggedIn={isLoggedIn}

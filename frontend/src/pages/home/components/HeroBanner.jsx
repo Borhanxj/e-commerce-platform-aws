@@ -8,19 +8,6 @@ export default function HeroBanner() {
         <Spline scene="https://prod.spline.design/smuAGxLA0AM6n8JN/scene.splinecode" />
       </div>
 
-      {/* Decorative background elements */}
-      <div className="hero-decor" aria-hidden="true">
-        <div className="decor-circle decor-circle-1" />
-        <div className="decor-circle decor-circle-2" />
-        <div className="decor-circle decor-circle-3" />
-        <div className="decor-lines" />
-        <div className="decor-diamond decor-diamond-1" />
-        <div className="decor-diamond decor-diamond-2" />
-        <div className="decor-stripe decor-stripe-1" />
-        <div className="decor-stripe decor-stripe-2" />
-        <div className="decor-stripe decor-stripe-3" />
-      </div>
-
       <div className="hero-text">
         <p className="hero-eyebrow">New Season</p>
         <h1>Discover Your Style</h1>
