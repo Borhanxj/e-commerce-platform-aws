@@ -39,7 +39,6 @@
   );
 }
 
-
 /* ── Navbar ── */
 .navbar {
   position: fixed;
@@ -413,7 +412,6 @@
     height: 100svh;
     padding: 56px 24px;
   }
-
 }
 
 /* ── Shared section layout ── */
