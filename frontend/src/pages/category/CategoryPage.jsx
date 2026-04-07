@@ -135,7 +135,7 @@ export default function CategoryPage({
   const wishlistIds = new Set(wishlistItems.map((i) => i.id))
 
   return (
-    <div className="flex min-h-svh w-full flex-col bg-[var(--bg)] pt-16 transition-colors duration-300">
+    <div className="flex min-h-svh w-full flex-col bg-[var(--bg)] pt-16">
       <header className="fixed top-0 right-0 left-0 z-[1000] border-b border-[var(--border)] bg-[rgba(var(--background),0.75)] px-6 backdrop-blur-[20px]">
         <div className="mx-auto flex h-16 max-w-[1280px] items-center gap-4">
           <button

@@ -267,7 +267,7 @@ function OrderManagement({ token }) {
 
       {/* Order Detail Modal */}
       <Dialog open={!!detail} onOpenChange={(open) => !open && setDetail(null)}>
-        <DialogContent className="max-w-[560px] rounded-2xl border border-[var(--glass-border)] bg-[var(--card-bg)] shadow-[var(--shadow)] backdrop-blur-xl transition-colors duration-300">
+        <DialogContent className="max-w-[560px] rounded-2xl border border-[var(--glass-border)] bg-[var(--card-bg)] shadow-[var(--shadow)] backdrop-blur-xl">
           <DialogHeader>
             <DialogTitle className="text-xl text-[var(--text-h)]">
               Order #{detail?.order.id}
@@ -381,7 +381,7 @@ function OrderManagement({ token }) {
 
       {/* Delete Confirmation */}
       <Dialog open={!!deleteConfirm} onOpenChange={(open) => !open && setDeleteConfirm(null)}>
-        <DialogContent className="max-w-md rounded-2xl border border-[var(--glass-border)] bg-[var(--card-bg)] shadow-[var(--shadow)] backdrop-blur-xl transition-colors duration-300">
+        <DialogContent className="max-w-md rounded-2xl border border-[var(--glass-border)] bg-[var(--card-bg)] shadow-[var(--shadow)] backdrop-blur-xl">
           <DialogHeader>
             <DialogTitle className="text-xl text-[var(--text-h)]">Delete Order</DialogTitle>
           </DialogHeader>

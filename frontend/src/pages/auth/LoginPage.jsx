@@ -38,7 +38,7 @@ function LoginPage({ onLogin, onForgotPassword, onRegister }) {
   }
 
   return (
-    <div className="flex min-h-svh items-center justify-center bg-[var(--bg)] p-6 transition-colors duration-300">
+    <div className="flex min-h-svh items-center justify-center bg-[var(--bg)] p-6">
       {/* Ambient background */}
       <div
         className="pointer-events-none fixed inset-0 z-0 overflow-hidden"

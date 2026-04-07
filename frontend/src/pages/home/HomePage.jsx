@@ -112,7 +112,7 @@ export default function HomePage({
   }
 
   return (
-    <div className="flex min-h-svh w-full flex-col bg-[var(--bg)] text-left transition-colors duration-300">
+    <div className="flex min-h-svh w-full flex-col bg-[var(--bg)] text-left">
       {/* Ambient background */}
       <div
         className="pointer-events-none fixed inset-0 z-0 overflow-hidden"

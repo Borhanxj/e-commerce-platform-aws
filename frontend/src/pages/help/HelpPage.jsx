@@ -331,7 +331,7 @@ export default function HelpPage({ onBack }) {
   }, [search, activeCategory])
 
   return (
-    <div className="flex min-h-svh w-full flex-col bg-[var(--bg)] pt-16 transition-colors duration-300">
+    <div className="flex min-h-svh w-full flex-col bg-[var(--bg)] pt-16">
       <header className="fixed top-0 right-0 left-0 z-[1000] border-b border-[var(--border)] bg-[rgba(var(--background),0.75)] px-6 backdrop-blur-[20px]">
         <div className="mx-auto flex h-16 max-w-[1280px] items-center gap-4">
           <button
@@ -347,7 +347,7 @@ export default function HelpPage({ onBack }) {
       </header>
 
       {/* Hero */}
-      <div className="flex flex-col items-center gap-3 bg-[linear-gradient(135deg,var(--bg)_0%,var(--bg-gradient-to)_50%,var(--accent-bg)_100%)] px-6 py-16 text-center transition-colors duration-300">
+      <div className="flex flex-col items-center gap-3 bg-[linear-gradient(135deg,var(--bg)_0%,var(--bg-gradient-to)_50%,var(--accent-bg)_100%)] px-6 py-16 text-center">
         <p className="m-0 text-[11px] font-bold tracking-[5px] text-purple-400 uppercase">
           Support
         </p>
@@ -436,7 +436,7 @@ export default function HelpPage({ onBack }) {
         )}
 
         {/* Contact strip */}
-        <div className="mt-4 flex flex-wrap items-center justify-between gap-6 rounded-[14px] border border-[var(--border)] bg-[linear-gradient(135deg,var(--bg)_0%,var(--bg-gradient-to)_50%,var(--accent-bg)_100%)] px-8 py-7 transition-colors duration-300 max-[600px]:flex-col max-[600px]:items-start max-[600px]:px-6">
+        <div className="mt-4 flex flex-wrap items-center justify-between gap-6 rounded-[14px] border border-[var(--border)] bg-[linear-gradient(135deg,var(--bg)_0%,var(--bg-gradient-to)_50%,var(--accent-bg)_100%)] px-8 py-7 max-[600px]:flex-col max-[600px]:items-start max-[600px]:px-6">
           <div>
             <p className="m-0 mb-1 text-[17px] font-bold text-[var(--text-h)]">Still need help?</p>
             <p className="m-0 text-[13px] text-[var(--text)] opacity-70">

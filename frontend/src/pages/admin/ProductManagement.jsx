@@ -257,7 +257,7 @@ function ProductManagement({ token }) {
 
       {/* Delete Confirmation */}
       <Dialog open={!!deleteConfirm} onOpenChange={(open) => !open && setDeleteConfirm(null)}>
-        <DialogContent className="max-w-md rounded-2xl border border-[var(--glass-border)] bg-[var(--card-bg)] shadow-[var(--shadow)] backdrop-blur-xl transition-colors duration-300">
+        <DialogContent className="max-w-md rounded-2xl border border-[var(--glass-border)] bg-[var(--card-bg)] shadow-[var(--shadow)] backdrop-blur-xl">
           <DialogHeader>
             <DialogTitle className="text-xl text-[var(--text-h)]">Delete Product</DialogTitle>
           </DialogHeader>
@@ -319,7 +319,7 @@ function ProductModal({ mode, product, onClose, onCreate, onUpdate }) {
 
   return (
     <Dialog open onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="max-w-md rounded-2xl border border-[var(--glass-border)] bg-[var(--card-bg)] shadow-[var(--shadow)] backdrop-blur-xl transition-colors duration-300">
+      <DialogContent className="max-w-md rounded-2xl border border-[var(--glass-border)] bg-[var(--card-bg)] shadow-[var(--shadow)] backdrop-blur-xl">
         <DialogHeader>
           <DialogTitle className="text-xl text-[var(--text-h)]">
             {mode === 'create' ? 'Create Product' : 'Edit Product'}

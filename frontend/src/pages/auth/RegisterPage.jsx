@@ -45,8 +45,7 @@ function RegisterPage({ onBack }) {
     }
   }
 
-  const wrapperCls =
-    'flex min-h-svh items-center justify-center p-6 bg-[var(--bg)] transition-colors duration-300'
+  const wrapperCls = 'flex min-h-svh items-center justify-center p-6 bg-[var(--bg)]'
   const cardCls =
     'relative z-10 w-full max-w-sm rounded-[20px] border border-[var(--glass-border)] bg-[var(--card-bg)] p-10 shadow-[var(--shadow)] backdrop-blur-xl'
   const inputCls =
