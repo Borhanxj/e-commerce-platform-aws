@@ -5,5 +5,15 @@
   },
   "scripts": {
     "prepare": "husky"
+  },
+  "lint-staged": {
+    "frontend/**/*.{js,jsx}": [
+      "bash -c 'cd frontend && npx eslint --fix $@' --",
+      "bash -c 'cd frontend && npx prettier --write $@' --"
+    ],
+    "backend/**/*.js": [
+      "bash -c 'cd backend && npx eslint --fix $@' --",
+      "bash -c 'cd backend && npx prettier --write $@' --"
+    ]
   }
 }
