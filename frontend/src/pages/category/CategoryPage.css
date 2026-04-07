@@ -227,3 +227,15 @@
   border-color: var(--accent);
   color: var(--accent);
 }
+
+.add-cart-btn.in-cart {
+  background: transparent;
+  border: 1px solid var(--accent);
+  color: var(--accent);
+}
+
+.add-wishlist-btn.in-wishlist {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: var(--accent-bg);
+}

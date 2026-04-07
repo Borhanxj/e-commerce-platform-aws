@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Routes, Route, Navigate, useNavigate, useLocation } from 'react-router-dom'
 import AdminLoginPage from './pages/admin/AdminLoginPage'
 import AdminDashboard from './pages/admin/AdminDashboard'
@@ -41,7 +41,14 @@ function RequireAdmin({ adminToken, children }) {
   return children
 }
 
-function CategoryRoute() {
+function CategoryRoute({
+  onAddToCart,
+  onRemoveFromCart,
+  onAddToWishlist,
+  onRemoveFromWishlist,
+  cartItems,
+  wishlistItems,
+}) {
   const { state } = useLocation()
   const navigate = useNavigate()
 
@@ -49,7 +56,18 @@ function CategoryRoute() {
     return <Navigate to="/" replace />
   }
 
-  return <CategoryPage category={state.category} onBack={() => navigate(-1)} />
+  return (
+    <CategoryPage
+      category={state.category}
+      onBack={() => navigate(-1)}
+      onAddToCart={onAddToCart}
+      onRemoveFromCart={onRemoveFromCart}
+      onAddToWishlist={onAddToWishlist}
+      onRemoveFromWishlist={onRemoveFromWishlist}
+      cartItems={cartItems}
+      wishlistItems={wishlistItems}
+    />
+  )
 }
 
 function App() {
@@ -66,7 +84,64 @@ function App() {
   })
 
   const [adminToken, setAdminToken] = useState(() => localStorage.getItem('adminToken'))
+  const [cart, setCart] = useState(() => {
+    try {
+      return JSON.parse(localStorage.getItem('guest_cart') || '[]')
+    } catch {
+      return []
+    }
+  })
+  const [wishlist, setWishlist] = useState(() => {
+    try {
+      return JSON.parse(localStorage.getItem('guest_wishlist') || '[]')
+    } catch {
+      return []
+    }
+  })
   const navigate = useNavigate()
+
+  useEffect(() => {
+    localStorage.setItem('guest_cart', JSON.stringify(cart))
+  }, [cart])
+
+  useEffect(() => {
+    localStorage.setItem('guest_wishlist', JSON.stringify(wishlist))
+  }, [wishlist])
+
+  function addToCart(product) {
+    setCart((prev) => {
+      const existing = prev.find((item) => item.id === product.id)
+      if (existing) {
+        return prev.map((item) =>
+          item.id === product.id ? { ...item, quantity: item.quantity + 1 } : item
+        )
+      }
+      return [...prev, { id: product.id, name: product.name, price: product.price, quantity: 1 }]
+    })
+  }
+
+  function removeFromCart(productId) {
+    setCart((prev) => prev.filter((item) => item.id !== productId))
+  }
+
+  function updateCartQuantity(productId, quantity) {
+    if (quantity < 1) {
+      removeFromCart(productId)
+      return
+    }
+    setCart((prev) => prev.map((item) => (item.id === productId ? { ...item, quantity } : item)))
+  }
+
+  function addToWishlist(product) {
+    setWishlist((prev) => {
+      if (prev.find((item) => item.id === product.id)) return prev
+      return [...prev, { id: product.id, name: product.name, price: product.price }]
+    })
+  }
+
+  function removeFromWishlist(productId) {
+    setWishlist((prev) => prev.filter((item) => item.id !== productId))
+  }
 
   function handleLogin(t) {
     const payload = decodeJwtPayload(t)
@@ -120,6 +195,9 @@ function App() {
               setUser(null)
               navigate('/')
             }}
+            cartCount={cart.reduce((sum, item) => sum + item.quantity, 0)}
+            wishlistCount={wishlist.length}
+            onAddToCart={addToCart}
           />
         }
       />
@@ -142,9 +220,42 @@ function App() {
         path="/reset-password"
         element={<ResetPasswordPage onBack={() => navigate('/login')} />}
       />
-      <Route path="/cart" element={<CartPage onBack={() => navigate(-1)} />} />
-      <Route path="/wishlist" element={<WishlistPage onBack={() => navigate(-1)} />} />
-      <Route path="/category" element={<CategoryRoute />} />
+      <Route
+        path="/cart"
+        element={
+          <CartPage
+            onBack={() => navigate(-1)}
+            cartItems={cart}
+            onRemove={removeFromCart}
+            onUpdateQuantity={updateCartQuantity}
+            isLoggedIn={!!token}
+          />
+        }
+      />
+      <Route
+        path="/wishlist"
+        element={
+          <WishlistPage
+            onBack={() => navigate(-1)}
+            wishlistItems={wishlist}
+            onRemove={removeFromWishlist}
+            onAddToCart={addToCart}
+          />
+        }
+      />
+      <Route
+        path="/category"
+        element={
+          <CategoryRoute
+            onAddToCart={addToCart}
+            onRemoveFromCart={removeFromCart}
+            onAddToWishlist={addToWishlist}
+            onRemoveFromWishlist={removeFromWishlist}
+            cartItems={cart}
+            wishlistItems={wishlist}
+          />
+        }
+      />
       <Route
         path="/account-settings"
         element={

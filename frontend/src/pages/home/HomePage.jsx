@@ -17,14 +17,14 @@ const CATEGORIES = [
 ]
 
 const NEW_RELEASES = [
-  { id: 1, name: 'Oversized Linen Shirt', category: "Women's", price: 79.99, hue: 280 },
-  { id: 2, name: 'Slim Fit Chinos', category: "Men's", price: 69.99, hue: 210 },
-  { id: 3, name: 'Leather Moto Jacket', category: 'Outerwear', price: 249.99, hue: 200 },
-  { id: 4, name: 'Platform Loafers', category: 'Footwear', price: 119.99, hue: 160 },
-  { id: 5, name: 'Structured Tote', category: 'Accessories', price: 139.99, hue: 40 },
-  { id: 6, name: 'Ribbed Midi Dress', category: "Women's", price: 94.99, hue: 340 },
-  { id: 7, name: 'Merino Polo', category: "Men's", price: 89.99, hue: 190 },
-  { id: 8, name: 'Cropped Blazer', category: 'Formal', price: 179.99, hue: 260 },
+  { id: 101, name: 'Oversized Linen Shirt', category: "Women's", price: 79.99, hue: 280 },
+  { id: 102, name: 'Slim Fit Chinos', category: "Men's", price: 69.99, hue: 210 },
+  { id: 103, name: 'Leather Moto Jacket', category: 'Outerwear', price: 249.99, hue: 200 },
+  { id: 104, name: 'Platform Loafers', category: 'Footwear', price: 119.99, hue: 160 },
+  { id: 105, name: 'Structured Tote', category: 'Accessories', price: 139.99, hue: 40 },
+  { id: 106, name: 'Ribbed Midi Dress', category: "Women's", price: 94.99, hue: 340 },
+  { id: 107, name: 'Merino Polo', category: "Men's", price: 89.99, hue: 190 },
+  { id: 108, name: 'Cropped Blazer', category: 'Formal', price: 179.99, hue: 260 },
 ]
 
 const REVIEWS = [
@@ -90,9 +90,16 @@ const REVIEWS = [
   },
 ]
 
-export default function HomePage({ isLoggedIn, userEmail, onNavigate, onRequireAuth, onLogout }) {
-  const [cartCount] = useState(0)
-  const [wishlistCount] = useState(0)
+export default function HomePage({
+  isLoggedIn,
+  userEmail,
+  onNavigate,
+  onRequireAuth,
+  onLogout,
+  cartCount = 0,
+  wishlistCount = 0,
+  onAddToCart,
+}) {
   const [searchQuery, setSearchQuery] = useState('')
   const [saleBannerVisible, setSaleBannerVisible] = useState(true)
 
@@ -217,7 +224,11 @@ export default function HomePage({ isLoggedIn, userEmail, onNavigate, onRequireA
                 <span className="release-name">{product.name}</span>
                 <div className="release-footer">
                   <span className="release-price">${product.price.toFixed(2)}</span>
-                  <button className="release-cart-btn" aria-label="Add to cart">
+                  <button
+                    className="release-cart-btn"
+                    aria-label="Add to cart"
+                    onClick={() => onAddToCart && onAddToCart(product)}
+                  >
                     <MiniCartIcon />
                   </button>
                 </div>

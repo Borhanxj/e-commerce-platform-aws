@@ -37,13 +37,13 @@ function CartIcon() {
   )
 }
 
-function HeartIcon() {
+function HeartIcon({ filled }) {
   return (
     <svg
       width="16"
       height="16"
       viewBox="0 0 24 24"
-      fill="none"
+      fill={filled ? 'currentColor' : 'none'}
       stroke="currentColor"
       strokeWidth="2"
       strokeLinecap="round"
@@ -121,8 +121,20 @@ const PRODUCTS = {
   ],
 }
 
-export default function CategoryPage({ category, onBack }) {
+export default function CategoryPage({
+  category,
+  onBack,
+  onAddToCart,
+  onRemoveFromCart,
+  onAddToWishlist,
+  onRemoveFromWishlist,
+  cartItems = [],
+  wishlistItems = [],
+}) {
   const products = PRODUCTS[category.id] ?? []
+
+  const cartIds = new Set(cartItems.map((i) => i.id))
+  const wishlistIds = new Set(wishlistItems.map((i) => i.id))
 
   return (
     <div className="category-page">
@@ -143,25 +155,44 @@ export default function CategoryPage({ category, onBack }) {
         </div>
 
         <div className="product-grid">
-          {products.map((product) => (
-            <div key={product.id} className="product-card">
-              <div className="product-image-placeholder">
-                <span className="product-placeholder-label">{product.name[0]}</span>
+          {products.map((product) => {
+            const inCart = cartIds.has(product.id)
+            const inWishlist = wishlistIds.has(product.id)
+            return (
+              <div key={product.id} className="product-card">
+                <div className="product-image-placeholder">
+                  <span className="product-placeholder-label">{product.name[0]}</span>
+                </div>
+                <div className="product-info">
+                  <span className="product-name">{product.name}</span>
+                  <span className="product-price">${product.price.toFixed(2)}</span>
+                </div>
+                <div className="product-actions">
+                  <button
+                    className={`add-cart-btn${inCart ? ' in-cart' : ''}`}
+                    onClick={() =>
+                      inCart
+                        ? onRemoveFromCart && onRemoveFromCart(product.id)
+                        : onAddToCart && onAddToCart(product)
+                    }
+                  >
+                    <CartIcon /> {inCart ? 'Remove from Cart' : 'Add to Cart'}
+                  </button>
+                  <button
+                    className={`add-wishlist-btn${inWishlist ? ' in-wishlist' : ''}`}
+                    aria-label={inWishlist ? 'Remove from wishlist' : 'Add to wishlist'}
+                    onClick={() =>
+                      inWishlist
+                        ? onRemoveFromWishlist && onRemoveFromWishlist(product.id)
+                        : onAddToWishlist && onAddToWishlist(product)
+                    }
+                  >
+                    <HeartIcon filled={inWishlist} />
+                  </button>
+                </div>
               </div>
-              <div className="product-info">
-                <span className="product-name">{product.name}</span>
-                <span className="product-price">${product.price.toFixed(2)}</span>
-              </div>
-              <div className="product-actions">
-                <button className="add-cart-btn">
-                  <CartIcon /> Add to Cart
-                </button>
-                <button className="add-wishlist-btn" aria-label="Add to wishlist">
-                  <HeartIcon />
-                </button>
-              </div>
-            </div>
-          ))}
+            )
+          })}
         </div>
       </main>
     </div>
