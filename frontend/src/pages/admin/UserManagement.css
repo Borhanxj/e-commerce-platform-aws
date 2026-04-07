@@ -26,7 +26,9 @@
   outline: none;
   flex: 1;
   min-width: 140px;
-  transition: border-color 0.15s, background 0.15s;
+  transition:
+    border-color 0.15s,
+    background 0.15s;
 }
 
 .um-search:focus {
@@ -45,7 +47,9 @@
   color: var(--text-h);
   outline: none;
   cursor: pointer;
-  transition: border-color 0.15s, background 0.15s;
+  transition:
+    border-color 0.15s,
+    background 0.15s;
 }
 
 /* ─── Buttons ─────────────────────────────────── */
