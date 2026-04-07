@@ -274,7 +274,7 @@
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 16px;
   box-shadow:
-    0 16px 48px rgba(0, 0, 0, 0.6),
+    0 8px 24px rgba(0, 0, 0, 0.3),
     inset 0 1px 0 rgba(255, 255, 255, 0.1);
   padding: 8px;
   z-index: 200;
@@ -907,6 +907,35 @@
   }
 }
 
+/* ── New Releases nav ── */
+.releases-nav {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.releases-arrow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(255, 255, 255, 0.07);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  color: var(--text-h);
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+
+.releases-arrow:hover {
+  background: rgba(192, 132, 252, 0.18);
+  border-color: rgba(192, 132, 252, 0.4);
+  color: var(--accent);
+}
+
 /* ── New Releases ── */
 .releases-scroll {
   display: flex;
@@ -935,7 +964,7 @@
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   box-shadow:
-    0 8px 32px rgba(0, 0, 0, 0.45),
+    0 4px 12px rgba(0, 0, 0, 0.2),
     inset 0 1px 0 rgba(255, 255, 255, 0.14);
   transition:
     box-shadow 0.25s,
@@ -945,7 +974,7 @@
 
 .release-card:hover {
   box-shadow:
-    0 16px 48px rgba(0, 0, 0, 0.6),
+    0 8px 24px rgba(0, 0, 0, 0.3),
     0 0 0 1px rgba(192, 132, 252, 0.35),
     inset 0 1px 0 rgba(255, 255, 255, 0.18);
   border-color: rgba(192, 132, 252, 0.4);
@@ -1156,7 +1185,7 @@
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   box-shadow:
-    0 8px 32px rgba(0, 0, 0, 0.45),
+    0 4px 12px rgba(0, 0, 0, 0.2),
     inset 0 1px 0 rgba(255, 255, 255, 0.14);
   cursor: pointer;
   text-align: left;
@@ -1169,7 +1198,7 @@
 
 .category-card:hover {
   box-shadow:
-    0 16px 48px rgba(0, 0, 0, 0.6),
+    0 8px 24px rgba(0, 0, 0, 0.3),
     0 0 0 1px rgba(192, 132, 252, 0.35),
     inset 0 1px 0 rgba(255, 255, 255, 0.18);
   border-color: rgba(192, 132, 252, 0.4);

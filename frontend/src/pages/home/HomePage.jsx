@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { MiniCartIcon, StarRating } from '../../components/icons'
 import Navbar from './components/Navbar'
 import HeroBanner from './components/HeroBanner'
@@ -101,6 +101,12 @@ export default function HomePage({
   onAddToCart,
 }) {
   const [searchQuery, setSearchQuery] = useState('')
+  const releasesRef = useRef(null)
+
+  function scrollReleases(dir) {
+    const el = releasesRef.current
+    if (el) el.scrollBy({ left: dir * 240, behavior: 'smooth' })
+  }
 
   return (
     <div className="home">
@@ -166,9 +172,47 @@ export default function HomePage({
             <p className="section-eyebrow">Just Dropped</p>
             <h2 className="section-title">New Releases</h2>
           </div>
-          <button className="section-link">View All</button>
+          <div className="releases-nav">
+            <button
+              className="releases-arrow"
+              onClick={() => scrollReleases(-1)}
+              aria-label="Scroll left"
+            >
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <polyline points="15 18 9 12 15 6" />
+              </svg>
+            </button>
+            <button
+              className="releases-arrow"
+              onClick={() => scrollReleases(1)}
+              aria-label="Scroll right"
+            >
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <polyline points="9 18 15 12 9 6" />
+              </svg>
+            </button>
+            <button className="section-link">View All</button>
+          </div>
         </div>
-        <div className="releases-scroll">
+        <div className="releases-scroll" ref={releasesRef}>
           {NEW_RELEASES.map((product) => (
             <div key={product.id} className="release-card">
               <div
