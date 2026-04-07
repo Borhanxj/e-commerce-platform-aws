@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { MiniCartIcon, StarRating } from '../../components/icons'
 import Navbar from './components/Navbar'
 import HeroBanner from './components/HeroBanner'
@@ -17,14 +17,14 @@ const CATEGORIES = [
 ]
 
 const NEW_RELEASES = [
-  { id: 1, name: 'Oversized Linen Shirt', category: "Women's", price: 79.99, hue: 280 },
-  { id: 2, name: 'Slim Fit Chinos', category: "Men's", price: 69.99, hue: 210 },
-  { id: 3, name: 'Leather Moto Jacket', category: 'Outerwear', price: 249.99, hue: 200 },
-  { id: 4, name: 'Platform Loafers', category: 'Footwear', price: 119.99, hue: 160 },
-  { id: 5, name: 'Structured Tote', category: 'Accessories', price: 139.99, hue: 40 },
-  { id: 6, name: 'Ribbed Midi Dress', category: "Women's", price: 94.99, hue: 340 },
-  { id: 7, name: 'Merino Polo', category: "Men's", price: 89.99, hue: 190 },
-  { id: 8, name: 'Cropped Blazer', category: 'Formal', price: 179.99, hue: 260 },
+  { id: 101, name: 'Oversized Linen Shirt', category: "Women's", price: 79.99, hue: 280 },
+  { id: 102, name: 'Slim Fit Chinos', category: "Men's", price: 69.99, hue: 210 },
+  { id: 103, name: 'Leather Moto Jacket', category: 'Outerwear', price: 249.99, hue: 200 },
+  { id: 104, name: 'Platform Loafers', category: 'Footwear', price: 119.99, hue: 160 },
+  { id: 105, name: 'Structured Tote', category: 'Accessories', price: 139.99, hue: 40 },
+  { id: 106, name: 'Ribbed Midi Dress', category: "Women's", price: 94.99, hue: 340 },
+  { id: 107, name: 'Merino Polo', category: "Men's", price: 89.99, hue: 190 },
+  { id: 108, name: 'Cropped Blazer', category: 'Formal', price: 179.99, hue: 260 },
 ]
 
 const REVIEWS = [
@@ -90,56 +90,28 @@ const REVIEWS = [
   },
 ]
 
-export default function HomePage({ isLoggedIn, userEmail, onNavigate, onRequireAuth, onLogout }) {
-  const [cartCount] = useState(0)
-  const [wishlistCount] = useState(0)
+export default function HomePage({
+  isLoggedIn,
+  userEmail,
+  onNavigate,
+  onRequireAuth,
+  onLogout,
+  cartCount = 0,
+  wishlistCount = 0,
+  onAddToCart,
+}) {
   const [searchQuery, setSearchQuery] = useState('')
-  const [saleBannerVisible, setSaleBannerVisible] = useState(true)
+  const releasesRef = useRef(null)
+
+  function scrollReleases(dir) {
+    const el = releasesRef.current
+    if (el) el.scrollBy({ left: dir * 240, behavior: 'smooth' })
+  }
 
   return (
     <div className="home">
-      {/* Sale announcement bar */}
-      {saleBannerVisible && (
-        <div className="sale-banner">
-          <div className="sale-marquee-track">
-            {[0, 1].map((copy) => (
-              <ul key={copy} className="sale-marquee-list" aria-hidden={copy === 1}>
-                <li>🔥 SUMMER SALE — UP TO 50% OFF</li>
-                <li>·</li>
-                <li>FREE SHIPPING ON ORDERS OVER £50</li>
-                <li>·</li>
-                <li>
-                  USE CODE <strong>SUMMER25</strong> FOR 25% OFF YOUR FIRST ORDER
-                </li>
-                <li>·</li>
-                <li>NEW ARRIVALS DROPPING EVERY WEEK</li>
-                <li>·</li>
-                <li>LIMITED TIME ONLY — DON'T MISS OUT</li>
-                <li>·</li>
-              </ul>
-            ))}
-          </div>
-          <button
-            className="sale-banner-close"
-            onClick={() => setSaleBannerVisible(false)}
-            aria-label="Dismiss sale banner"
-          >
-            <svg
-              width="14"
-              height="14"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2.5"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <line x1="18" y1="6" x2="6" y2="18" />
-              <line x1="6" y1="6" x2="18" y2="18" />
-            </svg>
-          </button>
-        </div>
-      )}
+      {/* Liquid glass ambient background */}
+      <div className="home-bg" aria-hidden="true" />
 
       <Navbar
         isLoggedIn={isLoggedIn}
@@ -194,9 +166,47 @@ export default function HomePage({ isLoggedIn, userEmail, onNavigate, onRequireA
             <p className="section-eyebrow">Just Dropped</p>
             <h2 className="section-title">New Releases</h2>
           </div>
-          <button className="section-link">View All</button>
+          <div className="releases-nav">
+            <button
+              className="releases-arrow"
+              onClick={() => scrollReleases(-1)}
+              aria-label="Scroll left"
+            >
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <polyline points="15 18 9 12 15 6" />
+              </svg>
+            </button>
+            <button
+              className="releases-arrow"
+              onClick={() => scrollReleases(1)}
+              aria-label="Scroll right"
+            >
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <polyline points="9 18 15 12 9 6" />
+              </svg>
+            </button>
+            <button className="section-link">View All</button>
+          </div>
         </div>
-        <div className="releases-scroll">
+        <div className="releases-scroll" ref={releasesRef}>
           {NEW_RELEASES.map((product) => (
             <div key={product.id} className="release-card">
               <div
@@ -217,7 +227,11 @@ export default function HomePage({ isLoggedIn, userEmail, onNavigate, onRequireA
                 <span className="release-name">{product.name}</span>
                 <div className="release-footer">
                   <span className="release-price">${product.price.toFixed(2)}</span>
-                  <button className="release-cart-btn" aria-label="Add to cart">
+                  <button
+                    className="release-cart-btn"
+                    aria-label="Add to cart"
+                    onClick={() => onAddToCart && onAddToCart(product)}
+                  >
                     <MiniCartIcon />
                   </button>
                 </div>
