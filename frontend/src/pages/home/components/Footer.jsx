@@ -7,7 +7,7 @@ export default function Footer() {
       <div className="mx-auto flex max-w-[1280px] gap-16 px-6 pt-14 pb-10 max-lg:flex-col max-lg:gap-10">
         {/* Brand + newsletter */}
         <div className="flex flex-col gap-3 max-lg:flex-none lg:w-[260px]">
-          <span className="text-[22px] font-bold tracking-[4px] text-[var(--text-h)]">MODÉ</span>
+          <span className="text-[22px] font-bold tracking-[4px] text-[var(--text-h)]">FIER</span>
           <p className="m-0 text-[13px] leading-relaxed text-[var(--text)]">
             Curated fashion for every occasion.
           </p>
@@ -80,7 +80,7 @@ export default function Footer() {
       <div className="border-t border-[var(--border)]">
         <div className="mx-auto flex max-w-[1280px] items-center justify-between gap-4 px-6 py-[18px] max-sm:flex-col max-sm:items-start max-sm:gap-3">
           <p className="m-0 text-xs text-[var(--text)]">
-            © {new Date().getFullYear()} MODÉ. All rights reserved. &nbsp;·&nbsp;
+            © {new Date().getFullYear()} FIER. All rights reserved. &nbsp;·&nbsp;
             <span className="cursor-pointer transition-colors hover:text-purple-400">
               Privacy Policy
             </span>

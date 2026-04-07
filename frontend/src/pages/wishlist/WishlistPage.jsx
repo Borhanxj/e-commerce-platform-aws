@@ -68,7 +68,7 @@ export default function WishlistPage({ onBack, wishlistItems, onRemove, onAddToC
               <BackIcon /> Back
             </button>
             <span className="ml-auto text-[22px] font-bold tracking-[4px] text-[var(--text-h)]">
-              MODÉ
+              FIER
             </span>
           </div>
         </header>
@@ -120,7 +120,7 @@ export default function WishlistPage({ onBack, wishlistItems, onRemove, onAddToC
             <BackIcon /> Back
           </button>
           <span className="ml-auto text-[22px] font-bold tracking-[4px] text-[var(--text-h)]">
-            MODÉ
+            FIER
           </span>
         </div>
       </header>

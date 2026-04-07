@@ -317,7 +317,7 @@ export default function OrdersPage({ onBack }) {
             <BackIcon /> Back
           </button>
           <span className="ml-auto text-[22px] font-bold tracking-[4px] text-[var(--text-h)]">
-            MODÉ
+            FIER
           </span>
         </div>
       </header>

@@ -43,7 +43,7 @@ export default function Navbar({
       <div className="mx-auto flex h-16 max-w-[1280px] items-center gap-6">
         {/* Brand */}
         <div className="shrink-0 text-[22px] font-bold tracking-[4px] text-[var(--text-h)]">
-          MODÉ
+          FIER
         </div>
 
         {/* Search bar */}

@@ -32,7 +32,7 @@ const FAQ_CATEGORIES = [
       },
       {
         q: 'Are your products ethically made?',
-        a: 'Yes. All MODÉ suppliers are audited against our Code of Conduct, which requires fair wages, safe working conditions, and no forced or child labour. We publish our full supplier list on our Sustainability page and are working towards B Corp certification.',
+        a: 'Yes. All FIER suppliers are audited against our Code of Conduct, which requires fair wages, safe working conditions, and no forced or child labour. We publish our full supplier list on our Sustainability page and are working towards B Corp certification.',
       },
       {
         q: 'How should I care for my garments?',
@@ -85,7 +85,7 @@ const FAQ_CATEGORIES = [
       },
       {
         q: 'What if my item arrives damaged or incorrect?',
-        a: "We're sorry to hear that! Please contact us within 48 hours of delivery via the Help & Support chat or by emailing support@mode.com. Attach photos of the issue and your order number, and we'll arrange a free replacement or full refund straight away.",
+        a: "We're sorry to hear that! Please contact us within 48 hours of delivery via the Help & Support chat or by emailing support@fier.com. Attach photos of the issue and your order number, and we'll arrange a free replacement or full refund straight away.",
       },
     ],
   },
@@ -201,28 +201,28 @@ const FAQ_CATEGORIES = [
     ),
     items: [
       {
-        q: 'Who is MODÉ?',
-        a: "MODÉ is a contemporary fashion brand founded with a simple belief: great style shouldn't come at the cost of quality or conscience. We design versatile, considered clothing for everyday life — made to last and meant to be worn.",
+        q: 'Who is FIER?',
+        a: "FIER is a contemporary fashion brand founded with a simple belief: great style shouldn't come at the cost of quality or conscience. We design versatile, considered clothing for everyday life — made to last and meant to be worn.",
       },
       {
         q: 'Where are you based?',
-        a: 'MODÉ is headquartered in London, UK. Our design studio is in Shoreditch, and our primary fulfilment centre operates out of the East Midlands. We work with manufacturing partners across Portugal, Italy, and Turkey.',
+        a: 'FIER is headquartered in London, UK. Our design studio is in Shoreditch, and our primary fulfilment centre operates out of the East Midlands. We work with manufacturing partners across Portugal, Italy, and Turkey.',
       },
       {
         q: 'Do you have any physical stores?',
-        a: 'Currently MODÉ is an online-only brand. We do host occasional pop-up events in London and Manchester — follow us on Instagram or sign up to our newsletter to be notified of upcoming dates.',
+        a: 'Currently FIER is an online-only brand. We do host occasional pop-up events in London and Manchester — follow us on Instagram or sign up to our newsletter to be notified of upcoming dates.',
       },
       {
         q: 'How can I contact customer support?',
-        a: 'Our support team is available Monday–Friday 9 am–6 pm GMT. You can reach us via the live chat on this page, by emailing support@mode.com, or by calling +44 20 1234 5678. We aim to respond to all queries within 4 business hours.',
+        a: 'Our support team is available Monday–Friday 9 am–6 pm GMT. You can reach us via the live chat on this page, by emailing support@fier.com, or by calling +44 20 1234 5678. We aim to respond to all queries within 4 business hours.',
       },
       {
         q: 'Do you have a loyalty programme?',
-        a: 'Yes! MODÉ Rewards lets you earn 1 point for every £1 spent. Points can be redeemed against future orders (100 points = £1 off). Members also get early access to sales, birthday discounts, and exclusive new-arrival previews. Enrol free in your account settings.',
+        a: 'Yes! FIER Rewards lets you earn 1 point for every £1 spent. Points can be redeemed against future orders (100 points = £1 off). Members also get early access to sales, birthday discounts, and exclusive new-arrival previews. Enrol free in your account settings.',
       },
       {
         q: 'How do I stay up to date with new collections?',
-        a: 'Subscribe to our newsletter for weekly new-arrival edits, style guides, and exclusive member offers. You can also follow @modeofficial on Instagram, TikTok, and Pinterest for daily inspiration and behind-the-scenes content.',
+        a: 'Subscribe to our newsletter for weekly new-arrival edits, style guides, and exclusive member offers. You can also follow @fierofficial on Instagram, TikTok, and Pinterest for daily inspiration and behind-the-scenes content.',
       },
     ],
   },
@@ -341,7 +341,7 @@ export default function HelpPage({ onBack }) {
             <BackIcon /> Back
           </button>
           <span className="ml-auto text-[22px] font-bold tracking-[4px] text-[var(--text-h)]">
-            MODÉ
+            FIER
           </span>
         </div>
       </header>

@@ -19,7 +19,7 @@ describe('Navbar', () => {
   it('renders the brand name', () => {
     render(<Navbar {...defaultProps} />)
 
-    expect(screen.getByText('MODÉ')).toBeInTheDocument()
+    expect(screen.getByText('FIER')).toBeInTheDocument()
   })
 
   it('renders the search input', () => {

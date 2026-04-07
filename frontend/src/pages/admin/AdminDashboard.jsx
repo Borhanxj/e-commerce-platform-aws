@@ -41,7 +41,7 @@ function AdminDashboard({ token, onLogout }) {
     <div className="flex min-h-svh bg-[var(--bg)] transition-colors duration-300">
       <aside className="box-border flex w-60 min-w-[240px] flex-col border-r border-[var(--border)] bg-[rgba(var(--background),0.4)] py-6 backdrop-blur-xl">
         <h2 className="m-0 border-b border-[var(--border)] px-6 pb-6 text-xl font-semibold text-purple-400">
-          MODÉ Admin
+          FIER Admin
         </h2>
         <nav className="flex flex-1 flex-col gap-1 px-3 py-4">
           {sections.map((s) => (

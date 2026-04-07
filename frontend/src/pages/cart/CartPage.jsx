@@ -61,7 +61,7 @@ export default function CartPage({ onBack, cartItems, onRemove, onUpdateQuantity
               <BackIcon /> Back
             </button>
             <span className="ml-auto text-[22px] font-bold tracking-[4px] text-[var(--text-h)]">
-              MODÉ
+              FIER
             </span>
           </div>
         </header>
@@ -113,7 +113,7 @@ export default function CartPage({ onBack, cartItems, onRemove, onUpdateQuantity
             <BackIcon /> Back
           </button>
           <span className="ml-auto text-[22px] font-bold tracking-[4px] text-[var(--text-h)]">
-            MODÉ
+            FIER
           </span>
         </div>
       </header>
