@@ -115,7 +115,7 @@ export default function Navbar({
             </button>
 
             {avatarOpen && (
-              <div className="animate-in fade-in slide-in-from-top-1.5 absolute top-[calc(100%+10px)] right-0 z-[200] w-[220px] rounded-2xl border border-[var(--border)] bg-[rgba(var(--background),0.85)] p-2 shadow-[var(--shadow)] backdrop-blur-xl">
+              <div className="animate-in fade-in slide-in-from-top-1.5 light:bg-white/92 light:shadow-[0_10px_30px_rgba(0,0,0,0.15)] absolute top-[calc(100%+10px)] right-0 z-[200] w-[220px] rounded-2xl border border-[var(--border)] bg-[rgba(var(--background-rgb),0.92)] p-2 shadow-[var(--shadow)] backdrop-blur-xl">
                 {isLoggedIn ? (
                   <>
                     <div className="flex items-center gap-2.5 px-2 pt-2 pb-2.5">

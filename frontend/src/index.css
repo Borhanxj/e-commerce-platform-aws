@@ -9,6 +9,7 @@
 :root {
   /* shadcn theme – dark purple by default */
   --background: oklch(0.09 0.047 292);
+  --background-rgb: 16, 13, 30;
   --foreground: oklch(0.76 0.047 289);
 
   --card: oklch(0.13 0.04 289 / 80%);
@@ -94,6 +95,7 @@
 :root.light {
   color-scheme: light;
   --background: oklch(0.98 0.01 292);
+  --background-rgb: 255, 255, 255;
   --foreground: oklch(0.2 0.047 292);
 
   --card: oklch(1 0 0 / 80%);
