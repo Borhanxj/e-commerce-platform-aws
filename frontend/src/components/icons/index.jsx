@@ -54,7 +54,7 @@ export function SearchIcon() {
 
 export function StarRating({ rating }) {
   return (
-    <div className="star-rating" aria-label={`${rating} out of 5 stars`}>
+    <div className="flex gap-0.5 text-amber-400" aria-label={`${rating} out of 5 stars`}>
       {[1, 2, 3, 4, 5].map((n) => (
         <svg
           key={n}
@@ -66,7 +66,7 @@ export function StarRating({ rating }) {
           strokeWidth="1.8"
           strokeLinecap="round"
           strokeLinejoin="round"
-          className={n <= rating ? 'star--filled' : 'star--empty'}
+          className={n <= rating ? '' : 'opacity-25'}
         >
           <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
         </svg>

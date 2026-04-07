@@ -1,5 +1,16 @@
 import { useState, useEffect, useCallback } from 'react'
 import API_BASE from '../../api'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table'
+import { Badge } from '@/components/ui/badge'
+import { Input } from '@/components/ui/input'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 
 const API = `${API_BASE}/api/admin`
 const ROLES = ['customer', 'sales_manager', 'product_manager', 'admin']
@@ -9,6 +20,29 @@ const ROLE_LABELS = {
   product_manager: 'Product Manager',
   admin: 'Admin',
 }
+
+const ROLE_BADGE_CLASS = {
+  customer: 'bg-blue-500/10 text-blue-400 border-0',
+  sales_manager: 'bg-emerald-500/10 text-emerald-400 border-0',
+  product_manager: 'bg-amber-500/10 text-amber-400 border-0',
+  admin: 'bg-purple-400/12 text-purple-400 border-0',
+}
+
+/* Shared primitive class strings */
+const btnBase =
+  'font-[inherit] text-[13px] font-medium px-4 py-2 border border-white/10 rounded-[10px] bg-white/5 text-[#eeeaff] cursor-pointer transition-all duration-150 whitespace-nowrap disabled:opacity-45 disabled:cursor-not-allowed hover:not-disabled:border-purple-400 hover:not-disabled:text-purple-400'
+const btnCreate =
+  'font-[inherit] text-[13px] font-medium px-4 py-2 rounded-[10px] bg-purple-400 text-[#100d1e] border-none cursor-pointer transition-opacity duration-150 hover:opacity-90 disabled:opacity-45 disabled:cursor-not-allowed'
+const btnSearch =
+  'font-[inherit] text-[13px] font-medium px-4 py-2 border border-purple-400/30 rounded-[10px] bg-purple-400/12 text-purple-400 cursor-pointer transition-all duration-150 whitespace-nowrap'
+const btnEdit =
+  'font-[inherit] text-[12px] font-medium px-3 py-1 border border-white/10 rounded-[10px] bg-white/5 text-[#eeeaff] cursor-pointer transition-all duration-150 hover:border-purple-400 hover:text-purple-400'
+const btnDelete =
+  'font-[inherit] text-[12px] font-medium px-3 py-1 border border-red-500/20 rounded-[10px] bg-red-500/10 text-red-400 cursor-pointer transition-all duration-150 hover:bg-red-500/20 hover:border-red-500'
+const btnDanger =
+  'font-[inherit] text-[13px] font-medium px-4 py-2 rounded-[10px] bg-red-500 text-white border-none cursor-pointer transition-opacity duration-150 hover:opacity-90'
+const fieldInputClass =
+  'w-full font-[inherit] text-sm py-2.5 px-3 border border-white/10 rounded-md bg-[#100d1e] text-[#eeeaff] outline-none transition-all duration-150 focus:border-purple-400 focus:shadow-[0_0_0_3px_rgba(192,132,252,0.12)]'
 
 function UserManagement({ token }) {
   const [users, setUsers] = useState([])
@@ -101,18 +135,19 @@ function UserManagement({ token }) {
   }
 
   return (
-    <div className="um">
-      <div className="um-toolbar">
-        <form className="um-search-form" onSubmit={handleSearch}>
-          <input
+    <div>
+      {/* Toolbar */}
+      <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
+        <form className="flex min-w-0 flex-1 gap-2" onSubmit={handleSearch}>
+          <Input
             type="text"
-            className="um-search"
+            className="min-w-[140px] flex-1 border-white/10 bg-white/5 text-[#eeeaff] placeholder:text-white/30"
             placeholder="Search by email…"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
           <select
-            className="um-role-filter"
+            className="cursor-pointer rounded-[10px] border border-white/10 bg-white/5 px-3 py-2 font-[inherit] text-sm text-[#eeeaff] transition-all duration-150 outline-none"
             value={roleFilter}
             onChange={(e) => {
               setRoleFilter(e.target.value)
@@ -125,82 +160,102 @@ function UserManagement({ token }) {
               </option>
             ))}
           </select>
-          <button type="submit" className="um-btn um-btn-search">
+          <button type="submit" className={btnSearch}>
             Search
           </button>
         </form>
-        <button className="um-btn um-btn-create" onClick={() => setModal({ mode: 'create' })}>
+        <button className={btnCreate} onClick={() => setModal({ mode: 'create' })}>
           + New User
         </button>
       </div>
 
-      {error && <p className="um-error">{error}</p>}
+      {error && <p className="mb-4 text-sm text-red-400">{error}</p>}
 
-      <div className="um-table-wrap">
-        <table className="um-table">
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Email</th>
-              <th>Role</th>
-              <th>Created</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
+      {/* Table */}
+      <div className="overflow-hidden rounded-2xl border border-white/15 bg-white/8 shadow-[0_4px_12px_rgba(0,0,0,0.2),inset_0_1px_0_rgba(255,255,255,0.14)] backdrop-blur-xl">
+        <Table>
+          <TableHeader>
+            <TableRow className="border-white/9 hover:bg-transparent">
+              <TableHead className="bg-purple-400/12 text-xs tracking-wide text-[rgba(190,178,215,0.82)] uppercase">
+                ID
+              </TableHead>
+              <TableHead className="bg-purple-400/12 text-xs tracking-wide text-[rgba(190,178,215,0.82)] uppercase">
+                Email
+              </TableHead>
+              <TableHead className="bg-purple-400/12 text-xs tracking-wide text-[rgba(190,178,215,0.82)] uppercase">
+                Role
+              </TableHead>
+              <TableHead className="bg-purple-400/12 text-xs tracking-wide text-[rgba(190,178,215,0.82)] uppercase">
+                Created
+              </TableHead>
+              <TableHead className="bg-purple-400/12 text-xs tracking-wide text-[rgba(190,178,215,0.82)] uppercase">
+                Actions
+              </TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
             {loading ? (
-              <tr>
-                <td colSpan="5" className="um-empty">
+              <TableRow className="border-white/9">
+                <TableCell colSpan={5} className="py-8 text-center text-[rgba(190,178,215,0.82)]">
                   Loading…
-                </td>
-              </tr>
+                </TableCell>
+              </TableRow>
             ) : users.length === 0 ? (
-              <tr>
-                <td colSpan="5" className="um-empty">
+              <TableRow className="border-white/9">
+                <TableCell colSpan={5} className="py-8 text-center text-[rgba(190,178,215,0.82)]">
                   No users found
-                </td>
-              </tr>
+                </TableCell>
+              </TableRow>
             ) : (
               users.map((u) => (
-                <tr key={u.id}>
-                  <td>{u.id}</td>
-                  <td>{u.email}</td>
-                  <td>
-                    <span className={`um-role-badge um-role-${u.role}`}>{ROLE_LABELS[u.role]}</span>
-                  </td>
-                  <td>{new Date(u.created_at).toLocaleDateString()}</td>
-                  <td className="um-actions">
-                    <button
-                      className="um-btn um-btn-edit"
-                      onClick={() => setModal({ mode: 'edit', user: u })}
+                <TableRow key={u.id} className="border-white/9 hover:bg-purple-400/5">
+                  <TableCell className="text-[#eeeaff]">{u.id}</TableCell>
+                  <TableCell className="text-[#eeeaff]">{u.email}</TableCell>
+                  <TableCell>
+                    <Badge
+                      className={ROLE_BADGE_CLASS[u.role] || 'border-0 bg-white/10 text-[#eeeaff]'}
                     >
-                      Edit
-                    </button>
-                    <button className="um-btn um-btn-delete" onClick={() => setDeleteConfirm(u)}>
-                      Delete
-                    </button>
-                  </td>
-                </tr>
+                      {ROLE_LABELS[u.role]}
+                    </Badge>
+                  </TableCell>
+                  <TableCell className="text-[#eeeaff]">
+                    {new Date(u.created_at).toLocaleDateString()}
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex gap-1.5">
+                      <button
+                        className={btnEdit}
+                        onClick={() => setModal({ mode: 'edit', user: u })}
+                      >
+                        Edit
+                      </button>
+                      <button className={btnDelete} onClick={() => setDeleteConfirm(u)}>
+                        Delete
+                      </button>
+                    </div>
+                  </TableCell>
+                </TableRow>
               ))
             )}
-          </tbody>
-        </table>
+          </TableBody>
+        </Table>
       </div>
 
+      {/* Pagination */}
       {pagination.totalPages > 1 && (
-        <div className="um-pagination">
+        <div className="mt-5 flex items-center justify-center gap-4">
           <button
-            className="um-btn"
+            className={btnBase}
             disabled={pagination.page <= 1}
             onClick={() => fetchUsers(pagination.page - 1)}
           >
             Previous
           </button>
-          <span className="um-page-info">
+          <span className="text-[13px] text-[rgba(190,178,215,0.82)]">
             Page {pagination.page} of {pagination.totalPages} ({pagination.total} users)
           </span>
           <button
-            className="um-btn"
+            className={btnBase}
             disabled={pagination.page >= pagination.totalPages}
             onClick={() => fetchUsers(pagination.page + 1)}
           >
@@ -221,28 +276,26 @@ function UserManagement({ token }) {
       )}
 
       {/* Delete Confirmation */}
-      {deleteConfirm && (
-        <div className="um-overlay" onClick={() => setDeleteConfirm(null)}>
-          <div className="um-modal" onClick={(e) => e.stopPropagation()}>
-            <h2>Delete User</h2>
-            <p>
-              Are you sure you want to delete <strong>{deleteConfirm.email}</strong>? This action
-              cannot be undone.
-            </p>
-            <div className="um-modal-actions">
-              <button className="um-btn" onClick={() => setDeleteConfirm(null)}>
-                Cancel
-              </button>
-              <button
-                className="um-btn um-btn-danger"
-                onClick={() => handleDelete(deleteConfirm.id)}
-              >
-                Delete
-              </button>
-            </div>
+      <Dialog open={!!deleteConfirm} onOpenChange={(open) => !open && setDeleteConfirm(null)}>
+        <DialogContent className="max-w-md rounded-2xl border border-white/15 bg-[rgba(25,20,45,0.95)] shadow-[0_20px_40px_rgba(0,0,0,0.4)] backdrop-blur-xl">
+          <DialogHeader>
+            <DialogTitle className="text-xl text-[#eeeaff]">Delete User</DialogTitle>
+          </DialogHeader>
+          <p className="mb-5 leading-relaxed text-[rgba(190,178,215,0.82)]">
+            Are you sure you want to delete{' '}
+            <strong className="text-[#eeeaff]">{deleteConfirm?.email}</strong>? This action cannot
+            be undone.
+          </p>
+          <div className="flex justify-end gap-2">
+            <button className={btnBase} onClick={() => setDeleteConfirm(null)}>
+              Cancel
+            </button>
+            <button className={btnDanger} onClick={() => handleDelete(deleteConfirm.id)}>
+              Delete
+            </button>
           </div>
-        </div>
-      )}
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }
@@ -275,23 +328,32 @@ function UserModal({ mode, user, onClose, onCreate, onUpdate }) {
   }
 
   return (
-    <div className="um-overlay" onClick={onClose}>
-      <div className="um-modal" onClick={(e) => e.stopPropagation()}>
-        <h2>{mode === 'create' ? 'Create User' : 'Edit User'}</h2>
+    <Dialog open onOpenChange={(open) => !open && onClose()}>
+      <DialogContent className="max-w-md rounded-2xl border border-white/15 bg-[rgba(25,20,45,0.95)] shadow-[0_20px_40px_rgba(0,0,0,0.4)] backdrop-blur-xl">
+        <DialogHeader>
+          <DialogTitle className="text-xl text-[#eeeaff]">
+            {mode === 'create' ? 'Create User' : 'Edit User'}
+          </DialogTitle>
+        </DialogHeader>
         <form onSubmit={handleSubmit}>
-          <div className="um-field">
-            <label>Email</label>
+          <div className="mb-4 flex flex-col gap-1.5">
+            <label className="text-[13px] font-medium text-[#eeeaff]">Email</label>
             <input
               type="email"
+              className={fieldInputClass}
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
               placeholder="user@example.com"
             />
           </div>
-          <div className="um-field">
-            <label>Role</label>
-            <select value={role} onChange={(e) => setRole(e.target.value)}>
+          <div className="mb-4 flex flex-col gap-1.5">
+            <label className="text-[13px] font-medium text-[#eeeaff]">Role</label>
+            <select
+              className={fieldInputClass}
+              value={role}
+              onChange={(e) => setRole(e.target.value)}
+            >
               {ROLES.map((r) => (
                 <option key={r} value={r}>
                   {ROLE_LABELS[r]}
@@ -299,28 +361,31 @@ function UserModal({ mode, user, onClose, onCreate, onUpdate }) {
               ))}
             </select>
           </div>
-          <div className="um-field">
-            <label>{mode === 'create' ? 'Password' : 'New Password (leave blank to keep)'}</label>
+          <div className="mb-4 flex flex-col gap-1.5">
+            <label className="text-[13px] font-medium text-[#eeeaff]">
+              {mode === 'create' ? 'Password' : 'New Password (leave blank to keep)'}
+            </label>
             <input
               type="password"
+              className={fieldInputClass}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="••••••••"
               {...(mode === 'create' ? { required: true, minLength: 8 } : {})}
             />
           </div>
-          {error && <p className="um-error">{error}</p>}
-          <div className="um-modal-actions">
-            <button type="button" className="um-btn" onClick={onClose}>
+          {error && <p className="mb-4 text-sm text-red-400">{error}</p>}
+          <div className="mt-6 flex justify-end gap-2">
+            <button type="button" className={btnBase} onClick={onClose}>
               Cancel
             </button>
-            <button type="submit" className="um-btn um-btn-create" disabled={saving}>
+            <button type="submit" className={btnCreate} disabled={saving}>
               {saving ? 'Saving…' : mode === 'create' ? 'Create' : 'Save Changes'}
             </button>
           </div>
         </form>
-      </div>
-    </div>
+      </DialogContent>
+    </Dialog>
   )
 }
 

@@ -1,5 +1,4 @@
 import { useNavigate } from 'react-router-dom'
-import './CartPage.css'
 
 function BackIcon() {
   return (
@@ -52,19 +51,26 @@ export default function CartPage({ onBack, cartItems, onRemove, onUpdateQuantity
 
   if (cartItems.length === 0) {
     return (
-      <div className="cart-page">
-        <header className="cart-header">
-          <div className="cart-header-inner">
-            <button className="back-btn" onClick={onBack}>
+      <div className="flex min-h-svh w-full flex-col bg-[#100d1e] pt-16">
+        <header className="fixed top-0 right-0 left-0 z-[1000] border-b border-white/15 bg-[rgba(16,13,30,0.75)] px-6 backdrop-blur-[20px]">
+          <div className="mx-auto flex h-16 max-w-[1280px] items-center gap-4">
+            <button
+              className="flex cursor-pointer items-center gap-1.5 rounded-lg border-none bg-transparent px-2.5 py-1.5 text-sm text-[rgba(190,178,215,0.82)] transition-colors hover:bg-purple-400/12 hover:text-purple-400"
+              onClick={onBack}
+            >
               <BackIcon /> Back
             </button>
-            <span className="brand">MODÉ</span>
+            <span className="ml-auto text-[22px] font-bold tracking-[4px] text-[#eeeaff]">
+              MODÉ
+            </span>
           </div>
         </header>
-        <main className="cart-main">
-          <h1 className="cart-title">Shopping Cart</h1>
-          <div className="cart-empty">
-            <div className="empty-icon">
+        <main className="mx-auto box-border w-full max-w-[1280px] px-6 pt-12 pb-16">
+          <h1 className="mb-10 text-[32px] font-bold tracking-[-0.5px] text-[#eeeaff]">
+            Shopping Cart
+          </h1>
+          <div className="flex flex-col items-center justify-center gap-3 px-6 py-20 text-center">
+            <div className="mb-2 text-purple-400 opacity-50">
               <svg
                 width="64"
                 height="64"
@@ -80,9 +86,14 @@ export default function CartPage({ onBack, cartItems, onRemove, onUpdateQuantity
                 <path d="M16 10a4 4 0 01-8 0" />
               </svg>
             </div>
-            <p className="empty-title">Your cart is empty</p>
-            <p className="empty-sub">Browse our categories and add items you love.</p>
-            <button className="cta-btn" onClick={onBack}>
+            <p className="m-0 text-[20px] font-semibold text-[#eeeaff]">Your cart is empty</p>
+            <p className="m-0 mb-4 text-sm text-[rgba(190,178,215,0.82)]">
+              Browse our categories and add items you love.
+            </p>
+            <button
+              className="cursor-pointer rounded-lg border-none bg-purple-400 px-7 py-3 text-sm font-semibold tracking-[0.5px] text-[#100d1e] transition-opacity hover:opacity-88"
+              onClick={onBack}
+            >
               Start Shopping
             </button>
           </div>
@@ -92,53 +103,67 @@ export default function CartPage({ onBack, cartItems, onRemove, onUpdateQuantity
   }
 
   return (
-    <div className="cart-page">
-      <header className="cart-header">
-        <div className="cart-header-inner">
-          <button className="back-btn" onClick={onBack}>
+    <div className="flex min-h-svh w-full flex-col bg-[#100d1e] pt-16">
+      <header className="fixed top-0 right-0 left-0 z-[1000] border-b border-white/15 bg-[rgba(16,13,30,0.75)] px-6 backdrop-blur-[20px]">
+        <div className="mx-auto flex h-16 max-w-[1280px] items-center gap-4">
+          <button
+            className="flex cursor-pointer items-center gap-1.5 rounded-lg border-none bg-transparent px-2.5 py-1.5 text-sm text-[rgba(190,178,215,0.82)] transition-colors hover:bg-purple-400/12 hover:text-purple-400"
+            onClick={onBack}
+          >
             <BackIcon /> Back
           </button>
-          <span className="brand">MODÉ</span>
+          <span className="ml-auto text-[22px] font-bold tracking-[4px] text-[#eeeaff]">MODÉ</span>
         </div>
       </header>
 
-      <main className="cart-main">
-        <h1 className="cart-title">Shopping Cart</h1>
+      <main className="mx-auto box-border w-full max-w-[1280px] px-6 pt-12 pb-16">
+        <h1 className="mb-10 text-[32px] font-bold tracking-[-0.5px] text-[#eeeaff]">
+          Shopping Cart
+        </h1>
 
-        <div className="cart-layout">
-          <div className="cart-items">
+        <div className="grid [grid-template-columns:1fr_340px] items-start gap-10 max-[860px]:[grid-template-columns:1fr]">
+          <div className="flex flex-col gap-4">
             {cartItems.map((item) => (
-              <div key={item.id} className="cart-item">
-                <div className="cart-item-image">
-                  <span className="cart-item-image-label">{item.name[0]}</span>
+              <div
+                key={item.id}
+                className="flex items-center gap-4 rounded-2xl border border-white/15 bg-white/8 p-4 shadow-[0_4px_12px_rgba(0,0,0,0.2),inset_0_1px_0_rgba(255,255,255,0.14)] backdrop-blur-xl"
+              >
+                <div className="flex h-18 w-18 shrink-0 items-center justify-center rounded-lg bg-purple-400/12">
+                  <span className="text-2xl font-bold text-purple-400">{item.name[0]}</span>
                 </div>
-                <div className="cart-item-details">
-                  <span className="cart-item-name">{item.name}</span>
-                  <span className="cart-item-price">${item.price.toFixed(2)}</span>
+                <div className="flex min-w-0 flex-1 flex-col gap-1">
+                  <span className="overflow-hidden text-[15px] font-medium text-ellipsis whitespace-nowrap text-[#eeeaff]">
+                    {item.name}
+                  </span>
+                  <span className="text-sm text-[rgba(190,178,215,0.82)]">
+                    ${item.price.toFixed(2)}
+                  </span>
                 </div>
-                <div className="cart-item-controls">
-                  <div className="quantity-controls">
+                <div className="flex shrink-0 items-center gap-4">
+                  <div className="flex items-center gap-2 rounded-lg border border-white/15 bg-[#100d1e] px-2 py-1">
                     <button
-                      className="qty-btn"
+                      className="flex cursor-pointer items-center justify-center border-none bg-transparent px-1 text-lg leading-none font-normal text-[#eeeaff] transition-colors hover:text-purple-400"
                       onClick={() => onUpdateQuantity(item.id, item.quantity - 1)}
                       aria-label="Decrease quantity"
                     >
                       −
                     </button>
-                    <span className="qty-value">{item.quantity}</span>
+                    <span className="min-w-[20px] text-center text-sm font-semibold text-[#eeeaff]">
+                      {item.quantity}
+                    </span>
                     <button
-                      className="qty-btn"
+                      className="flex cursor-pointer items-center justify-center border-none bg-transparent px-1 text-lg leading-none font-normal text-[#eeeaff] transition-colors hover:text-purple-400"
                       onClick={() => onUpdateQuantity(item.id, item.quantity + 1)}
                       aria-label="Increase quantity"
                     >
                       +
                     </button>
                   </div>
-                  <span className="cart-item-subtotal">
+                  <span className="min-w-[64px] text-right text-[15px] font-semibold text-[#eeeaff]">
                     ${(item.price * item.quantity).toFixed(2)}
                   </span>
                   <button
-                    className="remove-btn"
+                    className="flex cursor-pointer items-center rounded-md border-none bg-transparent p-1.5 text-[rgba(190,178,215,0.82)] transition-colors hover:bg-[rgba(232,93,93,0.1)] hover:text-[#e85d5d]"
                     onClick={() => onRemove(item.id)}
                     aria-label="Remove item"
                   >
@@ -149,31 +174,38 @@ export default function CartPage({ onBack, cartItems, onRemove, onUpdateQuantity
             ))}
           </div>
 
-          <div className="cart-summary">
-            <h2 className="summary-title">Order Summary</h2>
-            <div className="summary-row">
+          <div className="sticky top-[84px] flex flex-col gap-3.5 rounded-2xl border border-white/15 bg-white/8 p-7 shadow-[0_4px_12px_rgba(0,0,0,0.2),inset_0_1px_0_rgba(255,255,255,0.14)] backdrop-blur-xl">
+            <h2 className="m-0 mb-1 text-[18px] font-bold text-[#eeeaff]">Order Summary</h2>
+            <div className="flex items-center justify-between text-sm text-[rgba(190,178,215,0.82)]">
               <span>Subtotal ({cartItems.reduce((s, i) => s + i.quantity, 0)} items)</span>
               <span>${total.toFixed(2)}</span>
             </div>
-            <div className="summary-row">
+            <div className="flex items-center justify-between text-sm text-[rgba(190,178,215,0.82)]">
               <span>Shipping</span>
-              <span className="summary-free">{total >= 50 ? 'Free' : '$4.99'}</span>
+              <span className={total >= 50 ? 'font-semibold text-[#4caf82]' : ''}>
+                {total >= 50 ? 'Free' : '$4.99'}
+              </span>
             </div>
-            <div className="summary-divider" />
-            <div className="summary-row summary-total">
+            <hr className="my-1 border-t border-none border-white/15" />
+            <div className="flex items-center justify-between text-[16px] font-bold text-[#eeeaff]">
               <span>Total</span>
               <span>${(total + (total >= 50 ? 0 : 4.99)).toFixed(2)}</span>
             </div>
             {total < 50 && (
-              <p className="summary-shipping-hint">
+              <p className="-mt-1 text-center text-xs text-purple-400">
                 Add ${(50 - total).toFixed(2)} more for free shipping
               </p>
             )}
-            <button className="checkout-btn" onClick={handleCheckout}>
+            <button
+              className="mt-1 cursor-pointer rounded-[10px] border-none bg-purple-400 px-7 py-3.5 text-[15px] font-semibold tracking-[0.5px] text-[#100d1e] transition-opacity hover:opacity-88"
+              onClick={handleCheckout}
+            >
               {isLoggedIn ? 'Proceed to Checkout' : 'Login to Checkout'}
             </button>
             {!isLoggedIn && (
-              <p className="summary-guest-note">You need an account to complete your purchase.</p>
+              <p className="-mt-1 text-center text-xs text-[rgba(190,178,215,0.82)]">
+                You need an account to complete your purchase.
+              </p>
             )}
           </div>
         </div>

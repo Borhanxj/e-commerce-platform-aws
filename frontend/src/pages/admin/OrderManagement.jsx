@@ -1,5 +1,16 @@
 import { useState, useEffect, useCallback } from 'react'
 import API_BASE from '../../api'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table'
+import { Badge } from '@/components/ui/badge'
+import { Input } from '@/components/ui/input'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 
 const API = `${API_BASE}/api/admin/orders`
 const STATUSES = ['pending', 'processing', 'shipped', 'delivered', 'cancelled']
@@ -10,13 +21,24 @@ const STATUS_LABELS = {
   delivered: 'Delivered',
   cancelled: 'Cancelled',
 }
-const STATUS_COLORS = {
-  pending: 'um-role-customer',
-  processing: 'um-role-product_manager',
-  shipped: 'um-role-sales_manager',
-  delivered: 'um-role-sales_manager',
-  cancelled: 'um-role-admin',
+const STATUS_BADGE_CLASS = {
+  pending: 'bg-blue-500/10 text-blue-400 border-0',
+  processing: 'bg-amber-500/10 text-amber-400 border-0',
+  shipped: 'bg-purple-400/12 text-purple-400 border-0',
+  delivered: 'bg-emerald-500/10 text-emerald-400 border-0',
+  cancelled: 'bg-red-500/10 text-red-400 border-0',
 }
+
+const btnBase =
+  'font-[inherit] text-[13px] font-medium px-4 py-2 border border-white/10 rounded-[10px] bg-white/5 text-[#eeeaff] cursor-pointer transition-all duration-150 whitespace-nowrap disabled:opacity-45 disabled:cursor-not-allowed hover:not-disabled:border-purple-400 hover:not-disabled:text-purple-400'
+const btnSearch =
+  'font-[inherit] text-[13px] font-medium px-4 py-2 border border-purple-400/30 rounded-[10px] bg-purple-400/12 text-purple-400 cursor-pointer transition-all duration-150 whitespace-nowrap'
+const btnEdit =
+  'font-[inherit] text-[12px] font-medium px-3 py-1 border border-white/10 rounded-[10px] bg-white/5 text-[#eeeaff] cursor-pointer transition-all duration-150 hover:border-purple-400 hover:text-purple-400'
+const btnDelete =
+  'font-[inherit] text-[12px] font-medium px-3 py-1 border border-red-500/20 rounded-[10px] bg-red-500/10 text-red-400 cursor-pointer transition-all duration-150 hover:bg-red-500/20 hover:border-red-500'
+const btnDanger =
+  'font-[inherit] text-[13px] font-medium px-4 py-2 rounded-[10px] bg-red-500 text-white border-none cursor-pointer transition-opacity duration-150 hover:opacity-90'
 
 function OrderManagement({ token }) {
   const [orders, setOrders] = useState([])
@@ -110,18 +132,19 @@ function OrderManagement({ token }) {
   }
 
   return (
-    <div className="um">
-      <div className="um-toolbar">
-        <form className="um-search-form" onSubmit={handleSearch}>
-          <input
+    <div>
+      {/* Toolbar */}
+      <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
+        <form className="flex min-w-0 flex-1 gap-2" onSubmit={handleSearch}>
+          <Input
             type="text"
-            className="um-search"
+            className="min-w-[140px] flex-1 border-white/10 bg-white/5 text-[#eeeaff] placeholder:text-white/30"
             placeholder="Search by customer email…"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
           <select
-            className="um-role-filter"
+            className="cursor-pointer rounded-[10px] border border-white/10 bg-white/5 px-3 py-2 font-[inherit] text-sm text-[#eeeaff] transition-all duration-150 outline-none"
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
           >
@@ -132,80 +155,104 @@ function OrderManagement({ token }) {
               </option>
             ))}
           </select>
-          <button type="submit" className="um-btn um-btn-search">
+          <button type="submit" className={btnSearch}>
             Search
           </button>
         </form>
       </div>
 
-      {error && <p className="um-error">{error}</p>}
+      {error && <p className="mb-4 text-sm text-red-400">{error}</p>}
 
-      <div className="um-table-wrap">
-        <table className="um-table">
-          <thead>
-            <tr>
-              <th>Order ID</th>
-              <th>Customer</th>
-              <th>Status</th>
-              <th>Total</th>
-              <th>Date</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
+      {/* Table */}
+      <div className="overflow-hidden rounded-2xl border border-white/15 bg-white/8 shadow-[0_4px_12px_rgba(0,0,0,0.2),inset_0_1px_0_rgba(255,255,255,0.14)] backdrop-blur-xl">
+        <Table>
+          <TableHeader>
+            <TableRow className="border-white/9 hover:bg-transparent">
+              <TableHead className="bg-purple-400/12 text-xs tracking-wide text-[rgba(190,178,215,0.82)] uppercase">
+                Order ID
+              </TableHead>
+              <TableHead className="bg-purple-400/12 text-xs tracking-wide text-[rgba(190,178,215,0.82)] uppercase">
+                Customer
+              </TableHead>
+              <TableHead className="bg-purple-400/12 text-xs tracking-wide text-[rgba(190,178,215,0.82)] uppercase">
+                Status
+              </TableHead>
+              <TableHead className="bg-purple-400/12 text-xs tracking-wide text-[rgba(190,178,215,0.82)] uppercase">
+                Total
+              </TableHead>
+              <TableHead className="bg-purple-400/12 text-xs tracking-wide text-[rgba(190,178,215,0.82)] uppercase">
+                Date
+              </TableHead>
+              <TableHead className="bg-purple-400/12 text-xs tracking-wide text-[rgba(190,178,215,0.82)] uppercase">
+                Actions
+              </TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
             {loading ? (
-              <tr>
-                <td colSpan="6" className="um-empty">
+              <TableRow className="border-white/9">
+                <TableCell colSpan={6} className="py-8 text-center text-[rgba(190,178,215,0.82)]">
                   Loading…
-                </td>
-              </tr>
+                </TableCell>
+              </TableRow>
             ) : orders.length === 0 ? (
-              <tr>
-                <td colSpan="6" className="um-empty">
+              <TableRow className="border-white/9">
+                <TableCell colSpan={6} className="py-8 text-center text-[rgba(190,178,215,0.82)]">
                   No orders found
-                </td>
-              </tr>
+                </TableCell>
+              </TableRow>
             ) : (
               orders.map((o) => (
-                <tr key={o.id}>
-                  <td>#{o.id}</td>
-                  <td>{o.user_email}</td>
-                  <td>
-                    <span className={`um-role-badge ${STATUS_COLORS[o.status]}`}>
+                <TableRow key={o.id} className="border-white/9 hover:bg-purple-400/5">
+                  <TableCell className="text-[#eeeaff]">#{o.id}</TableCell>
+                  <TableCell className="text-[#eeeaff]">{o.user_email}</TableCell>
+                  <TableCell>
+                    <Badge
+                      className={
+                        STATUS_BADGE_CLASS[o.status] || 'border-0 bg-white/10 text-[#eeeaff]'
+                      }
+                    >
                       {STATUS_LABELS[o.status]}
-                    </span>
-                  </td>
-                  <td>${parseFloat(o.total).toFixed(2)}</td>
-                  <td>{new Date(o.created_at).toLocaleDateString()}</td>
-                  <td className="um-actions">
-                    <button className="um-btn um-btn-edit" onClick={() => viewOrder(o.id)}>
-                      View
-                    </button>
-                    <button className="um-btn um-btn-delete" onClick={() => setDeleteConfirm(o)}>
-                      Delete
-                    </button>
-                  </td>
-                </tr>
+                    </Badge>
+                  </TableCell>
+                  <TableCell className="text-[#eeeaff]">
+                    ${parseFloat(o.total).toFixed(2)}
+                  </TableCell>
+                  <TableCell className="text-[#eeeaff]">
+                    {new Date(o.created_at).toLocaleDateString()}
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex gap-1.5">
+                      <button className={btnEdit} onClick={() => viewOrder(o.id)}>
+                        View
+                      </button>
+                      <button className={btnDelete} onClick={() => setDeleteConfirm(o)}>
+                        Delete
+                      </button>
+                    </div>
+                  </TableCell>
+                </TableRow>
               ))
             )}
-          </tbody>
-        </table>
+          </TableBody>
+        </Table>
       </div>
 
+      {/* Pagination */}
       {pagination.totalPages > 1 && (
-        <div className="um-pagination">
+        <div className="mt-5 flex items-center justify-center gap-4">
           <button
-            className="um-btn"
+            className={btnBase}
             disabled={pagination.page <= 1}
             onClick={() => fetchOrders(pagination.page - 1)}
           >
             Previous
           </button>
-          <span className="um-page-info">
+          <span className="text-[13px] text-[rgba(190,178,215,0.82)]">
             Page {pagination.page} of {pagination.totalPages} ({pagination.total} orders)
           </span>
           <button
-            className="um-btn"
+            className={btnBase}
             disabled={pagination.page >= pagination.totalPages}
             onClick={() => fetchOrders(pagination.page + 1)}
           >
@@ -215,105 +262,133 @@ function OrderManagement({ token }) {
       )}
 
       {/* Order Detail Modal */}
-      {detail && (
-        <div className="um-overlay" onClick={() => setDetail(null)}>
-          <div className="um-modal om-detail-modal" onClick={(e) => e.stopPropagation()}>
-            <h2>Order #{detail.order.id}</h2>
-            <div className="om-detail-grid">
-              <div className="om-detail-item">
-                <span className="om-label">Customer</span>
-                <span>{detail.order.user_email}</span>
-              </div>
-              <div className="om-detail-item">
-                <span className="om-label">Status</span>
-                <select
-                  className="um-role-filter"
-                  value={detail.order.status}
-                  onChange={(e) => updateStatus(detail.order.id, e.target.value)}
-                >
-                  {STATUSES.map((s) => (
-                    <option key={s} value={s}>
-                      {STATUS_LABELS[s]}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <div className="om-detail-item">
-                <span className="om-label">Total</span>
-                <span>${parseFloat(detail.order.total).toFixed(2)}</span>
-              </div>
-              <div className="om-detail-item">
-                <span className="om-label">Date</span>
-                <span>{new Date(detail.order.created_at).toLocaleString()}</span>
-              </div>
-              {detail.order.address && (
-                <div className="om-detail-item om-full">
-                  <span className="om-label">Address</span>
-                  <span>{detail.order.address}</span>
+      <Dialog open={!!detail} onOpenChange={(open) => !open && setDetail(null)}>
+        <DialogContent className="max-w-[560px] rounded-2xl border border-white/15 bg-[rgba(25,20,45,0.95)] shadow-[0_20px_40px_rgba(0,0,0,0.4)] backdrop-blur-xl">
+          <DialogHeader>
+            <DialogTitle className="text-xl text-[#eeeaff]">Order #{detail?.order.id}</DialogTitle>
+          </DialogHeader>
+          {detail && (
+            <>
+              <div className="mb-5 grid grid-cols-2 gap-4">
+                <div className="flex flex-col gap-1">
+                  <span className="text-[12px] font-semibold tracking-wide text-[rgba(190,178,215,0.82)] uppercase">
+                    Customer
+                  </span>
+                  <span className="text-[#eeeaff]">{detail.order.user_email}</span>
                 </div>
+                <div className="flex flex-col gap-1">
+                  <span className="text-[12px] font-semibold tracking-wide text-[rgba(190,178,215,0.82)] uppercase">
+                    Status
+                  </span>
+                  <select
+                    className="cursor-pointer rounded-md border border-white/10 bg-white/5 px-3 py-2 font-[inherit] text-sm text-[#eeeaff] transition-all duration-150 outline-none"
+                    value={detail.order.status}
+                    onChange={(e) => updateStatus(detail.order.id, e.target.value)}
+                  >
+                    {STATUSES.map((s) => (
+                      <option key={s} value={s}>
+                        {STATUS_LABELS[s]}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div className="flex flex-col gap-1">
+                  <span className="text-[12px] font-semibold tracking-wide text-[rgba(190,178,215,0.82)] uppercase">
+                    Total
+                  </span>
+                  <span className="text-[#eeeaff]">
+                    ${parseFloat(detail.order.total).toFixed(2)}
+                  </span>
+                </div>
+                <div className="flex flex-col gap-1">
+                  <span className="text-[12px] font-semibold tracking-wide text-[rgba(190,178,215,0.82)] uppercase">
+                    Date
+                  </span>
+                  <span className="text-[#eeeaff]">
+                    {new Date(detail.order.created_at).toLocaleString()}
+                  </span>
+                </div>
+                {detail.order.address && (
+                  <div className="col-span-2 flex flex-col gap-1">
+                    <span className="text-[12px] font-semibold tracking-wide text-[rgba(190,178,215,0.82)] uppercase">
+                      Address
+                    </span>
+                    <span className="text-[#eeeaff]">{detail.order.address}</span>
+                  </div>
+                )}
+              </div>
+
+              {detail.items.length > 0 && (
+                <>
+                  <h3 className="m-0 mb-3 text-[15px] font-medium text-[#eeeaff]">Items</h3>
+                  <div className="mb-5 overflow-hidden rounded-xl border border-white/15 bg-white/8">
+                    <Table>
+                      <TableHeader>
+                        <TableRow className="border-white/9 hover:bg-transparent">
+                          <TableHead className="bg-purple-400/12 text-xs tracking-wide text-[rgba(190,178,215,0.82)] uppercase">
+                            Product
+                          </TableHead>
+                          <TableHead className="bg-purple-400/12 text-xs tracking-wide text-[rgba(190,178,215,0.82)] uppercase">
+                            Qty
+                          </TableHead>
+                          <TableHead className="bg-purple-400/12 text-xs tracking-wide text-[rgba(190,178,215,0.82)] uppercase">
+                            Price
+                          </TableHead>
+                          <TableHead className="bg-purple-400/12 text-xs tracking-wide text-[rgba(190,178,215,0.82)] uppercase">
+                            Subtotal
+                          </TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {detail.items.map((item) => (
+                          <TableRow key={item.id} className="border-white/9 hover:bg-purple-400/5">
+                            <TableCell className="text-[#eeeaff]">{item.product_name}</TableCell>
+                            <TableCell className="text-[#eeeaff]">{item.quantity}</TableCell>
+                            <TableCell className="text-[#eeeaff]">
+                              ${parseFloat(item.price).toFixed(2)}
+                            </TableCell>
+                            <TableCell className="text-[#eeeaff]">
+                              ${(item.quantity * parseFloat(item.price)).toFixed(2)}
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </div>
+                </>
               )}
-            </div>
 
-            {detail.items.length > 0 && (
-              <>
-                <h3 className="om-items-title">Items</h3>
-                <div className="um-table-wrap">
-                  <table className="um-table">
-                    <thead>
-                      <tr>
-                        <th>Product</th>
-                        <th>Qty</th>
-                        <th>Price</th>
-                        <th>Subtotal</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {detail.items.map((item) => (
-                        <tr key={item.id}>
-                          <td>{item.product_name}</td>
-                          <td>{item.quantity}</td>
-                          <td>${parseFloat(item.price).toFixed(2)}</td>
-                          <td>${(item.quantity * parseFloat(item.price)).toFixed(2)}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </>
-            )}
-
-            <div className="um-modal-actions">
-              <button className="um-btn" onClick={() => setDetail(null)}>
-                Close
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+              <div className="flex justify-end">
+                <button className={btnBase} onClick={() => setDetail(null)}>
+                  Close
+                </button>
+              </div>
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
 
       {/* Delete Confirmation */}
-      {deleteConfirm && (
-        <div className="um-overlay" onClick={() => setDeleteConfirm(null)}>
-          <div className="um-modal" onClick={(e) => e.stopPropagation()}>
-            <h2>Delete Order</h2>
-            <p>
-              Are you sure you want to delete order <strong>#{deleteConfirm.id}</strong>? This will
-              also remove all associated items.
-            </p>
-            <div className="um-modal-actions">
-              <button className="um-btn" onClick={() => setDeleteConfirm(null)}>
-                Cancel
-              </button>
-              <button
-                className="um-btn um-btn-danger"
-                onClick={() => handleDelete(deleteConfirm.id)}
-              >
-                Delete
-              </button>
-            </div>
+      <Dialog open={!!deleteConfirm} onOpenChange={(open) => !open && setDeleteConfirm(null)}>
+        <DialogContent className="max-w-md rounded-2xl border border-white/15 bg-[rgba(25,20,45,0.95)] shadow-[0_20px_40px_rgba(0,0,0,0.4)] backdrop-blur-xl">
+          <DialogHeader>
+            <DialogTitle className="text-xl text-[#eeeaff]">Delete Order</DialogTitle>
+          </DialogHeader>
+          <p className="mb-5 leading-relaxed text-[rgba(190,178,215,0.82)]">
+            Are you sure you want to delete order{' '}
+            <strong className="text-[#eeeaff]">#{deleteConfirm?.id}</strong>? This will also remove
+            all associated items.
+          </p>
+          <div className="flex justify-end gap-2">
+            <button className={btnBase} onClick={() => setDeleteConfirm(null)}>
+              Cancel
+            </button>
+            <button className={btnDanger} onClick={() => handleDelete(deleteConfirm.id)}>
+              Delete
+            </button>
           </div>
-        </div>
-      )}
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }
