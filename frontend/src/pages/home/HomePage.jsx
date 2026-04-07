@@ -101,52 +101,17 @@ export default function HomePage({
   onAddToCart,
 }) {
   const [searchQuery, setSearchQuery] = useState('')
-  const [saleBannerVisible, setSaleBannerVisible] = useState(true)
 
   return (
     <div className="home">
-      {/* Sale announcement bar */}
-      {saleBannerVisible && (
-        <div className="sale-banner">
-          <div className="sale-marquee-track">
-            {[0, 1].map((copy) => (
-              <ul key={copy} className="sale-marquee-list" aria-hidden={copy === 1}>
-                <li>🔥 SUMMER SALE — UP TO 50% OFF</li>
-                <li>·</li>
-                <li>FREE SHIPPING ON ORDERS OVER £50</li>
-                <li>·</li>
-                <li>
-                  USE CODE <strong>SUMMER25</strong> FOR 25% OFF YOUR FIRST ORDER
-                </li>
-                <li>·</li>
-                <li>NEW ARRIVALS DROPPING EVERY WEEK</li>
-                <li>·</li>
-                <li>LIMITED TIME ONLY — DON'T MISS OUT</li>
-                <li>·</li>
-              </ul>
-            ))}
-          </div>
-          <button
-            className="sale-banner-close"
-            onClick={() => setSaleBannerVisible(false)}
-            aria-label="Dismiss sale banner"
-          >
-            <svg
-              width="14"
-              height="14"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2.5"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <line x1="18" y1="6" x2="6" y2="18" />
-              <line x1="6" y1="6" x2="18" y2="18" />
-            </svg>
-          </button>
-        </div>
-      )}
+      {/* Liquid glass ambient background */}
+      <div className="home-bg" aria-hidden="true">
+        <div className="home-bg__orb home-bg__orb--a" />
+        <div className="home-bg__orb home-bg__orb--b" />
+        <div className="home-bg__orb home-bg__orb--c" />
+        <div className="home-bg__orb home-bg__orb--d" />
+        <div className="home-bg__orb home-bg__orb--e" />
+      </div>
 
       <Navbar
         isLoggedIn={isLoggedIn}
