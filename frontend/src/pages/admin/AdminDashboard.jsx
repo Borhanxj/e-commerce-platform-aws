@@ -5,9 +5,6 @@ import ProductManagement from './ProductManagement'
 import OrderManagement from './OrderManagement'
 import SettingsManagement from './SettingsManagement'
 import DashboardHome from './DashboardHome'
-import './AdminDashboard.css'
-import './UserManagement.css'
-import './Phase4.css'
 
 function AdminDashboard({ token, onLogout }) {
   const [admin, setAdmin] = useState(null)
@@ -41,14 +38,20 @@ function AdminDashboard({ token, onLogout }) {
   ]
 
   return (
-    <div className="admin-layout">
-      <aside className="admin-sidebar">
-        <h2 className="admin-sidebar-brand">MODÉ Admin</h2>
-        <nav className="admin-sidebar-nav">
+    <div className="flex min-h-svh bg-[var(--bg)]">
+      <aside className="box-border flex w-60 min-w-[240px] flex-col border-r border-[var(--border)] bg-[rgba(var(--background-rgb),0.4)] py-6 backdrop-blur-xl">
+        <h2 className="m-0 border-b border-[var(--border)] px-6 pb-6 text-xl font-semibold text-purple-400">
+          FIER Admin
+        </h2>
+        <nav className="flex flex-1 flex-col gap-1 px-3 py-4">
           {sections.map((s) => (
             <button
               key={s.key}
-              className={`admin-sidebar-link${activeSection === s.key ? ' active' : ''}`}
+              className={`flex cursor-pointer items-center gap-2.5 rounded-md border-none px-3 py-2.5 text-left font-[inherit] text-[15px] transition-all duration-150 [&_svg]:h-[18px] [&_svg]:w-[18px] [&_svg]:shrink-0 ${
+                activeSection === s.key
+                  ? 'border-l-2 border-purple-400 bg-purple-400/15 font-medium text-purple-400'
+                  : 'bg-transparent text-[var(--text)] hover:bg-purple-400/10 hover:text-[var(--text-h)]'
+              }`}
               onClick={() => setActiveSection(s.key)}
             >
               {s.icon}
@@ -56,28 +59,34 @@ function AdminDashboard({ token, onLogout }) {
             </button>
           ))}
         </nav>
-        <div className="admin-sidebar-footer">
-          <button className="admin-sidebar-link" onClick={onLogout}>
+        <div className="border-t border-[var(--border)] px-3 py-4">
+          <button
+            className="flex w-full cursor-pointer items-center gap-2.5 rounded-md border-none bg-transparent px-3 py-2.5 text-left font-[inherit] text-[15px] text-[var(--text)] transition-all duration-150 hover:bg-red-500/10 hover:text-red-400 [&_svg]:h-[18px] [&_svg]:w-[18px] [&_svg]:shrink-0"
+            onClick={onLogout}
+          >
             <LogoutIcon />
             Sign out
           </button>
         </div>
       </aside>
 
-      <div className="admin-main">
-        <header className="admin-header">
-          <h1 className="admin-header-title">
+      <div className="flex min-w-0 flex-1 flex-col">
+        <header className="flex items-center justify-between border-b border-[var(--border)] bg-[rgba(var(--background-rgb),0.4)] px-8 py-4 backdrop-blur-xl">
+          <h1 className="m-0 text-lg font-medium text-[var(--text-h)]">
             {sections.find((s) => s.key === activeSection)?.label}
           </h1>
-          <div className="admin-header-user">
+          <div className="flex items-center gap-3 text-sm text-[var(--text)]">
             <span>{admin?.email}</span>
-            <button className="admin-logout-btn" onClick={onLogout}>
+            <button
+              className="cursor-pointer rounded-md border border-[var(--border)] bg-transparent px-3.5 py-1.5 font-[inherit] text-[13px] text-[var(--text)] transition-all duration-150 hover:border-purple-400 hover:text-purple-400"
+              onClick={onLogout}
+            >
               Logout
             </button>
           </div>
         </header>
 
-        <main className="admin-content">
+        <main className="flex-1 overflow-y-auto p-8">
           {activeSection === 'dashboard' && (
             <DashboardHome token={token} onNavigate={setActiveSection} />
           )}

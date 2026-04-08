@@ -75,14 +75,14 @@ docker compose exec db psql -U postgres -d ecommerce -c "DELETE FROM auth.users 
 
 ### Running migrations
 
-Migrations are managed with `node-pg-migrate`. Migration scripts live in `backend/migrations/scripts/`.
+Migrations are managed with `node-pg-migrate`. Migration scripts live in `backend/migrations/`.
 
 ```bash
 docker compose exec backend npm run migrate:up    # Apply all pending migrations
 docker compose exec backend npm run migrate:down  # Roll back the last migration
 ```
 
-To add a new migration, create `backend/migrations/scripts/<N>_description.js` (increment N) with `exports.up` and `exports.down` functions, then run `migrate:up`.
+To add a new migration, create `backend/migrations/<N>_description.js` (increment N) with `exports.up` and `exports.down` functions, then run `migrate:up`.
 
 The runner tracks applied migrations in a `pgmigrations` table in the database. Never edit a migration file that has already been applied — write a new one instead.
 

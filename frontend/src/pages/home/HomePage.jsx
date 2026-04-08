@@ -3,7 +3,6 @@ import { MiniCartIcon, StarRating } from '../../components/icons'
 import Navbar from './components/Navbar'
 import HeroBanner from './components/HeroBanner'
 import Footer from './components/Footer'
-import './HomePage.css'
 
 const CATEGORIES = [
   { id: 1, title: "Women's Clothing", subtitle: 'New arrivals every week', hue: 280 },
@@ -90,6 +89,10 @@ const REVIEWS = [
   },
 ]
 
+const sectionCls = 'relative z-[1] mx-auto w-full max-w-[1280px] px-6 py-16 pb-20 box-border'
+const sectionDividerCls =
+  "after:absolute after:bottom-0 after:-left-[100vw] after:-right-[100vw] after:h-px after:content-[''] after:[background:linear-gradient(to_right,transparent,rgba(140,100,200,0.15)_30%,rgba(160,120,220,0.2)_50%,rgba(140,100,200,0.15)_70%,transparent)]"
+
 export default function HomePage({
   isLoggedIn,
   userEmail,
@@ -109,9 +112,16 @@ export default function HomePage({
   }
 
   return (
-    <div className="home">
-      {/* Liquid glass ambient background */}
-      <div className="home-bg" aria-hidden="true" />
+    <div className="flex min-h-svh w-full flex-col bg-[var(--bg)] text-left">
+      {/* Ambient background */}
+      <div
+        className="pointer-events-none fixed inset-0 z-0 overflow-hidden"
+        style={{
+          background:
+            'linear-gradient(170deg, var(--bg) 0%, var(--bg-gradient-to) 25%, var(--accent-bg) 50%, var(--bg-gradient-to) 75%, var(--bg) 100%)',
+        }}
+        aria-hidden="true"
+      />
 
       <Navbar
         isLoggedIn={isLoggedIn}
@@ -127,108 +137,124 @@ export default function HomePage({
 
       <HeroBanner />
 
-      {/* Category grid */}
-      <main className="categories-section">
-        <div className="section-header">
-          <h2 className="section-title">Browse Categories</h2>
-          <button className="section-link">View All</button>
+      {/* ── Category grid ── */}
+      <main className={`${sectionCls} ${sectionDividerCls}`}>
+        <div className="mb-8 flex items-end justify-between">
+          <h2 className="m-0 text-[28px] font-bold tracking-[-0.5px] text-[var(--text-h)]">
+            Browse Categories
+          </h2>
+          <button className="shrink-0 cursor-pointer border-none bg-transparent p-1 text-[13px] font-semibold tracking-[0.3px] text-purple-400 transition-opacity hover:opacity-75">
+            View All
+          </button>
         </div>
-        <div className="category-grid">
+
+        <div className="grid grid-cols-4 gap-5 max-[720px]:grid-cols-2 max-[720px]:gap-3.5 max-[420px]:grid-cols-1 max-lg:grid-cols-3">
           {CATEGORIES.map((cat) => (
             <button
               key={cat.id}
-              className="category-card"
+              className="flex cursor-pointer flex-col overflow-hidden rounded-2xl border border-[var(--glass-border)] bg-[var(--card-bg)] p-0 text-left shadow-[var(--shadow)] backdrop-blur-xl transition-[box-shadow,transform,border-color] duration-[250ms] hover:-translate-y-1 hover:border-purple-400/40 hover:shadow-[0_8px_24px_rgba(0,0,0,0.15),0_0_0_1px_rgba(192,132,252,0.35),inset_0_1px_0_rgba(255,255,255,0.18)]"
               onClick={() => onNavigate('category', cat)}
             >
               <div
-                className="card-image-placeholder"
+                className="flex aspect-[3/4] w-full items-center justify-center border-b border-[var(--glass-border)]"
                 style={{
-                  background: `linear-gradient(160deg, hsl(${cat.hue},35%,10%) 0%, hsl(${cat.hue},45%,17%) 100%)`,
+                  background: `linear-gradient(160deg, hsl(${cat.hue},35%,var(--cat-bg-l,10%)) 0%, hsl(${cat.hue},45%,var(--cat-bg-l2,17%)) 100%)`,
                 }}
               >
-                <span className="placeholder-label" style={{ color: `hsl(${cat.hue},70%,70%)` }}>
+                <span
+                  className="text-[64px] font-bold opacity-35 select-none"
+                  style={{ color: `hsl(${cat.hue},70%,var(--cat-text-l,70%))` }}
+                >
                   {cat.title[0]}
                 </span>
               </div>
-              <div className="card-info">
-                <span className="card-title">{cat.title}</span>
-                <span className="card-subtitle">{cat.subtitle}</span>
+              <div className="flex flex-col gap-1 p-4">
+                <span className="text-[15px] font-semibold text-[var(--text-h)]">{cat.title}</span>
+                <span className="text-[13px] text-[var(--text)]">{cat.subtitle}</span>
               </div>
             </button>
           ))}
         </div>
       </main>
 
-      {/* New Releases */}
-      <section className="releases-section">
-        <div className="section-header">
+      {/* ── New Releases ── */}
+      <section className={`${sectionCls} ${sectionDividerCls}`}>
+        <div className="mb-8 flex items-end justify-between">
           <div>
-            <p className="section-eyebrow">Just Dropped</p>
-            <h2 className="section-title">New Releases</h2>
+            <p className="m-0 mb-1.5 text-[11px] font-bold tracking-[4px] text-purple-400 uppercase">
+              Just Dropped
+            </p>
+            <h2 className="m-0 text-[28px] font-bold tracking-[-0.5px] text-[var(--text-h)]">
+              New Releases
+            </h2>
           </div>
-          <div className="releases-nav">
-            <button
-              className="releases-arrow"
-              onClick={() => scrollReleases(-1)}
-              aria-label="Scroll left"
-            >
-              <svg
-                width="16"
-                height="16"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2.5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
+          <div className="flex items-center gap-2">
+            {[-1, 1].map((dir) => (
+              <button
+                key={dir}
+                className="flex h-9 w-9 cursor-pointer items-center justify-center rounded-full border border-[var(--glass-border)] bg-[var(--card-bg)] text-[var(--text-h)] backdrop-blur-xl transition-[background,border-color,color] hover:border-purple-400/40 hover:bg-purple-400/18 hover:text-purple-400"
+                onClick={() => scrollReleases(dir)}
+                aria-label={dir === -1 ? 'Scroll left' : 'Scroll right'}
               >
-                <polyline points="15 18 9 12 15 6" />
-              </svg>
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  {dir === -1 ? (
+                    <polyline points="15 18 9 12 15 6" />
+                  ) : (
+                    <polyline points="9 18 15 12 9 6" />
+                  )}
+                </svg>
+              </button>
+            ))}
+            <button className="shrink-0 cursor-pointer border-none bg-transparent p-1 text-[13px] font-semibold tracking-[0.3px] text-purple-400 transition-opacity hover:opacity-75">
+              View All
             </button>
-            <button
-              className="releases-arrow"
-              onClick={() => scrollReleases(1)}
-              aria-label="Scroll right"
-            >
-              <svg
-                width="16"
-                height="16"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2.5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <polyline points="9 18 15 12 9 6" />
-              </svg>
-            </button>
-            <button className="section-link">View All</button>
           </div>
         </div>
-        <div className="releases-scroll" ref={releasesRef}>
+
+        <div
+          ref={releasesRef}
+          className="-mt-2 flex [scroll-snap-type:x_mandatory] gap-[18px] overflow-x-auto scroll-smooth pt-2 pb-3 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        >
           {NEW_RELEASES.map((product) => (
-            <div key={product.id} className="release-card">
+            <div
+              key={product.id}
+              className="flex w-[210px] shrink-0 [scroll-snap-align:start] flex-col overflow-hidden rounded-2xl border border-[var(--glass-border)] bg-[var(--card-bg)] shadow-[var(--shadow)] backdrop-blur-xl transition-[box-shadow,transform,border-color] duration-[250ms] hover:-translate-y-1 hover:border-purple-400/40 hover:shadow-[0_8px_24px_rgba(0,0,0,0.15),0_0_0_1px_rgba(192,132,252,0.35),inset_0_1px_0_rgba(255,255,255,0.18)]"
+            >
               <div
-                className="release-image"
+                className="relative flex aspect-[2/3] w-full items-center justify-center border-b border-[var(--glass-border)]"
                 style={{
-                  background: `linear-gradient(160deg, hsl(${product.hue},35%,10%) 0%, hsl(${product.hue},50%,20%) 100%)`,
+                  background: `linear-gradient(160deg, hsl(${product.hue},35%,var(--cat-bg-l,10%)) 0%, hsl(${product.hue},50%,var(--cat-bg-l2,20%)) 100%)`,
                 }}
               >
                 <span
-                  className="release-placeholder"
-                  style={{ color: `hsl(${product.hue},70%,70%)` }}
+                  className="text-[56px] font-bold opacity-40 select-none"
+                  style={{ color: `hsl(${product.hue},70%,var(--cat-text-l,70%))` }}
                 >
                   {product.name[0]}
                 </span>
               </div>
-              <div className="release-info">
-                <span className="release-category">{product.category}</span>
-                <span className="release-name">{product.name}</span>
-                <div className="release-footer">
-                  <span className="release-price">${product.price.toFixed(2)}</span>
+              <div className="flex flex-col gap-[3px] px-3.5 pt-3 pb-3.5">
+                <span className="text-[11px] font-semibold tracking-[1.5px] text-[var(--text)] uppercase">
+                  {product.category}
+                </span>
+                <span className="text-[13px] leading-[1.3] font-semibold text-[var(--text-h)]">
+                  {product.name}
+                </span>
+                <div className="mt-2 flex items-center justify-between">
+                  <span className="text-[15px] font-bold text-purple-400">
+                    ${product.price.toFixed(2)}
+                  </span>
                   <button
-                    className="release-cart-btn"
+                    className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-lg border border-[var(--glass-border)] bg-transparent text-[var(--text)] transition-[background,color,border-color] hover:border-purple-400 hover:bg-purple-400 hover:text-white"
                     aria-label="Add to cart"
                     onClick={() => onAddToCart && onAddToCart(product)}
                   >
@@ -241,25 +267,39 @@ export default function HomePage({
         </div>
       </section>
 
-      {/* Reviews marquee */}
-      <section className="reviews-section">
-        <div className="section-header reviews-section-header">
+      {/* ── Reviews marquee ── */}
+      <section className={sectionCls}>
+        <div className="mb-8 flex items-start justify-between">
           <div>
-            <p className="section-eyebrow">Testimonials</p>
-            <h2 className="section-title">What Our Customers Say</h2>
+            <p className="m-0 mb-1.5 text-[11px] font-bold tracking-[4px] text-purple-400 uppercase">
+              Testimonials
+            </p>
+            <h2 className="m-0 text-[28px] font-bold tracking-[-0.5px] text-[var(--text-h)]">
+              What Our Customers Say
+            </h2>
           </div>
         </div>
-        <div className="reviews-track-wrapper">
-          <div className="reviews-track">
+
+        <div className="overflow-hidden [mask-image:linear-gradient(to_right,transparent_0%,black_5%,black_95%,transparent_100%)]">
+          <div className="animate-marquee flex w-max gap-4 hover:[animation-play-state:paused]">
             {[...REVIEWS, ...REVIEWS].map((review, i) => (
-              <div key={i} className="review-card">
+              <div
+                key={i}
+                className="flex w-[280px] shrink-0 flex-col gap-3 rounded-2xl border border-[var(--glass-border)] bg-[var(--card-bg)] p-5 shadow-[var(--shadow)] backdrop-blur-xl"
+              >
                 <StarRating rating={review.rating} />
-                <p className="review-text">"{review.text}"</p>
-                <div className="review-author">
-                  <div className="review-avatar">{review.name[0]}</div>
+                <p className="m-0 flex-1 text-[13px] leading-relaxed text-[var(--text)]">
+                  "{review.text}"
+                </p>
+                <div className="flex items-center gap-2.5">
+                  <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-purple-400/12 text-[13px] font-bold text-purple-400">
+                    {review.name[0]}
+                  </div>
                   <div>
-                    <p className="review-name">{review.name}</p>
-                    <p className="review-verified">Verified Purchase</p>
+                    <p className="m-0 text-[13px] font-semibold text-[var(--text-h)]">
+                      {review.name}
+                    </p>
+                    <p className="m-0 text-[11px] text-[var(--text)]">Verified Purchase</p>
                   </div>
                 </div>
               </div>

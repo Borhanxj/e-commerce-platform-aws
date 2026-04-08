@@ -15,9 +15,9 @@ exports.up = (pgm) => {
   // Seed default settings
   pgm.sql(`
     INSERT INTO system_settings (key, value, label, type) VALUES
-      ('app_name', 'MODÉ', 'Application Name', 'text'),
+      ('app_name', 'FIER', 'Application Name', 'text'),
       ('maintenance_mode', 'false', 'Maintenance Mode', 'boolean'),
-      ('contact_email', 'support@mode.com', 'Contact Email', 'text'),
+      ('contact_email', 'support@fier.com', 'Contact Email', 'text'),
       ('max_order_items', '50', 'Max Items Per Order', 'number'),
       ('currency', 'USD', 'Currency', 'text'),
       ('free_shipping_threshold', '100', 'Free Shipping Threshold ($)', 'number')

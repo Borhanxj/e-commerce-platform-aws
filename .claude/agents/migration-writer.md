@@ -7,7 +7,7 @@ You write database migration files for this e-commerce platform using `node-pg-m
 
 ## File conventions
 
-- Migration files live in `backend/migrations/scripts/`
+- Migration files live in `backend/migrations/`
 - Naming: `N_description.js` where N is the next integer (currently the highest is 4, so the next is 5)
 - Always check existing files to confirm the current highest N before naming
 - Never edit a migration that has already been applied — always write a new one

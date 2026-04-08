@@ -8,8 +8,8 @@
     "lint": "eslint .",
     "format:check": "prettier --check .",
     "format": "prettier --write .",
-    "migrate:up": "node-pg-migrate up --migrations-dir migrations/scripts",
-    "migrate:down": "node-pg-migrate down --migrations-dir migrations/scripts",
+    "migrate:up": "node-pg-migrate up --migrations-dir migrations",
+    "migrate:down": "node-pg-migrate down --migrations-dir migrations",
     "seed:admin": "node scripts/seed-admin.js"
   },
   "keywords": [],

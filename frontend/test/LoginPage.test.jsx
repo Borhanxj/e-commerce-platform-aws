@@ -2,6 +2,15 @@ import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { vi } from 'vitest'
 import LoginPage from '../src/pages/auth/LoginPage'
+import { ThemeProvider } from '../src/context/ThemeContext'
+
+function renderLogin(props = {}) {
+  return render(
+    <ThemeProvider>
+      <LoginPage onLogin={vi.fn()} onForgotPassword={vi.fn()} onRegister={vi.fn()} {...props} />
+    </ThemeProvider>
+  )
+}
 
 describe('LoginPage', () => {
   afterEach(() => {
@@ -9,21 +18,21 @@ describe('LoginPage', () => {
   })
 
   it('renders email and password fields', () => {
-    render(<LoginPage onLogin={vi.fn()} onForgotPassword={vi.fn()} onRegister={vi.fn()} />)
+    renderLogin()
 
     expect(screen.getByLabelText(/email/i)).toBeInTheDocument()
     expect(screen.getByLabelText(/password/i)).toBeInTheDocument()
   })
 
   it('renders the sign in button', () => {
-    render(<LoginPage onLogin={vi.fn()} onForgotPassword={vi.fn()} onRegister={vi.fn()} />)
+    renderLogin()
 
     expect(screen.getByRole('button', { name: /sign in/i })).toBeInTheDocument()
   })
 
   it('calls onRegister when "Create a new account" is clicked', async () => {
     const onRegister = vi.fn()
-    render(<LoginPage onLogin={vi.fn()} onForgotPassword={vi.fn()} onRegister={onRegister} />)
+    renderLogin({ onRegister })
 
     await userEvent.click(screen.getByRole('button', { name: /create a new account/i }))
 
@@ -32,7 +41,7 @@ describe('LoginPage', () => {
 
   it('calls onForgotPassword when "Forgot password?" is clicked', async () => {
     const onForgotPassword = vi.fn()
-    render(<LoginPage onLogin={vi.fn()} onForgotPassword={onForgotPassword} onRegister={vi.fn()} />)
+    renderLogin({ onForgotPassword })
 
     await userEvent.click(screen.getByRole('button', { name: /forgot password/i }))
 
@@ -45,7 +54,7 @@ describe('LoginPage', () => {
       json: async () => ({ error: 'Invalid credentials' }),
     })
 
-    render(<LoginPage onLogin={vi.fn()} onForgotPassword={vi.fn()} onRegister={vi.fn()} />)
+    renderLogin()
 
     await userEvent.type(screen.getByLabelText(/email/i), 'test@example.com')
     await userEvent.type(screen.getByLabelText(/password/i), 'wrongpassword')
@@ -61,7 +70,7 @@ describe('LoginPage', () => {
       json: async () => ({ token: 'fake-jwt-token' }),
     })
 
-    render(<LoginPage onLogin={onLogin} onForgotPassword={vi.fn()} onRegister={vi.fn()} />)
+    renderLogin({ onLogin })
 
     await userEvent.type(screen.getByLabelText(/email/i), 'test@example.com')
     await userEvent.type(screen.getByLabelText(/password/i), 'password123')

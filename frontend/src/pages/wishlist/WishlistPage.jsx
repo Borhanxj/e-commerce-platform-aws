@@ -1,5 +1,3 @@
-import './WishlistPage.css'
-
 function BackIcon() {
   return (
     <svg
@@ -60,19 +58,26 @@ function CartIcon() {
 export default function WishlistPage({ onBack, wishlistItems, onRemove, onAddToCart }) {
   if (wishlistItems.length === 0) {
     return (
-      <div className="wishlist-page">
-        <header className="wishlist-header">
-          <div className="wishlist-header-inner">
-            <button className="back-btn" onClick={onBack}>
+      <div className="flex min-h-svh w-full flex-col bg-[var(--bg)] pt-16">
+        <header className="fixed top-0 right-0 left-0 z-[1000] border-b border-[var(--border)] bg-[rgba(var(--background-rgb),0.75)] px-6 backdrop-blur-[20px]">
+          <div className="mx-auto flex h-16 max-w-[1280px] items-center gap-4">
+            <button
+              className="flex cursor-pointer items-center gap-1.5 rounded-lg border-none bg-transparent px-2.5 py-1.5 text-sm text-[var(--text)] transition-colors hover:bg-purple-400/12 hover:text-purple-400"
+              onClick={onBack}
+            >
               <BackIcon /> Back
             </button>
-            <span className="brand">MODÉ</span>
+            <span className="ml-auto text-[22px] font-bold tracking-[4px] text-[var(--text-h)]">
+              FIER
+            </span>
           </div>
         </header>
-        <main className="wishlist-main">
-          <h1 className="wishlist-title">Wishlist</h1>
-          <div className="wishlist-empty">
-            <div className="empty-icon">
+        <main className="mx-auto box-border w-full max-w-[1280px] px-6 pt-12 pb-16">
+          <h1 className="mb-10 text-[32px] font-bold tracking-[-0.5px] text-[var(--text-h)]">
+            Wishlist
+          </h1>
+          <div className="flex flex-col items-center justify-center gap-3 px-6 py-20 text-center">
+            <div className="mb-2 text-purple-400 opacity-50">
               <svg
                 width="64"
                 height="64"
@@ -86,9 +91,16 @@ export default function WishlistPage({ onBack, wishlistItems, onRemove, onAddToC
                 <path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z" />
               </svg>
             </div>
-            <p className="empty-title">Your wishlist is empty</p>
-            <p className="empty-sub">Save items you love and come back to them anytime.</p>
-            <button className="cta-btn" onClick={onBack}>
+            <p className="m-0 text-[20px] font-semibold text-[var(--text-h)]">
+              Your wishlist is empty
+            </p>
+            <p className="m-0 mb-4 text-sm text-[var(--text)]">
+              Save items you love and come back to them anytime.
+            </p>
+            <button
+              className="cursor-pointer rounded-lg border-none bg-purple-400 px-7 py-3 text-sm font-semibold tracking-[0.5px] text-white transition-opacity hover:opacity-88"
+              onClick={onBack}
+            >
               Start Shopping
             </button>
           </div>
@@ -98,35 +110,50 @@ export default function WishlistPage({ onBack, wishlistItems, onRemove, onAddToC
   }
 
   return (
-    <div className="wishlist-page">
-      <header className="wishlist-header">
-        <div className="wishlist-header-inner">
-          <button className="back-btn" onClick={onBack}>
+    <div className="flex min-h-svh w-full flex-col bg-[var(--bg)] pt-16">
+      <header className="fixed top-0 right-0 left-0 z-[1000] border-b border-[var(--border)] bg-[rgba(var(--background-rgb),0.75)] px-6 backdrop-blur-[20px]">
+        <div className="mx-auto flex h-16 max-w-[1280px] items-center gap-4">
+          <button
+            className="flex cursor-pointer items-center gap-1.5 rounded-lg border-none bg-transparent px-2.5 py-1.5 text-sm text-[var(--text)] transition-colors hover:bg-purple-400/12 hover:text-purple-400"
+            onClick={onBack}
+          >
             <BackIcon /> Back
           </button>
-          <span className="brand">MODÉ</span>
+          <span className="ml-auto text-[22px] font-bold tracking-[4px] text-[var(--text-h)]">
+            FIER
+          </span>
         </div>
       </header>
 
-      <main className="wishlist-main">
-        <h1 className="wishlist-title">Wishlist</h1>
+      <main className="mx-auto box-border w-full max-w-[1280px] px-6 pt-12 pb-16">
+        <h1 className="mb-10 text-[32px] font-bold tracking-[-0.5px] text-[var(--text-h)]">
+          Wishlist
+        </h1>
 
-        <div className="wishlist-grid">
+        <div className="grid [grid-template-columns:repeat(auto-fill,minmax(260px,1fr))] gap-5">
           {wishlistItems.map((item) => (
-            <div key={item.id} className="wishlist-item">
-              <div className="wishlist-item-image">
-                <span className="wishlist-item-image-label">{item.name[0]}</span>
+            <div
+              key={item.id}
+              className="flex flex-col overflow-hidden rounded-2xl border border-[var(--glass-border)] bg-[var(--card-bg)] shadow-[var(--shadow)] backdrop-blur-xl transition-[transform,box-shadow] duration-250 hover:-translate-y-1 hover:shadow-[0_8px_24px_rgba(0,0,0,0.15),0_0_0_1px_rgba(192,132,252,0.35)]"
+            >
+              <div className="flex aspect-[4/3] w-full items-center justify-center bg-purple-400/12">
+                <span className="text-5xl font-bold text-purple-400 opacity-50">
+                  {item.name[0]}
+                </span>
               </div>
-              <div className="wishlist-item-info">
-                <span className="wishlist-item-name">{item.name}</span>
-                <span className="wishlist-item-price">${item.price.toFixed(2)}</span>
+              <div className="flex flex-1 flex-col gap-1 px-4 pt-3.5 pb-2">
+                <span className="text-[15px] font-medium text-[var(--text-h)]">{item.name}</span>
+                <span className="text-sm text-[var(--text)]">${item.price.toFixed(2)}</span>
               </div>
-              <div className="wishlist-item-actions">
-                <button className="wishlist-add-cart-btn" onClick={() => onAddToCart(item)}>
+              <div className="flex items-center gap-2.5 px-4 pt-3 pb-4">
+                <button
+                  className="flex flex-1 cursor-pointer items-center justify-center gap-1.5 rounded-lg border-none bg-purple-400 px-3.5 py-2.5 text-[13px] font-semibold tracking-[0.3px] text-white transition-opacity hover:opacity-88"
+                  onClick={() => onAddToCart(item)}
+                >
                   <CartIcon /> Add to Cart
                 </button>
                 <button
-                  className="wishlist-remove-btn"
+                  className="flex cursor-pointer items-center rounded-lg border border-[var(--border)] bg-transparent p-2.5 text-[var(--text)] transition-colors hover:border-[rgba(232,93,93,0.3)] hover:bg-[rgba(232,93,93,0.1)] hover:text-[#e85d5d]"
                   onClick={() => onRemove(item.id)}
                   aria-label="Remove from wishlist"
                 >

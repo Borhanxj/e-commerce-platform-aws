@@ -54,7 +54,7 @@ export function SearchIcon() {
 
 export function StarRating({ rating }) {
   return (
-    <div className="star-rating" aria-label={`${rating} out of 5 stars`}>
+    <div className="flex gap-0.5 text-amber-400" aria-label={`${rating} out of 5 stars`}>
       {[1, 2, 3, 4, 5].map((n) => (
         <svg
           key={n}
@@ -66,7 +66,7 @@ export function StarRating({ rating }) {
           strokeWidth="1.8"
           strokeLinecap="round"
           strokeLinejoin="round"
-          className={n <= rating ? 'star--filled' : 'star--empty'}
+          className={n <= rating ? '' : 'opacity-25'}
         >
           <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
         </svg>
@@ -218,6 +218,48 @@ export function ChevronRightIcon() {
       strokeLinejoin="round"
     >
       <polyline points="9 18 15 12 9 6" />
+    </svg>
+  )
+}
+
+export function SunIcon() {
+  return (
+    <svg
+      width="20"
+      height="20"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <circle cx="12" cy="12" r="5" />
+      <line x1="12" y1="1" x2="12" y2="3" />
+      <line x1="12" y1="21" x2="12" y2="23" />
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
+      <line x1="1" y1="12" x2="3" y2="12" />
+      <line x1="21" y1="12" x2="23" y2="12" />
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
+    </svg>
+  )
+}
+
+export function MoonIcon() {
+  return (
+    <svg
+      width="20"
+      height="20"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z" />
     </svg>
   )
 }
