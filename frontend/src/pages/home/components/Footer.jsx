@@ -3,7 +3,7 @@ export default function Footer() {
     'cursor-pointer text-[13px] text-[var(--text)] transition-colors hover:text-purple-400'
 
   return (
-    <footer className="relative z-[1] mt-auto bg-[rgba(var(--background),0.9)] backdrop-blur-xl">
+    <footer className="relative z-[1] mt-auto bg-[rgba(var(--background-rgb),0.9)] backdrop-blur-xl">
       <div className="mx-auto flex max-w-[1280px] gap-16 px-6 pt-14 pb-10 max-lg:flex-col max-lg:gap-10">
         {/* Brand + newsletter */}
         <div className="flex flex-col gap-3 max-lg:flex-none lg:w-[260px]">

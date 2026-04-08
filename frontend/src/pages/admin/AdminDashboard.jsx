@@ -39,7 +39,7 @@ function AdminDashboard({ token, onLogout }) {
 
   return (
     <div className="flex min-h-svh bg-[var(--bg)]">
-      <aside className="box-border flex w-60 min-w-[240px] flex-col border-r border-[var(--border)] bg-[rgba(var(--background),0.4)] py-6 backdrop-blur-xl">
+      <aside className="box-border flex w-60 min-w-[240px] flex-col border-r border-[var(--border)] bg-[rgba(var(--background-rgb),0.4)] py-6 backdrop-blur-xl">
         <h2 className="m-0 border-b border-[var(--border)] px-6 pb-6 text-xl font-semibold text-purple-400">
           FIER Admin
         </h2>
@@ -71,7 +71,7 @@ function AdminDashboard({ token, onLogout }) {
       </aside>
 
       <div className="flex min-w-0 flex-1 flex-col">
-        <header className="flex items-center justify-between border-b border-[var(--border)] bg-[rgba(var(--background),0.4)] px-8 py-4 backdrop-blur-xl">
+        <header className="flex items-center justify-between border-b border-[var(--border)] bg-[rgba(var(--background-rgb),0.4)] px-8 py-4 backdrop-blur-xl">
           <h1 className="m-0 text-lg font-medium text-[var(--text-h)]">
             {sections.find((s) => s.key === activeSection)?.label}
           </h1>
