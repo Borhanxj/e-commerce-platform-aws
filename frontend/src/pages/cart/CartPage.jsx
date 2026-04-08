@@ -186,7 +186,7 @@ export default function CartPage({ onBack, cartItems, onRemove, onUpdateQuantity
                 {total >= 50 ? 'Free' : '$4.99'}
               </span>
             </div>
-            <hr className="my-1 border-t border-none border-[var(--border)]" />
+            <hr className="my-1 border-t border-[var(--border)]" />
             <div className="flex items-center justify-between text-[16px] font-bold text-[var(--text-h)]">
               <span>Total</span>
               <span>${(total + (total >= 50 ? 0 : 4.99)).toFixed(2)}</span>
