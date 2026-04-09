@@ -8,6 +8,8 @@ import {
   useNavigationType,
 } from 'react-router-dom'
 import AdminLoginPage from './pages/admin/AdminLoginPage'
+import SalesManagerLoginPage from './pages/sales-manager/SalesManagerLoginPage'
+import SalesManagerDashboard from './pages/sales-manager/SalesManagerDashboard'
 import AdminDashboard from './pages/admin/AdminDashboard'
 import LoginPage from './pages/auth/LoginPage'
 import RegisterPage from './pages/auth/RegisterPage'
@@ -46,6 +48,14 @@ function decodeJwtPayload(token) {
 
 function RequireAuth({ token, children }) {
   if (!token) return <Navigate to="/login" replace />
+  return children
+}
+
+function RequireSalesManager({ salesManagerToken, children }) {
+  if (!salesManagerToken) return <Navigate to="/sales-manager/login" replace />
+  const payload = decodeJwtPayload(salesManagerToken)
+  if (!payload || payload.role !== 'sales_manager')
+    return <Navigate to="/sales-manager/login" replace />
   return children
 }
 
@@ -101,6 +111,16 @@ function App() {
   })
 
   const [adminToken, setAdminToken] = useState(() => localStorage.getItem('adminToken'))
+  const [salesManagerToken, setSalesManagerToken] = useState(() => {
+    const t = localStorage.getItem('salesManagerToken')
+    if (!t) return null
+    const payload = decodeJwtPayload(t)
+    if (!payload || payload.role !== 'sales_manager') {
+      localStorage.removeItem('salesManagerToken')
+      return null
+    }
+    return t
+  })
   const [cart, setCart] = useState(() => {
     try {
       return JSON.parse(localStorage.getItem('guest_cart') || '[]')
@@ -271,6 +291,18 @@ function App() {
     navigate('/admin/login')
   }
 
+  function handleSalesManagerLogin(t) {
+    localStorage.setItem('salesManagerToken', t)
+    setSalesManagerToken(t)
+    navigate('/sales-manager')
+  }
+
+  function handleSalesManagerLogout() {
+    localStorage.removeItem('salesManagerToken')
+    setSalesManagerToken(null)
+    navigate('/sales-manager/login')
+  }
+
   function handleLogout() {
     localStorage.setItem('guest_cart', JSON.stringify(cart))
     localStorage.removeItem('token')
@@ -401,6 +433,26 @@ function App() {
           }
         />
         <Route path="/help" element={<HelpPage onBack={() => navigate(-1)} />} />
+
+        {/* Sales manager routes */}
+        <Route
+          path="/sales-manager/login"
+          element={
+            salesManagerToken ? (
+              <Navigate to="/sales-manager" replace />
+            ) : (
+              <SalesManagerLoginPage onLogin={handleSalesManagerLogin} />
+            )
+          }
+        />
+        <Route
+          path="/sales-manager"
+          element={
+            <RequireSalesManager salesManagerToken={salesManagerToken}>
+              <SalesManagerDashboard onLogout={handleSalesManagerLogout} />
+            </RequireSalesManager>
+          }
+        />
 
         {/* Admin routes */}
         <Route
