@@ -8,6 +8,20 @@ import {
   useNavigationType,
 } from 'react-router-dom'
 import AdminLoginPage from './pages/admin/AdminLoginPage'
+import AdminDashboard from './pages/admin/AdminDashboard'
+import LoginPage from './pages/auth/LoginPage'
+import RegisterPage from './pages/auth/RegisterPage'
+import ForgotPasswordPage from './pages/auth/ForgotPasswordPage'
+import ResetPasswordPage from './pages/auth/ResetPasswordPage'
+import HomePage from './pages/home/HomePage'
+import CartPage from './pages/cart/CartPage'
+import CheckoutPage from './pages/checkout/CheckoutPage'
+import WishlistPage from './pages/wishlist/WishlistPage'
+import CategoryPage from './pages/category/CategoryPage'
+import AccountSettingsPage from './pages/account/AccountSettingsPage'
+import OrdersPage from './pages/orders/OrdersPage'
+import HelpPage from './pages/help/HelpPage'
+import API_BASE from './api'
 
 function ScrollToTop() {
   const { pathname } = useLocation()
@@ -17,18 +31,6 @@ function ScrollToTop() {
   }, [pathname, navType])
   return null
 }
-import AdminDashboard from './pages/admin/AdminDashboard'
-import LoginPage from './pages/auth/LoginPage'
-import RegisterPage from './pages/auth/RegisterPage'
-import ForgotPasswordPage from './pages/auth/ForgotPasswordPage'
-import ResetPasswordPage from './pages/auth/ResetPasswordPage'
-import HomePage from './pages/home/HomePage'
-import CartPage from './pages/cart/CartPage'
-import WishlistPage from './pages/wishlist/WishlistPage'
-import CategoryPage from './pages/category/CategoryPage'
-import AccountSettingsPage from './pages/account/AccountSettingsPage'
-import OrdersPage from './pages/orders/OrdersPage'
-import HelpPage from './pages/help/HelpPage'
 
 function decodeJwtPayload(token) {
   try {
@@ -116,14 +118,37 @@ function App() {
   const navigate = useNavigate()
 
   useEffect(() => {
-    localStorage.setItem('guest_cart', JSON.stringify(cart))
-  }, [cart])
+    if (!token) localStorage.setItem('guest_cart', JSON.stringify(cart))
+  }, [cart, token])
+
+  // On mount: if already logged in, load cart from server
+  useEffect(() => {
+    if (!token) return
+    fetch(`${API_BASE}/api/cart`, { headers: { Authorization: `Bearer ${token}` } })
+      .then((r) => r.json())
+      .then((data) => {
+        if (data.items) setCart(data.items)
+      })
+      .catch(() => {})
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     localStorage.setItem('guest_wishlist', JSON.stringify(wishlist))
   }, [wishlist])
 
-  function addToCart(product) {
+  async function addToCart(product) {
+    if (token) {
+      const res = await fetch(`${API_BASE}/api/cart`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ productId: product.id, quantity: 1 }),
+      }).catch(() => null)
+      const data = await res?.json().catch(() => null)
+      if (data?.items) {
+        setCart(data.items)
+        return
+      }
+    }
     setCart((prev) => {
       const existing = prev.find((item) => item.id === product.id)
       if (existing) {
@@ -135,14 +160,37 @@ function App() {
     })
   }
 
-  function removeFromCart(productId) {
+  async function removeFromCart(productId) {
+    if (token) {
+      const res = await fetch(`${API_BASE}/api/cart/${productId}`, {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${token}` },
+      }).catch(() => null)
+      const data = await res?.json().catch(() => null)
+      if (data?.items) {
+        setCart(data.items)
+        return
+      }
+    }
     setCart((prev) => prev.filter((item) => item.id !== productId))
   }
 
-  function updateCartQuantity(productId, quantity) {
+  async function updateCartQuantity(productId, quantity) {
     if (quantity < 1) {
       removeFromCart(productId)
       return
+    }
+    if (token) {
+      const res = await fetch(`${API_BASE}/api/cart/${productId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ quantity }),
+      }).catch(() => null)
+      const data = await res?.json().catch(() => null)
+      if (data?.items) {
+        setCart(data.items)
+        return
+      }
     }
     setCart((prev) => prev.map((item) => (item.id === productId ? { ...item, quantity } : item)))
   }
@@ -158,15 +206,56 @@ function App() {
     setWishlist((prev) => prev.filter((item) => item.id !== productId))
   }
 
-  function handleLogin(t) {
+  async function handleLogin(t) {
     const payload = decodeJwtPayload(t)
     if (!payload) {
       localStorage.removeItem('token')
       return
     }
     localStorage.setItem('token', t)
+
+    // Login: discard guest cart and load the server cart
+    const res = await fetch(`${API_BASE}/api/cart`, {
+      headers: { Authorization: `Bearer ${t}` },
+    }).catch(() => null)
+    const data = await res?.json().catch(() => null)
+
     setToken(t)
     setUser({ email: payload.email })
+    if (data?.items) {
+      localStorage.removeItem('guest_cart')
+      setCart(data.items)
+    }
+    navigate('/')
+  }
+
+  async function handleSignup(t) {
+    const payload = decodeJwtPayload(t)
+    if (!payload) return
+    localStorage.setItem('token', t)
+
+    // Signup: merge guest cart items into the new (empty) server cart
+    const guestItems = cart.filter((item) => item.id)
+    for (const item of guestItems) {
+      await fetch(`${API_BASE}/api/cart`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${t}` },
+        body: JSON.stringify({ productId: item.id, quantity: item.quantity }),
+      }).catch(() => {})
+    }
+
+    // Fetch the merged cart from the server
+    const res = await fetch(`${API_BASE}/api/cart`, {
+      headers: { Authorization: `Bearer ${t}` },
+    }).catch(() => null)
+    const data = await res?.json().catch(() => null)
+
+    setToken(t)
+    setUser({ email: payload.email })
+    if (data?.items) {
+      localStorage.removeItem('guest_cart')
+      setCart(data.items)
+    }
     navigate('/')
   }
 
@@ -180,6 +269,14 @@ function App() {
     localStorage.removeItem('adminToken')
     setAdminToken(null)
     navigate('/admin/login')
+  }
+
+  function handleLogout() {
+    localStorage.setItem('guest_cart', JSON.stringify(cart))
+    localStorage.removeItem('token')
+    setToken(null)
+    setUser(null)
+    navigate('/')
   }
 
   function requireAuth() {
@@ -206,12 +303,7 @@ function App() {
               userEmail={user?.email}
               onNavigate={handleNavigate}
               onRequireAuth={requireAuth}
-              onLogout={() => {
-                localStorage.removeItem('token')
-                setToken(null)
-                setUser(null)
-                navigate('/')
-              }}
+              onLogout={handleLogout}
               cartCount={cart.reduce((sum, item) => sum + item.quantity, 0)}
               wishlistCount={wishlist.length}
               onAddToCart={addToCart}
@@ -228,7 +320,10 @@ function App() {
             />
           }
         />
-        <Route path="/register" element={<RegisterPage onBack={() => navigate('/login')} />} />
+        <Route
+          path="/register"
+          element={<RegisterPage onBack={() => navigate('/login')} onSignup={handleSignup} />}
+        />
         <Route
           path="/forgot-password"
           element={<ForgotPasswordPage onBack={() => navigate('/login')} />}
@@ -246,7 +341,23 @@ function App() {
               onRemove={removeFromCart}
               onUpdateQuantity={updateCartQuantity}
               isLoggedIn={!!token}
+              token={token}
             />
+          }
+        />
+        <Route
+          path="/checkout"
+          element={
+            <RequireAuth token={token}>
+              <CheckoutPage
+                cartItems={cart}
+                token={token}
+                onOrderConfirmed={() => {
+                  setCart([])
+                  navigate('/orders')
+                }}
+              />
+            </RequireAuth>
           }
         />
         <Route
