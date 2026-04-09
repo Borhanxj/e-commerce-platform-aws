@@ -139,7 +139,9 @@ docker compose exec backend node scripts/seed-products.js
 Route files live in `backend/routes/`:
 
 - `auth.js` — `POST /api/auth/register`, `POST /api/auth/login`, and password reset endpoints
-- `products.js` — public `GET /api/products` (no auth); supports `?category=` and `?limit=` query params; results ordered by `created_at DESC`
+- `products.js` — public `GET /api/products` (no auth); supports `?category=` and `?limit=` query params; results ordered by `created_at DESC`; returns `available_stock` (stock minus active reservations)
+- `cart.js` — authenticated cart CRUD at `/api/cart`; `GET` returns items, `POST` upserts (increments if already present), `PUT /:productId` sets exact quantity, `DELETE /:productId` removes one item, `DELETE /` clears the cart
+- `checkout.js` — authenticated checkout flow at `/api/checkout`; `POST /reserve` soft-locks stock for 10 min, `DELETE /reserve` releases the lock, `POST /confirm` hard-decrements stock and creates the order
 - `admin.js` — user CRUD at `/api/admin/users` and `GET /api/admin/me`
 - `admin-products.js` — product CRUD at `/api/admin/products`
 - `admin-orders.js` — order management at `/api/admin/orders`
@@ -179,7 +181,7 @@ Pages are colocated with their CSS under `src/pages/<section>/`. Admin pages liv
 
 ### Database schema
 
-All user/auth tables live in the `auth` schema (`auth.users`, `auth.customers`, `auth.sales_managers`, `auth.product_managers`). Product and order tables are in `public` (`products`, `orders`, `order_items`, `system_settings`).
+All user/auth tables live in the `auth` schema (`auth.users`, `auth.customers`, `auth.sales_managers`, `auth.product_managers`). Product and order tables are in `public` (`products`, `orders`, `order_items`, `system_settings`, `cart_items`, `stock_reservations`).
 
 User roles are a PostgreSQL enum `auth.user_role`: `customer`, `sales_manager`, `product_manager`, `admin`.
 
