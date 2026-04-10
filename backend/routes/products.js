@@ -3,6 +3,37 @@ const pool = require('../db')
 
 const router = express.Router()
 
+// GET /api/products/search — search products by name or description, ?q= ?limit=
+router.get('/search', async (req, res) => {
+  const q = (req.query.q || '').trim()
+  if (!q) return res.json({ products: [] })
+
+  const limit = Math.min(100, Math.max(1, parseInt(req.query.limit) || 50))
+  const term = `%${q}%`
+
+  const result = await pool.query(
+    `SELECT p.id, p.name, p.description, p.price, p.stock, p.category, p.image_url, p.created_at,
+            GREATEST(0, p.stock - COALESCE(SUM(sr.quantity), 0)) AS available_stock,
+            pd.discount_percent,
+            CASE WHEN pd.discount_percent IS NOT NULL
+                 THEN ROUND(p.price * (1 - pd.discount_percent / 100.0), 2)
+                 ELSE NULL
+            END AS discounted_price
+     FROM products p
+     LEFT JOIN stock_reservations sr ON sr.product_id = p.id AND sr.expires_at > NOW()
+     LEFT JOIN product_discounts pd ON pd.product_id = p.id
+       AND pd.start_at <= NOW()
+       AND (pd.end_at IS NULL OR pd.end_at > NOW())
+     WHERE (p.name ILIKE $1 OR p.description ILIKE $1)
+     GROUP BY p.id, pd.discount_percent
+     ORDER BY p.created_at DESC
+     LIMIT $2`,
+    [term, limit]
+  )
+
+  res.json({ products: result.rows })
+})
+
 // GET /api/products — list products, optional ?category= and ?limit=
 router.get('/', async (req, res) => {
   const category = (req.query.category || '').trim()
