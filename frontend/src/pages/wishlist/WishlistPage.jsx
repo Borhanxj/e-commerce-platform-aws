@@ -143,9 +143,23 @@ export default function WishlistPage({ onBack, wishlistItems, onRemove, onAddToC
               </div>
               <div className="flex flex-1 flex-col gap-1 px-4 pt-3.5 pb-2">
                 <span className="text-[15px] font-medium text-[var(--text-h)]">{item.name}</span>
-                <span className="text-sm text-[var(--text)]">
-                  ${parseFloat(item.price).toFixed(2)}
-                </span>
+                {item.discounted_price != null ? (
+                  <div className="flex flex-col gap-0.5">
+                    <span className="text-sm text-red-400 line-through opacity-70">
+                      ${parseFloat(item.price).toFixed(2)}
+                    </span>
+                    <span className="text-sm font-bold text-purple-400">
+                      ${parseFloat(item.discounted_price).toFixed(2)}
+                      <span className="ml-1.5 text-[11px] font-semibold text-green-400">
+                        -{item.discount_percent}%
+                      </span>
+                    </span>
+                  </div>
+                ) : (
+                  <span className="text-sm text-[var(--text)]">
+                    ${parseFloat(item.price).toFixed(2)}
+                  </span>
+                )}
               </div>
               <div className="flex items-center gap-2.5 px-4 pt-3 pb-4">
                 <button

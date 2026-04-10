@@ -7,9 +7,17 @@ router.use(authenticate)
 
 async function fetchWishlist(userId) {
   const result = await pool.query(
-    `SELECT wi.product_id AS id, p.name, p.price
+    `SELECT wi.product_id AS id, p.name, p.price,
+            pd.discount_percent,
+            CASE WHEN pd.discount_percent IS NOT NULL
+                 THEN ROUND(p.price * (1 - pd.discount_percent / 100.0), 2)
+                 ELSE NULL
+            END AS discounted_price
      FROM wishlist_items wi
      JOIN products p ON p.id = wi.product_id
+     LEFT JOIN product_discounts pd ON pd.product_id = p.id
+       AND pd.start_at <= NOW()
+       AND (pd.end_at IS NULL OR pd.end_at > NOW())
      WHERE wi.user_id = $1
      ORDER BY wi.added_at ASC`,
     [userId]

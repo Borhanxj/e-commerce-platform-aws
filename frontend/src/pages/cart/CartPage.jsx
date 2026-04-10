@@ -49,7 +49,9 @@ export default function CartPage({
   token,
 }) {
   const navigate = useNavigate()
-  const total = cartItems.reduce((sum, item) => sum + parseFloat(item.price) * item.quantity, 0)
+  const effectivePrice = (item) =>
+    parseFloat(item.discounted_price != null ? item.discounted_price : item.price)
+  const total = cartItems.reduce((sum, item) => sum + effectivePrice(item) * item.quantity, 0)
   const [reserving, setReserving] = useState(false)
   const [reserveError, setReserveError] = useState(null)
 
@@ -175,9 +177,23 @@ export default function CartPage({
                   <span className="overflow-hidden text-[15px] font-medium text-ellipsis whitespace-nowrap text-[var(--text-h)]">
                     {item.name}
                   </span>
-                  <span className="text-sm text-[var(--text)]">
-                    ${parseFloat(item.price).toFixed(2)}
-                  </span>
+                  {item.discounted_price != null ? (
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-sm text-red-400 line-through opacity-70">
+                        ${parseFloat(item.price).toFixed(2)}
+                      </span>
+                      <span className="text-sm font-bold text-purple-400">
+                        ${parseFloat(item.discounted_price).toFixed(2)}
+                      </span>
+                      <span className="text-[11px] font-semibold text-green-400">
+                        -{item.discount_percent}%
+                      </span>
+                    </div>
+                  ) : (
+                    <span className="text-sm text-[var(--text)]">
+                      ${parseFloat(item.price).toFixed(2)}
+                    </span>
+                  )}
                 </div>
                 <div className="flex shrink-0 items-center gap-4">
                   <div className="flex items-center gap-2 rounded-lg border border-[var(--border)] bg-[var(--bg)] px-2 py-1">
@@ -200,7 +216,7 @@ export default function CartPage({
                     </button>
                   </div>
                   <span className="min-w-[64px] text-right text-[15px] font-semibold text-[var(--text-h)]">
-                    ${(parseFloat(item.price) * item.quantity).toFixed(2)}
+                    ${(effectivePrice(item) * item.quantity).toFixed(2)}
                   </span>
                   <button
                     className="flex cursor-pointer items-center rounded-md border-none bg-transparent p-1.5 text-[var(--text)] transition-colors hover:bg-[rgba(232,93,93,0.1)] hover:text-[#e85d5d]"

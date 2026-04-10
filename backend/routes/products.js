@@ -22,11 +22,19 @@ router.get('/', async (req, res) => {
 
   const result = await pool.query(
     `SELECT p.id, p.name, p.description, p.price, p.stock, p.category, p.image_url, p.created_at,
-            GREATEST(0, p.stock - COALESCE(SUM(sr.quantity), 0)) AS available_stock
+            GREATEST(0, p.stock - COALESCE(SUM(sr.quantity), 0)) AS available_stock,
+            pd.discount_percent,
+            CASE WHEN pd.discount_percent IS NOT NULL
+                 THEN ROUND(p.price * (1 - pd.discount_percent / 100.0), 2)
+                 ELSE NULL
+            END AS discounted_price
      FROM products p
      LEFT JOIN stock_reservations sr ON sr.product_id = p.id AND sr.expires_at > NOW()
+     LEFT JOIN product_discounts pd ON pd.product_id = p.id
+       AND pd.start_at <= NOW()
+       AND (pd.end_at IS NULL OR pd.end_at > NOW())
      ${whereClause}
-     GROUP BY p.id
+     GROUP BY p.id, pd.discount_percent
      ORDER BY p.created_at DESC
      LIMIT $${idx}`,
     [...params, limit]

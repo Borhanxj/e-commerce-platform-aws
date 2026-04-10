@@ -175,7 +175,9 @@ export default function CheckoutPage({ cartItems, token, onOrderConfirmed }) {
     setPaymentErrors((p) => ({ ...p, [field]: undefined }))
   }
 
-  const total = cartItems.reduce((sum, item) => sum + parseFloat(item.price) * item.quantity, 0)
+  const effectivePrice = (item) =>
+    parseFloat(item.discounted_price != null ? item.discounted_price : item.price)
+  const total = cartItems.reduce((sum, item) => sum + effectivePrice(item) * item.quantity, 0)
   const shippingCost = total >= 50 ? 0 : 4.99
   const cardType = getCardType(payment.cardNumber)
   const maskedCard = payment.cardNumber
@@ -538,9 +540,22 @@ export default function CheckoutPage({ cartItems, token, onOrderConfirmed }) {
                       </p>
                       <p className="m-0 text-[11px] text-[var(--text)]">× {item.quantity}</p>
                     </div>
-                    <span className="shrink-0 text-[13px] font-semibold text-[var(--text-h)]">
-                      ${(parseFloat(item.price) * item.quantity).toFixed(2)}
-                    </span>
+                    <div className="shrink-0 text-right">
+                      {item.discounted_price != null ? (
+                        <>
+                          <span className="block text-[11px] text-red-400 line-through opacity-70">
+                            ${(parseFloat(item.price) * item.quantity).toFixed(2)}
+                          </span>
+                          <span className="block text-[13px] font-semibold text-[var(--text-h)]">
+                            ${(effectivePrice(item) * item.quantity).toFixed(2)}
+                          </span>
+                        </>
+                      ) : (
+                        <span className="text-[13px] font-semibold text-[var(--text-h)]">
+                          ${(effectivePrice(item) * item.quantity).toFixed(2)}
+                        </span>
+                      )}
+                    </div>
                   </div>
                 ))}
               </div>
