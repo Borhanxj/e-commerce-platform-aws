@@ -413,6 +413,7 @@ function App() {
             <HomePage
               isLoggedIn={!!token}
               userEmail={user?.email}
+              token={token}
               onNavigate={handleNavigate}
               onRequireAuth={requireAuth}
               onLogout={handleLogout}

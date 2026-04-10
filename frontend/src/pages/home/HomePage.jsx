@@ -97,6 +97,7 @@ const sectionDividerCls =
 export default function HomePage({
   isLoggedIn,
   userEmail,
+  token,
   onNavigate,
   onRequireAuth,
   onLogout,
@@ -135,6 +136,7 @@ export default function HomePage({
       <Navbar
         isLoggedIn={isLoggedIn}
         userEmail={userEmail}
+        token={token}
         onNavigate={onNavigate}
         onRequireAuth={onRequireAuth}
         onLogout={onLogout}
@@ -263,9 +265,23 @@ export default function HomePage({
                     {product.name}
                   </span>
                   <div className="mt-2 flex items-center justify-between">
-                    <span className="text-[15px] font-bold text-purple-400">
-                      ${parseFloat(product.price).toFixed(2)}
-                    </span>
+                    {product.discounted_price != null ? (
+                      <div className="flex flex-col gap-0.5">
+                        <span className="text-[13px] text-red-400 line-through opacity-70">
+                          ${parseFloat(product.price).toFixed(2)}
+                        </span>
+                        <span className="text-[15px] font-bold text-purple-400">
+                          ${parseFloat(product.discounted_price).toFixed(2)}
+                          <span className="ml-1.5 text-[11px] font-semibold text-green-400">
+                            -{product.discount_percent}%
+                          </span>
+                        </span>
+                      </div>
+                    ) : (
+                      <span className="text-[15px] font-bold text-purple-400">
+                        ${parseFloat(product.price).toFixed(2)}
+                      </span>
+                    )}
                     <button
                       className={
                         outOfStock

@@ -11,6 +11,7 @@ const adminProductsRouter = require('./routes/admin-products')
 const adminOrdersRouter = require('./routes/admin-orders')
 const adminSettingsRouter = require('./routes/admin-settings')
 const salesManagerProductsRouter = require('./routes/sales-manager-products')
+const notificationsRouter = require('./routes/notifications')
 
 const app = express()
 
@@ -27,6 +28,7 @@ app.use('/api/admin/orders', adminOrdersRouter)
 app.use('/api/admin/settings', adminSettingsRouter)
 app.use('/api/admin', adminRouter)
 app.use('/api/sales-manager/products', salesManagerProductsRouter)
+app.use('/api/notifications', notificationsRouter)
 
 // Global error handler — catches unhandled errors from async route handlers
 app.use((err, req, res, _next) => {

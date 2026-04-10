@@ -8,7 +8,7 @@ const router = express.Router()
 router.use(authenticate)
 router.use(requireSalesManager)
 
-// GET /api/sales-manager/products — paginated product list
+// GET /api/sales-manager/products — paginated product list with active discount info
 router.get('/', async (req, res) => {
   const page = Math.max(1, parseInt(req.query.page) || 1)
   const limit = Math.min(100, Math.max(1, parseInt(req.query.limit) || 15))
@@ -18,7 +18,17 @@ router.get('/', async (req, res) => {
   const total = parseInt(countResult.rows[0].count)
 
   const dataResult = await pool.query(
-    'SELECT id, name, category, price, stock FROM products ORDER BY name ASC LIMIT $1 OFFSET $2',
+    `SELECT p.id, p.name, p.category, p.price, p.stock,
+            pd.discount_percent,
+            CASE WHEN pd.discount_percent IS NOT NULL
+                 THEN ROUND(p.price * (1 - pd.discount_percent / 100.0), 2)
+                 ELSE NULL
+            END AS discounted_price
+     FROM products p
+     LEFT JOIN product_discounts pd ON pd.product_id = p.id
+       AND pd.start_at <= NOW()
+       AND (pd.end_at IS NULL OR pd.end_at > NOW())
+     ORDER BY p.name ASC LIMIT $1 OFFSET $2`,
     [limit, offset]
   )
 
@@ -56,6 +66,98 @@ router.patch('/:id/price', async (req, res) => {
   )
 
   res.json({ product: result.rows[0] })
+})
+
+// POST /api/sales-manager/products/discount — apply discount to one or more products
+router.post('/discount', async (req, res) => {
+  const { productIds, discountPercent } = req.body
+
+  if (!Array.isArray(productIds) || productIds.length === 0) {
+    return res.status(400).json({ error: 'productIds must be a non-empty array' })
+  }
+
+  const ids = productIds.map(Number)
+  if (ids.some((id) => !Number.isInteger(id) || id <= 0)) {
+    return res.status(400).json({ error: 'All product IDs must be positive integers' })
+  }
+
+  const pct = Number(discountPercent)
+  if (!Number.isInteger(pct) || pct < 1 || pct > 100) {
+    return res.status(400).json({ error: 'discountPercent must be an integer between 1 and 100' })
+  }
+
+  const client = await pool.connect()
+  try {
+    await client.query('BEGIN')
+
+    const productsResult = await client.query(
+      'SELECT id, name, price FROM products WHERE id = ANY($1)',
+      [ids]
+    )
+    if (productsResult.rows.length !== ids.length) {
+      await client.query('ROLLBACK')
+      return res.status(404).json({ error: 'One or more products not found' })
+    }
+
+    for (const product of productsResult.rows) {
+      await client.query(
+        `INSERT INTO product_discounts (product_id, discount_percent, created_by)
+         VALUES ($1, $2, $3)
+         ON CONFLICT (product_id) DO UPDATE
+           SET discount_percent = EXCLUDED.discount_percent,
+               created_by = EXCLUDED.created_by,
+               start_at = NOW(),
+               end_at = NULL`,
+        [product.id, pct, req.user.userId]
+      )
+    }
+
+    const wishlistResult = await client.query(
+      `SELECT wi.user_id, wi.product_id
+       FROM wishlist_items wi
+       WHERE wi.product_id = ANY($1)`,
+      [ids]
+    )
+
+    const productMap = {}
+    for (const p of productsResult.rows) {
+      productMap[p.id] = p
+    }
+
+    for (const row of wishlistResult.rows) {
+      const product = productMap[row.product_id]
+      const discountedPrice = Math.round(parseFloat(product.price) * (1 - pct / 100) * 100) / 100
+      await client.query(
+        `INSERT INTO notifications (user_id, product_id, product_name, original_price, discounted_price, discount_percent)
+         VALUES ($1, $2, $3, $4, $5, $6)`,
+        [row.user_id, product.id, product.name, product.price, discountedPrice, pct]
+      )
+    }
+
+    await client.query('COMMIT')
+    res.json({ updated: productsResult.rows.length, notified: wishlistResult.rows.length })
+  } catch (err) {
+    await client.query('ROLLBACK')
+    throw err
+  } finally {
+    client.release()
+  }
+})
+
+// DELETE /api/sales-manager/products/:id/discount — remove active discount from a product
+router.delete('/:id/discount', async (req, res) => {
+  const productId = parseInt(req.params.id, 10)
+  if (isNaN(productId) || productId <= 0) {
+    return res.status(400).json({ error: 'Invalid product ID' })
+  }
+
+  const existing = await pool.query('SELECT id FROM products WHERE id = $1', [productId])
+  if (existing.rows.length === 0) {
+    return res.status(404).json({ error: 'Product not found' })
+  }
+
+  await pool.query('DELETE FROM product_discounts WHERE product_id = $1', [productId])
+  res.status(204).send()
 })
 
 module.exports = router

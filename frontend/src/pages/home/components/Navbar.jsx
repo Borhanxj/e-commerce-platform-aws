@@ -13,10 +13,12 @@ import {
   MoonIcon,
 } from '../../../components/icons'
 import { useTheme } from '../../../context/ThemeContext'
+import NotificationBell from './NotificationBell'
 
 export default function Navbar({
   isLoggedIn,
   userEmail,
+  token,
   onNavigate,
   onRequireAuth,
   onLogout,
@@ -92,6 +94,9 @@ export default function Navbar({
           >
             {theme === 'dark' ? <SunIcon /> : <MoonIcon />}
           </button>
+
+          {/* Notifications — only shown to logged-in customers */}
+          {isLoggedIn && token && <NotificationBell token={token} />}
 
           {/* Wishlist */}
           <button
