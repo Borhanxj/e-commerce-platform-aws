@@ -36,6 +36,21 @@ npm run format:check  # Prettier validation (used in CI)
 npm test              # Jest (single run)
 ```
 
+### Before committing
+
+Run these in both packages before every commit — CI enforces all four:
+
+```bash
+# Frontend
+cd frontend && npm run lint && npm run format:check
+
+# Backend
+cd backend && npm run lint && npm run format:check
+
+# Auto-fix formatting (then re-check)
+npm run format
+```
+
 ### Running a single test
 
 ```bash
@@ -52,7 +67,10 @@ cd backend && npx jest --testNamePattern "returns 201"
 docker compose up --build   # First run, or after package.json changes
 docker compose up           # Subsequent runs
 docker compose down         # Stop and remove containers
+docker compose down -v      # Stop and remove containers AND all volumes (see warning below)
 ```
+
+> **Warning — `down -v`:** Removes **all** volumes, including the named `postgres_data` volume. All database data (users, products, orders) will be lost. Only use this to fix stale anonymous `node_modules` volumes when `nodemon` or other packages are not found inside the container despite being in `package.json`. After running, re-seed the database.
 
 Services: frontend → <http://localhost:5173>, backend → <http://localhost:3000>, PostgreSQL → localhost:5432
 
@@ -139,7 +157,7 @@ docker compose exec backend node scripts/seed-products.js
 Route files live in `backend/routes/`:
 
 - `auth.js` — `POST /api/auth/register`, `POST /api/auth/login`, and password reset endpoints
-- `products.js` — public `GET /api/products` (no auth); supports `?category=` and `?limit=` query params; results ordered by `created_at DESC`; returns `available_stock` (stock minus active reservations)
+- `products.js` — public (no auth); `GET /api/products` supports `?category=` and `?limit=`; `GET /api/products/search` supports `?q=` (case-insensitive partial match on name + description, ordered by name ASC; single-char queries return empty; empty q returns all)
 - `cart.js` — authenticated cart CRUD at `/api/cart`; `GET` returns items, `POST` upserts (increments if already present), `PUT /:productId` sets exact quantity, `DELETE /:productId` removes one item, `DELETE /` clears the cart
 - `checkout.js` — authenticated checkout flow at `/api/checkout`; `POST /reserve` soft-locks stock for 10 min, `DELETE /reserve` releases the lock, `POST /confirm` hard-decrements stock and creates the order
 - `admin.js` — user CRUD at `/api/admin/users` and `GET /api/admin/me`
@@ -182,6 +200,7 @@ Pages are colocated with their CSS under `src/pages/<section>/`. Admin pages liv
 **Product data is fetched from the API, not hardcoded:**
 - `CategoryPage` — fetches `GET /api/products?category={category.title}` on mount; shows a loading state while the request is in flight
 - `HomePage` new releases — fetches `GET /api/products?limit=8` on mount; the 8 most recently added products are shown as new releases (insertion order drives this — no explicit "featured" flag exists)
+- `SearchPage` (`src/pages/search/SearchPage.jsx`) — public route at `/search?q=`; fetches `GET /api/products/search?q=`; accessible to guests; Navbar search bar navigates here on submit
 
 ### Database schema
 
