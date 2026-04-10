@@ -141,7 +141,7 @@ function App() {
     if (!token) localStorage.setItem('guest_cart', JSON.stringify(cart))
   }, [cart, token])
 
-  // On mount: if already logged in, load cart from server
+  // On mount: if already logged in, load cart and wishlist from server
   useEffect(() => {
     if (!token) return
     fetch(`${API_BASE}/api/cart`, { headers: { Authorization: `Bearer ${token}` } })
@@ -150,11 +150,17 @@ function App() {
         if (data.items) setCart(data.items)
       })
       .catch(() => {})
+    fetch(`${API_BASE}/api/wishlist`, { headers: { Authorization: `Bearer ${token}` } })
+      .then((r) => r.json())
+      .then((data) => {
+        if (data.items) setWishlist(data.items)
+      })
+      .catch(() => {})
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
-    localStorage.setItem('guest_wishlist', JSON.stringify(wishlist))
-  }, [wishlist])
+    if (!token) localStorage.setItem('guest_wishlist', JSON.stringify(wishlist))
+  }, [wishlist, token])
 
   async function addToCart(product) {
     if (token) {
@@ -215,14 +221,37 @@ function App() {
     setCart((prev) => prev.map((item) => (item.id === productId ? { ...item, quantity } : item)))
   }
 
-  function addToWishlist(product) {
+  async function addToWishlist(product) {
+    if (token) {
+      const res = await fetch(`${API_BASE}/api/wishlist`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ productId: product.id }),
+      }).catch(() => null)
+      const data = await res?.json().catch(() => null)
+      if (data?.items) {
+        setWishlist(data.items)
+        return
+      }
+    }
     setWishlist((prev) => {
       if (prev.find((item) => item.id === product.id)) return prev
       return [...prev, { id: product.id, name: product.name, price: product.price }]
     })
   }
 
-  function removeFromWishlist(productId) {
+  async function removeFromWishlist(productId) {
+    if (token) {
+      const res = await fetch(`${API_BASE}/api/wishlist/${productId}`, {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${token}` },
+      }).catch(() => null)
+      const data = await res?.json().catch(() => null)
+      if (data?.items) {
+        setWishlist(data.items)
+        return
+      }
+    }
     setWishlist((prev) => prev.filter((item) => item.id !== productId))
   }
 
@@ -234,17 +263,27 @@ function App() {
     }
     localStorage.setItem('token', t)
 
-    // Login: discard guest cart and load the server cart
-    const res = await fetch(`${API_BASE}/api/cart`, {
-      headers: { Authorization: `Bearer ${t}` },
-    }).catch(() => null)
-    const data = await res?.json().catch(() => null)
+    // Login: discard guest cart/wishlist and load from server
+    const [cartRes, wishlistRes] = await Promise.all([
+      fetch(`${API_BASE}/api/cart`, { headers: { Authorization: `Bearer ${t}` } }).catch(
+        () => null
+      ),
+      fetch(`${API_BASE}/api/wishlist`, { headers: { Authorization: `Bearer ${t}` } }).catch(
+        () => null
+      ),
+    ])
+    const cartData = await cartRes?.json().catch(() => null)
+    const wishlistData = await wishlistRes?.json().catch(() => null)
 
     setToken(t)
     setUser({ email: payload.email })
-    if (data?.items) {
+    if (cartData?.items) {
       localStorage.removeItem('guest_cart')
-      setCart(data.items)
+      setCart(cartData.items)
+    }
+    if (wishlistData?.items) {
+      localStorage.removeItem('guest_wishlist')
+      setWishlist(wishlistData.items)
     }
     navigate('/')
   }
@@ -254,27 +293,48 @@ function App() {
     if (!payload) return
     localStorage.setItem('token', t)
 
-    // Signup: merge guest cart items into the new (empty) server cart
-    const guestItems = cart.filter((item) => item.id)
-    for (const item of guestItems) {
-      await fetch(`${API_BASE}/api/cart`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${t}` },
-        body: JSON.stringify({ productId: item.id, quantity: item.quantity }),
-      }).catch(() => {})
-    }
+    // Signup: merge guest cart and wishlist into the new server records
+    const guestCartItems = cart.filter((item) => item.id)
+    const guestWishlistItems = wishlist.filter((item) => item.id)
 
-    // Fetch the merged cart from the server
-    const res = await fetch(`${API_BASE}/api/cart`, {
-      headers: { Authorization: `Bearer ${t}` },
-    }).catch(() => null)
-    const data = await res?.json().catch(() => null)
+    await Promise.all([
+      ...guestCartItems.map((item) =>
+        fetch(`${API_BASE}/api/cart`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${t}` },
+          body: JSON.stringify({ productId: item.id, quantity: item.quantity }),
+        }).catch(() => {})
+      ),
+      ...guestWishlistItems.map((item) =>
+        fetch(`${API_BASE}/api/wishlist`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${t}` },
+          body: JSON.stringify({ productId: item.id }),
+        }).catch(() => {})
+      ),
+    ])
+
+    // Fetch merged cart and wishlist from server
+    const [cartRes, wishlistRes] = await Promise.all([
+      fetch(`${API_BASE}/api/cart`, { headers: { Authorization: `Bearer ${t}` } }).catch(
+        () => null
+      ),
+      fetch(`${API_BASE}/api/wishlist`, { headers: { Authorization: `Bearer ${t}` } }).catch(
+        () => null
+      ),
+    ])
+    const cartData = await cartRes?.json().catch(() => null)
+    const wishlistData = await wishlistRes?.json().catch(() => null)
 
     setToken(t)
     setUser({ email: payload.email })
-    if (data?.items) {
+    if (cartData?.items) {
       localStorage.removeItem('guest_cart')
-      setCart(data.items)
+      setCart(cartData.items)
+    }
+    if (wishlistData?.items) {
+      localStorage.removeItem('guest_wishlist')
+      setWishlist(wishlistData.items)
     }
     navigate('/')
   }
@@ -304,10 +364,13 @@ function App() {
   }
 
   function handleLogout() {
-    localStorage.setItem('guest_cart', JSON.stringify(cart))
+    localStorage.removeItem('guest_cart')
+    localStorage.removeItem('guest_wishlist')
     localStorage.removeItem('token')
     setToken(null)
     setUser(null)
+    setCart([])
+    setWishlist([])
     navigate('/')
   }
 
