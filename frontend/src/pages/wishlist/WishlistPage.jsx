@@ -143,7 +143,9 @@ export default function WishlistPage({ onBack, wishlistItems, onRemove, onAddToC
               </div>
               <div className="flex flex-1 flex-col gap-1 px-4 pt-3.5 pb-2">
                 <span className="text-[15px] font-medium text-[var(--text-h)]">{item.name}</span>
-                <span className="text-sm text-[var(--text)]">${item.price.toFixed(2)}</span>
+                <span className="text-sm text-[var(--text)]">
+                  ${parseFloat(item.price).toFixed(2)}
+                </span>
               </div>
               <div className="flex items-center gap-2.5 px-4 pt-3 pb-4">
                 <button
