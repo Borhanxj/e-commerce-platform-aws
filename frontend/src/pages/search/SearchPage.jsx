@@ -91,8 +91,6 @@ export default function SearchPage({
   const loading = loadedQuery !== searchQuery
 
   useEffect(() => {
-    setInputValue(searchQuery)
-
     let cancelled = false
     fetch(`${API_BASE}/api/products/search?q=${encodeURIComponent(searchQuery)}`)
       .then((r) => r.json())

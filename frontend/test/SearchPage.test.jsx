@@ -68,9 +68,7 @@ describe('SearchPage', () => {
     renderPage({ searchQuery: 'running shoes' })
 
     await vi.waitFor(() => {
-      expect(globalThis.fetch).toHaveBeenCalledWith(
-        expect.stringContaining('q=running%20shoes')
-      )
+      expect(globalThis.fetch).toHaveBeenCalledWith(expect.stringContaining('q=running%20shoes'))
     })
 
     await waitForElementToBeRemoved(() => screen.queryByText(/loading products/i))
@@ -137,9 +135,7 @@ describe('SearchPage', () => {
 
     renderPage({ searchQuery: 'zzznomatch' })
 
-    expect(
-      await screen.findByText(/no products found for "zzznomatch"/i)
-    ).toBeInTheDocument()
+    expect(await screen.findByText(/no products found for "zzznomatch"/i)).toBeInTheDocument()
   })
 
   it('fetches all products when searchQuery is empty and shows them', async () => {
@@ -148,7 +144,9 @@ describe('SearchPage', () => {
       vi.fn().mockResolvedValue({
         ok: true,
         json: async () => ({
-          products: [{ id: 1, name: 'All Products Item', price: '9.99', stock: 5, available_stock: 5 }],
+          products: [
+            { id: 1, name: 'All Products Item', price: '9.99', stock: 5, available_stock: 5 },
+          ],
         }),
       })
     )

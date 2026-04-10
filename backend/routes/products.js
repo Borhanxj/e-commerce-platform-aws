@@ -12,15 +12,8 @@ router.get('/search', async (req, res) => {
   // Single-character queries match too broadly — reject them early
   if (q.length === 1) return res.json({ products: [] })
 
-  let whereClause = ''
-  let params = []
-
-  if (q) {
-    whereClause = 'WHERE (p.name ILIKE $1 OR p.description ILIKE $1)'
-    params = [`%${q}%`, limit]
-  } else {
-    params = [limit]
-  }
+  const whereClause = q ? 'WHERE (p.name ILIKE $1 OR p.description ILIKE $1)' : ''
+  const params = q ? [`%${q}%`, limit] : [limit]
 
   const result = await pool.query(
     `SELECT p.id, p.name, p.description, p.price, p.stock, p.category, p.image_url, p.created_at,
