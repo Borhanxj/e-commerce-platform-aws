@@ -143,7 +143,7 @@ export default function DiscountManagement({ token }) {
             max="100"
             step="1"
             placeholder="e.g. 20"
-            className={`${fieldInputClass} w-36`}
+            className={`${fieldInputClass} !w-36`}
             value={discountPercent}
             onChange={(e) => setDiscountPercent(e.target.value)}
           />
