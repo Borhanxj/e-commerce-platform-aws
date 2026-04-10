@@ -465,6 +465,8 @@ function App() {
               wishlistItems={wishlist}
               onRemove={removeFromWishlist}
               onAddToCart={addToCart}
+              onRemoveFromCart={removeFromCart}
+              cartItems={cart}
             />
           }
         />
