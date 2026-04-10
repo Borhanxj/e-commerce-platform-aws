@@ -15,4 +15,4 @@ echo "Seeding admin user..."
 node scripts/seed-admin.js
 
 echo "Starting server..."
-exec node server.js
+exec npm run dev
