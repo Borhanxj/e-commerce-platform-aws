@@ -139,7 +139,9 @@ export default function WishlistPage({
 
         <div className="grid [grid-template-columns:repeat(auto-fill,minmax(260px,1fr))] gap-5">
           {wishlistItems.map((item) => {
-            const outOfStock = parseInt(item.available_stock) === 0
+            const availableStock = parseInt(item.available_stock ?? 0)
+            const outOfStock = availableStock === 0
+            const lowStock = availableStock > 0 && availableStock <= 10
             const inCart = cartItems.some((c) => c.id === item.id)
             return (
               <div
@@ -168,6 +170,11 @@ export default function WishlistPage({
                   ) : (
                     <span className="text-sm text-[var(--text)]">
                       ${parseFloat(item.price).toFixed(2)}
+                    </span>
+                  )}
+                  {lowStock && (
+                    <span className="text-[11px] font-semibold text-red-400">
+                      Only {availableStock} left
                     </span>
                   )}
                 </div>

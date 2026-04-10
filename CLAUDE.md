@@ -147,6 +147,7 @@ Route files live in `backend/routes/`:
 - `admin-orders.js` — order management at `/api/admin/orders`
 - `admin-settings.js` — system settings + dashboard stats at `/api/admin/settings`
 - `sales-manager-products.js` — `GET /api/sales-manager/products` (paginated list), `PATCH /api/sales-manager/products/:id/price` (price-only update)
+- `wishlist.js` — authenticated wishlist at `/api/wishlist`; `GET` returns items, `POST` adds item (idempotent), `DELETE /:productId` removes one item; responses include `available_stock`, `discount_percent`, and `discounted_price`
 
 Middleware in `backend/middleware/`:
 
@@ -184,7 +185,7 @@ Pages are colocated with their CSS under `src/pages/<section>/`. Admin pages liv
 
 ### Database schema
 
-All user/auth tables live in the `auth` schema (`auth.users`, `auth.customers`, `auth.sales_managers`, `auth.product_managers`). Product and order tables are in `public` (`products`, `orders`, `order_items`, `system_settings`, `cart_items`, `stock_reservations`).
+All user/auth tables live in the `auth` schema (`auth.users`, `auth.customers`, `auth.sales_managers`, `auth.product_managers`). Product and order tables are in `public` (`products`, `orders`, `order_items`, `system_settings`, `cart_items`, `stock_reservations`, `wishlist_items`, `product_discounts`).
 
 User roles are a PostgreSQL enum `auth.user_role`: `customer`, `sales_manager`, `product_manager`, `admin`.
 
