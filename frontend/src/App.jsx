@@ -435,6 +435,8 @@ function App() {
               cartItems={cart}
               onRemove={removeFromCart}
               onUpdateQuantity={updateCartQuantity}
+              onAddToWishlist={addToWishlist}
+              wishlistItems={wishlist}
               isLoggedIn={!!token}
               token={token}
             />

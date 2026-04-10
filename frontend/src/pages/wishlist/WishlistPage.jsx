@@ -163,10 +163,16 @@ export default function WishlistPage({ onBack, wishlistItems, onRemove, onAddToC
               </div>
               <div className="flex items-center gap-2.5 px-4 pt-3 pb-4">
                 <button
-                  className="flex flex-1 cursor-pointer items-center justify-center gap-1.5 rounded-lg border-none bg-purple-400 px-3.5 py-2.5 text-[13px] font-semibold tracking-[0.3px] text-white transition-opacity hover:opacity-88"
-                  onClick={() => onAddToCart(item)}
+                  className={
+                    parseInt(item.available_stock) === 0
+                      ? 'flex flex-1 cursor-not-allowed items-center justify-center gap-1.5 rounded-lg border border-[var(--border)] bg-transparent px-3.5 py-2.5 text-[13px] font-semibold text-[var(--text)] opacity-40'
+                      : 'flex flex-1 cursor-pointer items-center justify-center gap-1.5 rounded-lg border-none bg-purple-400 px-3.5 py-2.5 text-[13px] font-semibold tracking-[0.3px] text-white transition-opacity hover:opacity-88'
+                  }
+                  disabled={parseInt(item.available_stock) === 0}
+                  onClick={() => parseInt(item.available_stock) !== 0 && onAddToCart(item)}
                 >
-                  <CartIcon /> Add to Cart
+                  <CartIcon />
+                  {parseInt(item.available_stock) === 0 ? 'Out of Stock' : 'Add to Cart'}
                 </button>
                 <button
                   className="flex cursor-pointer items-center rounded-lg border border-[var(--border)] bg-transparent p-2.5 text-[var(--text)] transition-colors hover:border-[rgba(232,93,93,0.3)] hover:bg-[rgba(232,93,93,0.1)] hover:text-[#e85d5d]"

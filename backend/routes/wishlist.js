@@ -8,6 +8,10 @@ router.use(authenticate)
 async function fetchWishlist(userId) {
   const result = await pool.query(
     `SELECT wi.product_id AS id, p.name, p.price,
+            GREATEST(0, p.stock - COALESCE(
+              (SELECT SUM(sr.quantity) FROM stock_reservations sr
+               WHERE sr.product_id = p.id AND sr.expires_at > NOW()), 0
+            )) AS available_stock,
             pd.discount_percent,
             CASE WHEN pd.discount_percent IS NOT NULL
                  THEN ROUND(p.price * (1 - pd.discount_percent / 100.0), 2)

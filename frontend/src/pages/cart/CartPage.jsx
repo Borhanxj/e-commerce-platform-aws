@@ -45,6 +45,8 @@ export default function CartPage({
   cartItems,
   onRemove,
   onUpdateQuantity,
+  onAddToWishlist,
+  wishlistItems = [],
   isLoggedIn,
   token,
 }) {
@@ -52,6 +54,8 @@ export default function CartPage({
   const effectivePrice = (item) =>
     parseFloat(item.discounted_price != null ? item.discounted_price : item.price)
   const total = cartItems.reduce((sum, item) => sum + effectivePrice(item) * item.quantity, 0)
+  const outOfStockItems = cartItems.filter((item) => parseInt(item.available_stock) === 0)
+  const hasOutOfStock = outOfStockItems.length > 0
   const [reserving, setReserving] = useState(false)
   const [reserveError, setReserveError] = useState(null)
 
@@ -165,69 +169,89 @@ export default function CartPage({
 
         <div className="grid [grid-template-columns:1fr_340px] items-start gap-10 max-[860px]:[grid-template-columns:1fr]">
           <div className="flex flex-col gap-4">
-            {cartItems.map((item) => (
-              <div
-                key={item.id}
-                className="flex items-center gap-4 rounded-2xl border border-[var(--glass-border)] bg-[var(--card-bg)] p-4 shadow-[var(--shadow)] backdrop-blur-xl"
-              >
-                <div className="flex h-18 w-18 shrink-0 items-center justify-center rounded-lg bg-purple-400/12">
-                  <span className="text-2xl font-bold text-purple-400">{item.name[0]}</span>
-                </div>
-                <div className="flex min-w-0 flex-1 flex-col gap-1">
-                  <span className="overflow-hidden text-[15px] font-medium text-ellipsis whitespace-nowrap text-[var(--text-h)]">
-                    {item.name}
-                  </span>
-                  {item.discounted_price != null ? (
-                    <div className="flex items-center gap-1.5">
-                      <span className="text-sm text-red-400 line-through opacity-70">
+            {cartItems.map((item) => {
+              const outOfStock = parseInt(item.available_stock) === 0
+              const inWishlist = wishlistItems.some((w) => w.id === item.id)
+              return (
+                <div
+                  key={item.id}
+                  className={`flex items-center gap-4 rounded-2xl border p-4 shadow-[var(--shadow)] backdrop-blur-xl ${outOfStock ? 'border-red-400/30 bg-red-400/5' : 'border-[var(--glass-border)] bg-[var(--card-bg)]'}`}
+                >
+                  <div className="flex h-18 w-18 shrink-0 items-center justify-center rounded-lg bg-purple-400/12">
+                    <span className="text-2xl font-bold text-purple-400">{item.name[0]}</span>
+                  </div>
+                  <div className="flex min-w-0 flex-1 flex-col gap-1">
+                    <div className="flex items-center gap-2">
+                      <span className="overflow-hidden text-[15px] font-medium text-ellipsis whitespace-nowrap text-[var(--text-h)]">
+                        {item.name}
+                      </span>
+                      {outOfStock && (
+                        <span className="shrink-0 rounded-full bg-red-400/12 px-2 py-0.5 text-[11px] font-semibold text-red-400">
+                          Out of Stock
+                        </span>
+                      )}
+                    </div>
+                    {item.discounted_price != null ? (
+                      <div className="flex items-center gap-1.5">
+                        <span className="text-sm text-red-400 line-through opacity-70">
+                          ${parseFloat(item.price).toFixed(2)}
+                        </span>
+                        <span className="text-sm font-bold text-purple-400">
+                          ${parseFloat(item.discounted_price).toFixed(2)}
+                        </span>
+                        <span className="text-[11px] font-semibold text-green-400">
+                          -{item.discount_percent}%
+                        </span>
+                      </div>
+                    ) : (
+                      <span className="text-sm text-[var(--text)]">
                         ${parseFloat(item.price).toFixed(2)}
                       </span>
-                      <span className="text-sm font-bold text-purple-400">
-                        ${parseFloat(item.discounted_price).toFixed(2)}
+                    )}
+                  </div>
+                  <div className="flex shrink-0 items-center gap-4">
+                    <div className="flex items-center gap-2 rounded-lg border border-[var(--border)] bg-[var(--bg)] px-2 py-1">
+                      <button
+                        className="flex cursor-pointer items-center justify-center border-none bg-transparent px-1 text-lg leading-none font-normal text-[var(--text-h)] transition-colors hover:text-purple-400"
+                        onClick={() => onUpdateQuantity(item.id, item.quantity - 1)}
+                        aria-label="Decrease quantity"
+                      >
+                        −
+                      </button>
+                      <span className="min-w-[20px] text-center text-sm font-semibold text-[var(--text-h)]">
+                        {item.quantity}
                       </span>
-                      <span className="text-[11px] font-semibold text-green-400">
-                        -{item.discount_percent}%
-                      </span>
+                      <button
+                        className="flex cursor-pointer items-center justify-center border-none bg-transparent px-1 text-lg leading-none font-normal text-[var(--text-h)] transition-colors hover:text-purple-400"
+                        onClick={() => onUpdateQuantity(item.id, item.quantity + 1)}
+                        aria-label="Increase quantity"
+                      >
+                        +
+                      </button>
                     </div>
-                  ) : (
-                    <span className="text-sm text-[var(--text)]">
-                      ${parseFloat(item.price).toFixed(2)}
+                    <span className="min-w-[64px] text-right text-[15px] font-semibold text-[var(--text-h)]">
+                      ${(effectivePrice(item) * item.quantity).toFixed(2)}
                     </span>
-                  )}
-                </div>
-                <div className="flex shrink-0 items-center gap-4">
-                  <div className="flex items-center gap-2 rounded-lg border border-[var(--border)] bg-[var(--bg)] px-2 py-1">
+                    {outOfStock && onAddToWishlist && !inWishlist && (
+                      <button
+                        className="flex cursor-pointer items-center gap-1 rounded-md border border-[var(--border)] bg-transparent px-2 py-1.5 text-[11px] font-semibold text-[var(--text)] transition-colors hover:border-purple-400/40 hover:text-purple-400"
+                        onClick={() => onAddToWishlist(item)}
+                        aria-label="Save to wishlist"
+                      >
+                        ♡ Wishlist
+                      </button>
+                    )}
                     <button
-                      className="flex cursor-pointer items-center justify-center border-none bg-transparent px-1 text-lg leading-none font-normal text-[var(--text-h)] transition-colors hover:text-purple-400"
-                      onClick={() => onUpdateQuantity(item.id, item.quantity - 1)}
-                      aria-label="Decrease quantity"
+                      className="flex cursor-pointer items-center rounded-md border-none bg-transparent p-1.5 text-[var(--text)] transition-colors hover:bg-[rgba(232,93,93,0.1)] hover:text-[#e85d5d]"
+                      onClick={() => onRemove(item.id)}
+                      aria-label="Remove item"
                     >
-                      −
-                    </button>
-                    <span className="min-w-[20px] text-center text-sm font-semibold text-[var(--text-h)]">
-                      {item.quantity}
-                    </span>
-                    <button
-                      className="flex cursor-pointer items-center justify-center border-none bg-transparent px-1 text-lg leading-none font-normal text-[var(--text-h)] transition-colors hover:text-purple-400"
-                      onClick={() => onUpdateQuantity(item.id, item.quantity + 1)}
-                      aria-label="Increase quantity"
-                    >
-                      +
+                      <TrashIcon />
                     </button>
                   </div>
-                  <span className="min-w-[64px] text-right text-[15px] font-semibold text-[var(--text-h)]">
-                    ${(effectivePrice(item) * item.quantity).toFixed(2)}
-                  </span>
-                  <button
-                    className="flex cursor-pointer items-center rounded-md border-none bg-transparent p-1.5 text-[var(--text)] transition-colors hover:bg-[rgba(232,93,93,0.1)] hover:text-[#e85d5d]"
-                    onClick={() => onRemove(item.id)}
-                    aria-label="Remove item"
-                  >
-                    <TrashIcon />
-                  </button>
                 </div>
-              </div>
-            ))}
+              )
+            })}
           </div>
 
           <div className="sticky top-[84px] flex flex-col gap-3.5 rounded-2xl border border-[var(--glass-border)] bg-[var(--card-bg)] p-7 shadow-[var(--shadow)] backdrop-blur-xl">
@@ -252,6 +276,11 @@ export default function CartPage({
                 Add ${(50 - total).toFixed(2)} more for free shipping
               </p>
             )}
+            {hasOutOfStock && (
+              <p className="m-0 rounded-lg bg-red-400/8 px-3 py-2 text-center text-xs text-red-400">
+                Remove out-of-stock items before checking out.
+              </p>
+            )}
             {reserveError && (
               <p className="m-0 rounded-lg bg-red-400/8 px-3 py-2 text-center text-xs text-red-400">
                 {reserveError}
@@ -260,7 +289,7 @@ export default function CartPage({
             <button
               className="mt-1 cursor-pointer rounded-[10px] border-none bg-purple-400 px-7 py-3.5 text-[15px] font-semibold tracking-[0.5px] text-white transition-opacity hover:opacity-88 disabled:cursor-not-allowed disabled:opacity-50"
               onClick={handleCheckout}
-              disabled={reserving}
+              disabled={reserving || hasOutOfStock}
             >
               {reserving
                 ? 'Reserving stock…'
