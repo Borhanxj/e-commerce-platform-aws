@@ -146,6 +146,7 @@ Route files live in `backend/routes/`:
 - `admin-products.js` — product CRUD at `/api/admin/products`
 - `admin-orders.js` — order management at `/api/admin/orders`
 - `admin-settings.js` — system settings + dashboard stats at `/api/admin/settings`
+- `sales-manager-products.js` — `GET /api/sales-manager/products` (paginated list), `PATCH /api/sales-manager/products/:id/price` (price-only update)
 
 Middleware in `backend/middleware/`:
 
@@ -161,7 +162,9 @@ JWT payload shape: `{ userId, email, role }`. Tokens expire in 7 days.
 
 `src/main.jsx` wraps `<App>` in `<BrowserRouter>`. All routing is in `src/App.jsx` using React Router v7.
 
-Auth state (`token`, `user`), admin auth state (`adminToken`), and sales manager auth state (`salesManagerToken`) are held in `App` state, initialised from `localStorage`. The JWT payload is decoded client-side with a local `decodeJwtPayload` helper (no library) to extract email and role.
+Auth state (`token`, `user`), admin auth state (`adminToken`), and sales manager auth state (`salesManagerToken`) are held in `App` state, initialised from `localStorage`. The JWT payload is decoded client-side via `src/utils/jwt.js` (`decodeJwtPayload`) to extract email and role.
+
+Shared frontend utilities: `src/utils/jwt.js` (JWT decode), `src/styles/dashboardStyles.js` (shared Tailwind button/input constants), `src/components/DashboardLayout.jsx` (shared sidebar+header shell used by admin and sales manager dashboards).
 
 **Auth sessions and route guards:**
 
