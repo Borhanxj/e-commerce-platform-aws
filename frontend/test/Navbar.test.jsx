@@ -1,6 +1,7 @@
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { vi } from 'vitest'
+import { MemoryRouter } from 'react-router-dom'
 import Navbar from '../src/pages/home/components/Navbar'
 import { ThemeProvider } from '../src/context/ThemeContext'
 
@@ -18,9 +19,11 @@ const defaultProps = {
 
 function renderNavbar(props = {}) {
   return render(
-    <ThemeProvider>
-      <Navbar {...defaultProps} {...props} />
-    </ThemeProvider>
+    <MemoryRouter>
+      <ThemeProvider>
+        <Navbar {...defaultProps} {...props} />
+      </ThemeProvider>
+    </MemoryRouter>
   )
 }
 
