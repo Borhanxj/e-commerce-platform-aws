@@ -164,7 +164,8 @@ Route files live in `backend/routes/`:
 - `admin-products.js` — product CRUD at `/api/admin/products`
 - `admin-orders.js` — order management at `/api/admin/orders`
 - `admin-settings.js` — system settings + dashboard stats at `/api/admin/settings`
-- `sales-manager-products.js` — `GET /api/sales-manager/products` (paginated list), `PATCH /api/sales-manager/products/:id/price` (price-only update)
+- `sales-manager-products.js` — `GET /api/sales-manager/products` (paginated list), `PATCH /api/sales-manager/products/:id/price` (price-only update), `POST /api/sales-manager/products/discount` (bulk upsert discounts + notify wishlist holders), `DELETE /api/sales-manager/products/:id/discount` (remove discount)
+- `notifications.js` — authenticated (any role); `GET /api/notifications`, `PATCH /api/notifications/:id/read`, `PATCH /api/notifications/read-all`
 - `wishlist.js` — authenticated wishlist at `/api/wishlist`; `GET` returns items, `POST` adds item (idempotent), `DELETE /:productId` removes one item; responses include `available_stock`, `discount_percent`, and `discounted_price`
 
 Middleware in `backend/middleware/`:
@@ -201,10 +202,12 @@ Pages are colocated with their CSS under `src/pages/<section>/`. Admin pages liv
 - `CategoryPage` — fetches `GET /api/products?category={category.title}` on mount; shows a loading state while the request is in flight
 - `HomePage` new releases — fetches `GET /api/products?limit=8` on mount; the 8 most recently added products are shown as new releases (insertion order drives this — no explicit "featured" flag exists)
 - `SearchPage` (`src/pages/search/SearchPage.jsx`) — public route at `/search?q=`; fetches `GET /api/products/search?q=`; accessible to guests; Navbar search bar navigates here on submit
+- `DiscountManagement` (`src/pages/sales-manager/DiscountManagement.jsx`) — sales manager dashboard section; multi-select product table with discount % input and apply/remove actions
+- `NotificationBell` (`src/pages/home/components/NotificationBell.jsx`) — rendered in Navbar for logged-in customers only; shows unread badge and dropdown of price-drop notifications
 
 ### Database schema
 
-All user/auth tables live in the `auth` schema (`auth.users`, `auth.customers`, `auth.sales_managers`, `auth.product_managers`). Product and order tables are in `public` (`products`, `orders`, `order_items`, `system_settings`, `cart_items`, `stock_reservations`, `wishlist_items`, `product_discounts`).
+All user/auth tables live in the `auth` schema (`auth.users`, `auth.customers`, `auth.sales_managers`, `auth.product_managers`). Product and order tables are in `public` (`products`, `orders`, `order_items`, `system_settings`, `cart_items`, `stock_reservations`, `wishlist_items`, `product_discounts`, `notifications`).
 
 User roles are a PostgreSQL enum `auth.user_role`: `customer`, `sales_manager`, `product_manager`, `admin`.
 
