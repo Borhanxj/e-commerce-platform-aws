@@ -50,16 +50,32 @@ describe('GET /api/products/search', () => {
     expect(params[0]).toBe('%powerful%')
   })
 
-  it('returns empty array and skips DB call when q is empty', async () => {
+  it('returns all products when q is empty', async () => {
+    pool.query.mockResolvedValueOnce({ rows: [mockProduct()] })
+
     const res = await request(app).get('/api/products/search?q=')
 
     expect(res.status).toBe(200)
-    expect(res.body).toEqual({ products: [] })
-    expect(pool.query).not.toHaveBeenCalled()
+    expect(res.body.products).toHaveLength(1)
+    expect(pool.query).toHaveBeenCalled()
+
+    // No ILIKE clause when q is empty
+    const [sql] = pool.query.mock.calls[0]
+    expect(sql).not.toMatch(/ILIKE/)
   })
 
-  it('returns empty array and skips DB call when q is whitespace', async () => {
+  it('returns all products when q is whitespace', async () => {
+    pool.query.mockResolvedValueOnce({ rows: [mockProduct()] })
+
     const res = await request(app).get('/api/products/search?q=   ')
+
+    expect(res.status).toBe(200)
+    expect(res.body.products).toHaveLength(1)
+    expect(pool.query).toHaveBeenCalled()
+  })
+
+  it('returns empty array without hitting DB for single-character query', async () => {
+    const res = await request(app).get('/api/products/search?q=a')
 
     expect(res.status).toBe(200)
     expect(res.body).toEqual({ products: [] })

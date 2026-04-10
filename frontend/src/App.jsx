@@ -6,6 +6,7 @@ import {
   useNavigate,
   useLocation,
   useNavigationType,
+  useSearchParams,
 } from 'react-router-dom'
 import AdminLoginPage from './pages/admin/AdminLoginPage'
 import SalesManagerLoginPage from './pages/sales-manager/SalesManagerLoginPage'
@@ -20,6 +21,7 @@ import CartPage from './pages/cart/CartPage'
 import CheckoutPage from './pages/checkout/CheckoutPage'
 import WishlistPage from './pages/wishlist/WishlistPage'
 import CategoryPage from './pages/category/CategoryPage'
+import SearchPage from './pages/search/SearchPage'
 import AccountSettingsPage from './pages/account/AccountSettingsPage'
 import OrdersPage from './pages/orders/OrdersPage'
 import HelpPage from './pages/help/HelpPage'
@@ -75,6 +77,32 @@ function CategoryRoute({
   return (
     <CategoryPage
       category={state.category}
+      onBack={() => navigate(-1)}
+      onAddToCart={onAddToCart}
+      onRemoveFromCart={onRemoveFromCart}
+      onAddToWishlist={onAddToWishlist}
+      onRemoveFromWishlist={onRemoveFromWishlist}
+      cartItems={cartItems}
+      wishlistItems={wishlistItems}
+    />
+  )
+}
+
+function SearchRoute({
+  onAddToCart,
+  onRemoveFromCart,
+  onAddToWishlist,
+  onRemoveFromWishlist,
+  cartItems,
+  wishlistItems,
+}) {
+  const [searchParams] = useSearchParams()
+  const navigate = useNavigate()
+  const q = searchParams.get('q') || ''
+
+  return (
+    <SearchPage
+      searchQuery={q}
       onBack={() => navigate(-1)}
       onAddToCart={onAddToCart}
       onRemoveFromCart={onRemoveFromCart}
@@ -463,6 +491,19 @@ function App() {
           path="/category"
           element={
             <CategoryRoute
+              onAddToCart={addToCart}
+              onRemoveFromCart={removeFromCart}
+              onAddToWishlist={addToWishlist}
+              onRemoveFromWishlist={removeFromWishlist}
+              cartItems={cart}
+              wishlistItems={wishlist}
+            />
+          }
+        />
+        <Route
+          path="/search"
+          element={
+            <SearchRoute
               onAddToCart={addToCart}
               onRemoveFromCart={removeFromCart}
               onAddToWishlist={addToWishlist}

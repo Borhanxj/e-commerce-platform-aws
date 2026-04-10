@@ -4,12 +4,23 @@ const pool = require('../db')
 const router = express.Router()
 
 // GET /api/products/search — search products by name or description, ?q= ?limit=
+// Empty or missing q returns all products sorted alphabetically.
 router.get('/search', async (req, res) => {
   const q = (req.query.q || '').trim()
-  if (!q) return res.json({ products: [] })
-
   const limit = Math.min(100, Math.max(1, parseInt(req.query.limit) || 50))
-  const term = `%${q}%`
+
+  // Single-character queries match too broadly — reject them early
+  if (q.length === 1) return res.json({ products: [] })
+
+  let whereClause = ''
+  let params = []
+
+  if (q) {
+    whereClause = 'WHERE (p.name ILIKE $1 OR p.description ILIKE $1)'
+    params = [`%${q}%`, limit]
+  } else {
+    params = [limit]
+  }
 
   const result = await pool.query(
     `SELECT p.id, p.name, p.description, p.price, p.stock, p.category, p.image_url, p.created_at,
@@ -24,11 +35,11 @@ router.get('/search', async (req, res) => {
      LEFT JOIN product_discounts pd ON pd.product_id = p.id
        AND pd.start_at <= NOW()
        AND (pd.end_at IS NULL OR pd.end_at > NOW())
-     WHERE (p.name ILIKE $1 OR p.description ILIKE $1)
+     ${whereClause}
      GROUP BY p.id, pd.discount_percent
-     ORDER BY p.created_at DESC
-     LIMIT $2`,
-    [term, limit]
+     ORDER BY p.name ASC
+     LIMIT $${params.length}`,
+    params
   )
 
   res.json({ products: result.rows })
