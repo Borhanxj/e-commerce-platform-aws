@@ -26,7 +26,6 @@ export default function DiscountManagement({ token }) {
     async (page = 1) => {
       setLoading(true)
       setError('')
-      setSuccess('')
       try {
         const params = new URLSearchParams({ page, limit: 15 })
         const res = await fetch(`${API}?${params}`, {
@@ -101,7 +100,7 @@ export default function DiscountManagement({ token }) {
         `Discount applied to ${data.updated} product(s). ${data.notified} customer(s) notified.`
       )
       setDiscountPercent('')
-      fetchProducts(pagination.page)
+      await fetchProducts(pagination.page)
     } catch {
       setError('Could not connect to server')
     } finally {
@@ -122,7 +121,7 @@ export default function DiscountManagement({ token }) {
         setError(data.error || 'Failed to remove discount')
         return
       }
-      fetchProducts(pagination.page)
+      await fetchProducts(pagination.page)
     } catch {
       setError('Could not connect to server')
     }
@@ -144,7 +143,7 @@ export default function DiscountManagement({ token }) {
             max="100"
             step="1"
             placeholder="e.g. 20"
-            className={`${fieldInputClass} w-28`}
+            className={`${fieldInputClass} w-36`}
             value={discountPercent}
             onChange={(e) => setDiscountPercent(e.target.value)}
           />
@@ -249,7 +248,7 @@ export default function DiscountManagement({ token }) {
                             ${parseFloat(p.discounted_price).toFixed(2)}
                           </span>
                         )}
-                        {preview != null && !p.discount_percent && (
+                        {preview != null && !p.discount_percent && isSelected && (
                           <span className="text-[11px] text-purple-400 opacity-70">
                             → ${preview}
                           </span>

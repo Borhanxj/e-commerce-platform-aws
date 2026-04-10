@@ -76,7 +76,7 @@ router.post('/discount', async (req, res) => {
     return res.status(400).json({ error: 'productIds must be a non-empty array' })
   }
 
-  const ids = productIds.map(Number)
+  const ids = [...new Set(productIds.map(Number))]
   if (ids.some((id) => !Number.isInteger(id) || id <= 0)) {
     return res.status(400).json({ error: 'All product IDs must be positive integers' })
   }
@@ -99,40 +99,28 @@ router.post('/discount', async (req, res) => {
       return res.status(404).json({ error: 'One or more products not found' })
     }
 
-    for (const product of productsResult.rows) {
-      await client.query(
-        `INSERT INTO product_discounts (product_id, discount_percent, created_by)
-         VALUES ($1, $2, $3)
-         ON CONFLICT (product_id) DO UPDATE
-           SET discount_percent = EXCLUDED.discount_percent,
-               created_by = EXCLUDED.created_by,
-               start_at = NOW(),
-               end_at = NULL`,
-        [product.id, pct, req.user.userId]
-      )
-    }
-
-    const wishlistResult = await client.query(
-      `SELECT wi.user_id, wi.product_id
-       FROM wishlist_items wi
-       WHERE wi.product_id = ANY($1)`,
-      [ids]
+    await client.query(
+      `INSERT INTO product_discounts (product_id, discount_percent, created_by)
+       SELECT id, $2, $3 FROM UNNEST($1::int[]) AS id
+       ON CONFLICT (product_id) DO UPDATE
+         SET discount_percent = EXCLUDED.discount_percent,
+             created_by = EXCLUDED.created_by,
+             start_at = NOW(),
+             end_at = NULL`,
+      [ids, pct, req.user.userId]
     )
 
-    const productMap = {}
-    for (const p of productsResult.rows) {
-      productMap[p.id] = p
-    }
-
-    for (const row of wishlistResult.rows) {
-      const product = productMap[row.product_id]
-      const discountedPrice = Math.round(parseFloat(product.price) * (1 - pct / 100) * 100) / 100
-      await client.query(
-        `INSERT INTO notifications (user_id, product_id, product_name, original_price, discounted_price, discount_percent)
-         VALUES ($1, $2, $3, $4, $5, $6)`,
-        [row.user_id, product.id, product.name, product.price, discountedPrice, pct]
-      )
-    }
+    const wishlistResult = await client.query(
+      `INSERT INTO notifications (user_id, product_id, product_name, original_price, discounted_price, discount_percent)
+       SELECT wi.user_id, p.id, p.name, p.price,
+              ROUND(p.price * (1 - $2 / 100.0), 2),
+              $2
+       FROM wishlist_items wi
+       JOIN products p ON p.id = wi.product_id
+       WHERE wi.product_id = ANY($1)
+       RETURNING user_id`,
+      [ids, pct]
+    )
 
     await client.query('COMMIT')
     res.json({ updated: productsResult.rows.length, notified: wishlistResult.rows.length })

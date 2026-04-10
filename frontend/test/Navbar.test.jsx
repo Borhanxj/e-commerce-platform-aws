@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react'
+import { render, screen, act } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { vi } from 'vitest'
 import { MemoryRouter } from 'react-router-dom'
@@ -8,6 +8,7 @@ import { ThemeProvider } from '../src/context/ThemeContext'
 const defaultProps = {
   isLoggedIn: false,
   userEmail: '',
+  token: null,
   onNavigate: vi.fn(),
   onRequireAuth: vi.fn(),
   onLogout: vi.fn(),
@@ -80,5 +81,32 @@ describe('Navbar', () => {
     await userEvent.click(screen.getByRole('button', { name: /sign out/i }))
 
     expect(onLogout).toHaveBeenCalledOnce()
+  })
+
+  it('renders NotificationBell when logged in with a token', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi
+        .fn()
+        .mockResolvedValue({ ok: true, json: async () => ({ notifications: [], unreadCount: 0 }) })
+    )
+    await act(async () => {
+      renderNavbar({ isLoggedIn: true, token: 'test-token' })
+    })
+
+    expect(screen.getByRole('button', { name: /notifications/i })).toBeInTheDocument()
+    vi.unstubAllGlobals()
+  })
+
+  it('does not render NotificationBell when logged out', () => {
+    renderNavbar({ isLoggedIn: false, token: null })
+
+    expect(screen.queryByRole('button', { name: /notifications/i })).not.toBeInTheDocument()
+  })
+
+  it('does not render NotificationBell when logged in without a token', () => {
+    renderNavbar({ isLoggedIn: true, token: null })
+
+    expect(screen.queryByRole('button', { name: /notifications/i })).not.toBeInTheDocument()
   })
 })

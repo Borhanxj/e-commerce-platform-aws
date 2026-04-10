@@ -27,6 +27,7 @@ const sampleNotification = {
   discount_percent: 20,
   is_read: false,
   created_at: new Date().toISOString(),
+  unread_count: '1',
 }
 
 describe('GET /api/notifications', () => {

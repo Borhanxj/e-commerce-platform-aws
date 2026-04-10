@@ -9,13 +9,14 @@ router.use(authenticate)
 router.get('/', async (req, res) => {
   const result = await pool.query(
     `SELECT id, product_id, product_name, original_price, discounted_price,
-            discount_percent, is_read, created_at
+            discount_percent, is_read, created_at,
+            COUNT(*) FILTER (WHERE NOT is_read) OVER () AS unread_count
      FROM notifications
      WHERE user_id = $1
      ORDER BY created_at DESC`,
     [req.user.userId]
   )
-  const unreadCount = result.rows.filter((n) => !n.is_read).length
+  const unreadCount = result.rows.length > 0 ? parseInt(result.rows[0].unread_count) : 0
   res.json({ notifications: result.rows, unreadCount })
 })
 

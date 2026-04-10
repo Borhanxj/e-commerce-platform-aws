@@ -47,10 +47,11 @@ export default function NotificationBell({ token }) {
 
   async function markRead(id) {
     try {
-      await fetch(`${API_BASE}/api/notifications/${id}/read`, {
+      const res = await fetch(`${API_BASE}/api/notifications/${id}/read`, {
         method: 'PATCH',
         headers: { Authorization: `Bearer ${token}` },
       })
+      if (!res.ok) return
       setNotifications((prev) => prev.map((n) => (n.id === id ? { ...n, is_read: true } : n)))
       setUnreadCount((prev) => Math.max(0, prev - 1))
     } catch {
@@ -60,10 +61,11 @@ export default function NotificationBell({ token }) {
 
   async function markAllRead() {
     try {
-      await fetch(`${API_BASE}/api/notifications/read-all`, {
+      const res = await fetch(`${API_BASE}/api/notifications/read-all`, {
         method: 'PATCH',
         headers: { Authorization: `Bearer ${token}` },
       })
+      if (!res.ok) return
       setNotifications((prev) => prev.map((n) => ({ ...n, is_read: true })))
       setUnreadCount(0)
     } catch {
@@ -82,6 +84,8 @@ export default function NotificationBell({ token }) {
       <button
         className="relative flex h-10 w-10 items-center justify-center rounded-lg border border-[var(--border)] bg-[var(--card-bg)] text-[var(--text-h)] transition-colors hover:border-purple-400/40 hover:bg-purple-400/12 hover:text-purple-400"
         aria-label="Notifications"
+        aria-expanded={open}
+        aria-haspopup="listbox"
         onClick={handleToggle}
       >
         <BellIcon />
