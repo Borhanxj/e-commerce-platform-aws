@@ -171,4 +171,75 @@ describe('GET /api/products', () => {
 
     expect(res.status).toBe(500)
   })
+
+  it('returns null discount_percent and discounted_price when no active discount', async () => {
+    pool.query.mockResolvedValueOnce({
+      rows: [
+        {
+          id: 1,
+          name: 'Widget',
+          description: 'A widget',
+          price: '19.99',
+          stock: 10,
+          category: 'Electronics',
+          image_url: null,
+          created_at: new Date(),
+          available_stock: '10',
+          discount_percent: null,
+          discounted_price: null,
+        },
+      ],
+    })
+
+    const res = await request(app).get('/api/products')
+
+    expect(res.status).toBe(200)
+    expect(res.body.products[0].discount_percent).toBeNull()
+    expect(res.body.products[0].discounted_price).toBeNull()
+  })
+
+  it('returns discount_percent and discounted_price when active discount is present', async () => {
+    pool.query.mockResolvedValueOnce({
+      rows: [
+        {
+          id: 1,
+          name: 'Widget',
+          description: 'A widget',
+          price: '20.00',
+          stock: 10,
+          category: 'Electronics',
+          image_url: null,
+          created_at: new Date(),
+          available_stock: '10',
+          discount_percent: 25,
+          discounted_price: '15.00',
+        },
+      ],
+    })
+
+    const res = await request(app).get('/api/products')
+
+    expect(res.status).toBe(200)
+    expect(res.body.products[0].discount_percent).toBe(25)
+    expect(res.body.products[0].discounted_price).toBe('15.00')
+  })
+
+  it('includes discount_percent and discounted_price columns in the SQL query', async () => {
+    pool.query.mockResolvedValueOnce({ rows: [] })
+
+    await request(app).get('/api/products')
+
+    const [sql] = pool.query.mock.calls[0]
+    expect(sql).toContain('discount_percent')
+    expect(sql).toContain('discounted_price')
+  })
+
+  it('JOINs product_discounts table in the SQL query', async () => {
+    pool.query.mockResolvedValueOnce({ rows: [] })
+
+    await request(app).get('/api/products')
+
+    const [sql] = pool.query.mock.calls[0]
+    expect(sql).toContain('product_discounts')
+  })
 })

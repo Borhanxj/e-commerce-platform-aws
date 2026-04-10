@@ -182,3 +182,90 @@ describe('CartPage', () => {
     expect(onBack).toHaveBeenCalledOnce()
   })
 })
+
+const outOfStockItem = {
+  id: 2,
+  name: 'OOS Item',
+  price: '10.00',
+  quantity: 1,
+  available_stock: '0',
+}
+const discountedItem = {
+  id: 3,
+  name: 'Sale Widget',
+  price: '20.00',
+  discounted_price: '16.00',
+  discount_percent: 20,
+  quantity: 1,
+}
+
+describe('CartPage — out-of-stock items', () => {
+  afterEach(() => {
+    vi.unstubAllGlobals()
+  })
+
+  it('renders "Out of Stock" badge for out-of-stock item', () => {
+    renderPage({ cartItems: [outOfStockItem] })
+
+    expect(screen.getByText('Out of Stock')).toBeInTheDocument()
+  })
+
+  it('disables checkout button when cart has out-of-stock items', () => {
+    renderPage({ cartItems: [outOfStockItem] })
+
+    const btn = screen.getByRole('button', { name: /proceed to checkout/i })
+    expect(btn).toBeDisabled()
+  })
+
+  it('shows "Remove out-of-stock items before checking out" message', () => {
+    renderPage({ cartItems: [outOfStockItem] })
+
+    expect(screen.getByText(/remove out-of-stock items before checking out/i)).toBeInTheDocument()
+  })
+
+  it('shows "♡ Wishlist" button for out-of-stock item when onAddToWishlist is provided and item is not in wishlist', () => {
+    renderPage({ cartItems: [outOfStockItem], onAddToWishlist: vi.fn(), wishlistItems: [] })
+
+    expect(screen.getByRole('button', { name: /save to wishlist/i })).toBeInTheDocument()
+  })
+
+  it('calls onAddToWishlist with the item when "♡ Wishlist" is clicked', async () => {
+    const onAddToWishlist = vi.fn()
+    renderPage({ cartItems: [outOfStockItem], onAddToWishlist, wishlistItems: [] })
+
+    await userEvent.click(screen.getByRole('button', { name: /save to wishlist/i }))
+
+    expect(onAddToWishlist).toHaveBeenCalledWith(outOfStockItem)
+  })
+
+  it('does NOT show "♡ Wishlist" button when item is already in wishlistItems', () => {
+    renderPage({
+      cartItems: [outOfStockItem],
+      onAddToWishlist: vi.fn(),
+      wishlistItems: [{ id: 2 }],
+    })
+
+    expect(screen.queryByRole('button', { name: /save to wishlist/i })).not.toBeInTheDocument()
+  })
+})
+
+describe('CartPage — discounted items', () => {
+  afterEach(() => {
+    vi.unstubAllGlobals()
+  })
+
+  it('shows strikethrough original price and discounted price for discounted item', () => {
+    renderPage({ cartItems: [discountedItem] })
+
+    expect(screen.getByText('$20.00')).toBeInTheDocument()
+    // discounted price appears at least once (may also appear as line total when qty = 1)
+    expect(screen.getAllByText('$16.00').length).toBeGreaterThanOrEqual(1)
+  })
+
+  it('uses discounted_price for total calculation, not original price', () => {
+    renderPage({ cartItems: [discountedItem] })
+
+    // discounted_price is $16.00 × 1 = $16.00, plus $4.99 shipping = $20.99
+    expect(screen.getByText('$20.99')).toBeInTheDocument()
+  })
+})
