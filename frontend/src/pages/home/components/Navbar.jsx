@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 import {
   CartIcon,
   WishlistIcon,
@@ -27,6 +28,14 @@ export default function Navbar({
   const [avatarOpen, setAvatarOpen] = useState(false)
   const avatarRef = useRef(null)
   const { theme, toggleTheme } = useTheme()
+  const navigate = useNavigate()
+
+  function handleSearchSubmit(e) {
+    e.preventDefault()
+    const q = searchQuery.trim()
+    // Allow empty (shows all products) and 2+ chars; block single-char noise
+    if (q.length !== 1) navigate(q ? '/search?q=' + encodeURIComponent(q) : '/search')
+  }
 
   useEffect(() => {
     function handleClickOutside(e) {
@@ -47,10 +56,17 @@ export default function Navbar({
         </div>
 
         {/* Search bar */}
-        <div className="flex h-10 max-w-[480px] flex-1 items-center gap-2 rounded-[10px] border border-[var(--border)] bg-[var(--card-bg)] px-[14px] backdrop-blur-xl transition-[border-color,background] duration-200 focus-within:border-purple-400/50 focus-within:bg-[var(--card-bg)]">
-          <span className="flex items-center text-[var(--text)]">
+        <form
+          onSubmit={handleSearchSubmit}
+          className="flex h-10 max-w-[480px] flex-1 items-center gap-2 rounded-[10px] border border-[var(--border)] bg-[var(--card-bg)] px-[14px] backdrop-blur-xl transition-[border-color,background] duration-200 focus-within:border-purple-400/50 focus-within:bg-[var(--card-bg)]"
+        >
+          <button
+            type="submit"
+            aria-label="Search"
+            className="flex items-center border-none bg-transparent p-0 text-[var(--text)] hover:text-purple-400"
+          >
             <SearchIcon />
-          </span>
+          </button>
           <input
             type="text"
             placeholder="Search for clothes, brands…"
@@ -58,7 +74,13 @@ export default function Navbar({
             onChange={(e) => setSearchQuery(e.target.value)}
             className="flex-1 border-none bg-transparent text-sm text-[var(--text-h)] outline-none placeholder:text-[var(--text)]/40"
           />
-        </div>
+          <button
+            type="submit"
+            className="shrink-0 rounded-md border-none bg-purple-400/15 px-2.5 py-1 text-[12px] font-semibold text-purple-400 transition-colors hover:bg-purple-400/28"
+          >
+            Search
+          </button>
+        </form>
 
         {/* Actions */}
         <nav className="ml-auto flex items-center gap-2">
