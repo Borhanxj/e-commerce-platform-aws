@@ -34,7 +34,7 @@ export default function Navbar({
     e.preventDefault()
     const q = searchQuery.trim()
     // Allow empty (shows all products) and 2+ chars; block single-char noise
-    if (q.length !== 1) navigate('/search?q=' + encodeURIComponent(q))
+    if (q.length !== 1) navigate(q ? '/search?q=' + encodeURIComponent(q) : '/search')
   }
 
   useEffect(() => {

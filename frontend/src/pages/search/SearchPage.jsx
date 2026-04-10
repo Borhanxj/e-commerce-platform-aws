@@ -87,13 +87,18 @@ export default function SearchPage({
   const [products, setProducts] = useState([])
   const [loadedQuery, setLoadedQuery] = useState(null)
   const [inputValue, setInputValue] = useState(searchQuery)
+  const [error, setError] = useState(false)
   const navigate = useNavigate()
   const loading = loadedQuery !== searchQuery
 
   useEffect(() => {
     let cancelled = false
+    setError(false)
     fetch(`${API_BASE}/api/products/search?q=${encodeURIComponent(searchQuery)}`)
-      .then((r) => r.json())
+      .then((r) => {
+        if (!r.ok) throw new Error('Server error')
+        return r.json()
+      })
       .then((data) => {
         if (!cancelled) {
           setProducts(data.products ?? [])
@@ -103,6 +108,7 @@ export default function SearchPage({
       .catch(() => {
         if (!cancelled) {
           setProducts([])
+          setError(true)
           setLoadedQuery(searchQuery)
         }
       })
@@ -111,10 +117,15 @@ export default function SearchPage({
     }
   }, [searchQuery])
 
+  useEffect(() => {
+    setInputValue(searchQuery)
+  }, [searchQuery])
+
   function handleSearchSubmit(e) {
     e.preventDefault()
     const q = inputValue.trim()
-    if (q.length !== 1) navigate('/search?q=' + encodeURIComponent(q), { replace: true })
+    if (q.length !== 1)
+      navigate(q ? '/search?q=' + encodeURIComponent(q) : '/search', { replace: true })
   }
 
   const cartIds = new Set(cartItems.map((i) => i.id))
@@ -171,11 +182,13 @@ export default function SearchPage({
           </h1>
           {!loading && (
             <p className="m-0 text-[15px] text-[var(--text)]">
-              {products.length === 0
-                ? searchQuery
-                  ? `No products found for "${searchQuery}"`
-                  : 'No products available.'
-                : `${products.length} product${products.length !== 1 ? 's' : ''} found`}
+              {error
+                ? 'Failed to load products. Please try again.'
+                : products.length === 0
+                  ? searchQuery
+                    ? `No products found for "${searchQuery}"`
+                    : 'No products available.'
+                  : `${products.length} product${products.length !== 1 ? 's' : ''} found`}
             </p>
           )}
         </div>

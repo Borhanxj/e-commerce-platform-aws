@@ -7,13 +7,22 @@ const router = express.Router()
 // Empty or missing q returns all products sorted alphabetically.
 router.get('/search', async (req, res) => {
   const q = (req.query.q || '').trim()
-  const limit = Math.min(100, Math.max(1, parseInt(req.query.limit) || 50))
 
   // Single-character queries match too broadly — reject them early
   if (q.length === 1) return res.json({ products: [] })
 
+  // For keyword searches: default limit 50, capped at 100.
+  // For "show all" (empty q): no default limit; explicit ?limit= is still respected.
+  const explicitLimit =
+    req.query.limit !== undefined
+      ? Math.min(100, Math.max(1, parseInt(req.query.limit) || 1))
+      : null
+  const limit = explicitLimit ?? (q ? 50 : null)
+
   const whereClause = q ? 'WHERE (p.name ILIKE $1 OR p.description ILIKE $1)' : ''
-  const params = q ? [`%${q}%`, limit] : [limit]
+  const params = q ? [`%${q}%`] : []
+  if (limit !== null) params.push(limit)
+  const limitClause = limit !== null ? `LIMIT $${params.length}` : ''
 
   const result = await pool.query(
     `SELECT p.id, p.name, p.description, p.price, p.stock, p.category, p.image_url, p.created_at,
@@ -31,7 +40,7 @@ router.get('/search', async (req, res) => {
      ${whereClause}
      GROUP BY p.id, pd.discount_percent
      ORDER BY p.name ASC
-     LIMIT $${params.length}`,
+     ${limitClause}`,
     params
   )
 

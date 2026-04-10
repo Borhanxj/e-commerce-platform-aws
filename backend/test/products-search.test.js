@@ -59,9 +59,20 @@ describe('GET /api/products/search', () => {
     expect(res.body.products).toHaveLength(1)
     expect(pool.query).toHaveBeenCalled()
 
-    // No ILIKE clause when q is empty
+    // No ILIKE clause and no LIMIT when q is empty and no explicit limit given
     const [sql] = pool.query.mock.calls[0]
     expect(sql).not.toMatch(/ILIKE/)
+    expect(sql).not.toMatch(/LIMIT/)
+  })
+
+  it('respects explicit limit when q is empty', async () => {
+    pool.query.mockResolvedValueOnce({ rows: [] })
+
+    await request(app).get('/api/products/search?q=&limit=10')
+
+    const [sql, params] = pool.query.mock.calls[0]
+    expect(sql).toMatch(/LIMIT/)
+    expect(params[params.length - 1]).toBe(10)
   })
 
   it('returns all products when q is whitespace', async () => {
