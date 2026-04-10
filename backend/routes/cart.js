@@ -7,9 +7,21 @@ router.use(authenticate)
 
 async function fetchCart(userId) {
   const result = await pool.query(
-    `SELECT ci.product_id AS id, p.name, p.price, ci.quantity
+    `SELECT ci.product_id AS id, p.name, p.price, ci.quantity,
+            GREATEST(0, p.stock - COALESCE(
+              (SELECT SUM(sr.quantity) FROM stock_reservations sr
+               WHERE sr.product_id = p.id AND sr.expires_at > NOW()), 0
+            )) AS available_stock,
+            pd.discount_percent,
+            CASE WHEN pd.discount_percent IS NOT NULL
+                 THEN ROUND(p.price * (1 - pd.discount_percent / 100.0), 2)
+                 ELSE NULL
+            END AS discounted_price
      FROM cart_items ci
      JOIN products p ON p.id = ci.product_id
+     LEFT JOIN product_discounts pd ON pd.product_id = p.id
+       AND pd.start_at <= NOW()
+       AND (pd.end_at IS NULL OR pd.end_at > NOW())
      WHERE ci.user_id = $1
      ORDER BY ci.added_at ASC`,
     [userId]

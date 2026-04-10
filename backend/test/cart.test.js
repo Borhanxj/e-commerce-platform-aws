@@ -199,3 +199,126 @@ describe('DELETE /api/cart/:productId', () => {
     expect(res.status).toBe(500)
   })
 })
+
+describe('GET /api/cart — discount and available_stock fields', () => {
+  beforeEach(() => jest.clearAllMocks())
+
+  it('passes through discount_percent and discounted_price when a discount is active', async () => {
+    pool.query.mockResolvedValueOnce({
+      rows: [
+        {
+          id: 1,
+          name: 'Widget',
+          price: '20.00',
+          quantity: 1,
+          available_stock: '8',
+          discount_percent: 20,
+          discounted_price: '16.00',
+        },
+      ],
+    })
+
+    const res = await request(app).get('/api/cart').set('Authorization', `Bearer ${userToken}`)
+
+    expect(res.status).toBe(200)
+    expect(res.body.items[0].discount_percent).toBe(20)
+    expect(res.body.items[0].discounted_price).toBe('16.00')
+  })
+
+  it('returns null discount fields when no discount is active', async () => {
+    pool.query.mockResolvedValueOnce({
+      rows: [
+        {
+          id: 1,
+          name: 'Widget',
+          price: '20.00',
+          quantity: 1,
+          available_stock: '8',
+          discount_percent: null,
+          discounted_price: null,
+        },
+      ],
+    })
+
+    const res = await request(app).get('/api/cart').set('Authorization', `Bearer ${userToken}`)
+
+    expect(res.status).toBe(200)
+    expect(res.body.items[0].discount_percent).toBeNull()
+    expect(res.body.items[0].discounted_price).toBeNull()
+  })
+
+  it('passes through available_stock for each item', async () => {
+    pool.query.mockResolvedValueOnce({
+      rows: [
+        {
+          id: 1,
+          name: 'Widget',
+          price: '9.99',
+          quantity: 1,
+          available_stock: '3',
+          discount_percent: null,
+          discounted_price: null,
+        },
+      ],
+    })
+
+    const res = await request(app).get('/api/cart').set('Authorization', `Bearer ${userToken}`)
+
+    expect(res.status).toBe(200)
+    expect(res.body.items[0].available_stock).toBe('3')
+  })
+
+  it('passes through available_stock of 0 for out-of-stock item', async () => {
+    pool.query.mockResolvedValueOnce({
+      rows: [
+        {
+          id: 1,
+          name: 'Widget',
+          price: '9.99',
+          quantity: 1,
+          available_stock: '0',
+          discount_percent: null,
+          discounted_price: null,
+        },
+      ],
+    })
+
+    const res = await request(app).get('/api/cart').set('Authorization', `Bearer ${userToken}`)
+
+    expect(res.status).toBe(200)
+    expect(res.body.items[0].available_stock).toBe('0')
+  })
+})
+
+describe('POST /api/cart — discount and available_stock fields', () => {
+  beforeEach(() => jest.clearAllMocks())
+
+  it('returns discount fields in the cart after adding an item', async () => {
+    pool.query
+      .mockResolvedValueOnce({ rows: [{ id: 1 }] }) // product exists
+      .mockResolvedValueOnce({ rows: [] }) // upsert
+      .mockResolvedValueOnce({
+        rows: [
+          {
+            id: 1,
+            name: 'Widget',
+            price: '20.00',
+            quantity: 1,
+            available_stock: '5',
+            discount_percent: 10,
+            discounted_price: '18.00',
+          },
+        ],
+      }) // fetchCart
+
+    const res = await request(app)
+      .post('/api/cart')
+      .set('Authorization', `Bearer ${userToken}`)
+      .send({ productId: 1, quantity: 1 })
+
+    expect(res.status).toBe(200)
+    expect(res.body.items[0].discount_percent).toBe(10)
+    expect(res.body.items[0].discounted_price).toBe('18.00')
+    expect(res.body.items[0].available_stock).toBe('5')
+  })
+})

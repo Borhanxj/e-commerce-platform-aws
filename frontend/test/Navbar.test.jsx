@@ -37,13 +37,13 @@ describe('Navbar', () => {
     expect(screen.getByPlaceholderText(/search/i)).toBeInTheDocument()
   })
 
-  it('calls onRequireAuth when cart is clicked while logged out', async () => {
-    const onRequireAuth = vi.fn()
-    renderNavbar({ onRequireAuth })
+  it('calls onNavigate with "cart" when cart is clicked while logged out', async () => {
+    const onNavigate = vi.fn()
+    renderNavbar({ isLoggedIn: false, onNavigate })
 
     await userEvent.click(screen.getByRole('button', { name: /shopping cart/i }))
 
-    expect(onRequireAuth).toHaveBeenCalledOnce()
+    expect(onNavigate).toHaveBeenCalledWith('cart')
   })
 
   it('calls onNavigate with "cart" when cart is clicked while logged in', async () => {

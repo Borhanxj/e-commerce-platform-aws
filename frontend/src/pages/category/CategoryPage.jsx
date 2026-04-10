@@ -139,9 +139,23 @@ export default function CategoryPage({
                 </div>
                 <div className="flex flex-1 flex-col gap-1 px-4 pt-3.5 pb-2.5">
                   <span className="text-sm font-semibold text-[var(--text-h)]">{product.name}</span>
-                  <span className="text-[15px] font-bold text-purple-400">
-                    ${parseFloat(product.price).toFixed(2)}
-                  </span>
+                  {product.discounted_price != null ? (
+                    <div className="flex flex-col gap-0.5">
+                      <span className="text-[13px] text-red-400 line-through opacity-70">
+                        ${parseFloat(product.price).toFixed(2)}
+                      </span>
+                      <span className="text-[15px] font-bold text-purple-400">
+                        ${parseFloat(product.discounted_price).toFixed(2)}
+                        <span className="ml-1.5 text-[11px] font-semibold text-green-400">
+                          -{product.discount_percent}%
+                        </span>
+                      </span>
+                    </div>
+                  ) : (
+                    <span className="text-[15px] font-bold text-purple-400">
+                      ${parseFloat(product.price).toFixed(2)}
+                    </span>
+                  )}
                   <span
                     className={
                       availableStock < 10

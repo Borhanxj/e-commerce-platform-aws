@@ -55,7 +55,14 @@ function CartIcon() {
   )
 }
 
-export default function WishlistPage({ onBack, wishlistItems, onRemove, onAddToCart }) {
+export default function WishlistPage({
+  onBack,
+  wishlistItems,
+  onRemove,
+  onAddToCart,
+  onRemoveFromCart,
+  cartItems = [],
+}) {
   if (wishlistItems.length === 0) {
     return (
       <div className="flex min-h-svh w-full flex-col bg-[var(--bg)] pt-16">
@@ -131,37 +138,68 @@ export default function WishlistPage({ onBack, wishlistItems, onRemove, onAddToC
         </h1>
 
         <div className="grid [grid-template-columns:repeat(auto-fill,minmax(260px,1fr))] gap-5">
-          {wishlistItems.map((item) => (
-            <div
-              key={item.id}
-              className="flex flex-col overflow-hidden rounded-2xl border border-[var(--glass-border)] bg-[var(--card-bg)] shadow-[var(--shadow)] backdrop-blur-xl transition-[transform,box-shadow] duration-250 hover:-translate-y-1 hover:shadow-[0_8px_24px_rgba(0,0,0,0.15),0_0_0_1px_rgba(192,132,252,0.35)]"
-            >
-              <div className="flex aspect-[4/3] w-full items-center justify-center bg-purple-400/12">
-                <span className="text-5xl font-bold text-purple-400 opacity-50">
-                  {item.name[0]}
-                </span>
+          {wishlistItems.map((item) => {
+            const outOfStock = parseInt(item.available_stock) === 0
+            const inCart = cartItems.some((c) => c.id === item.id)
+            return (
+              <div
+                key={item.id}
+                className="flex flex-col overflow-hidden rounded-2xl border border-[var(--glass-border)] bg-[var(--card-bg)] shadow-[var(--shadow)] backdrop-blur-xl transition-[transform,box-shadow] duration-250 hover:-translate-y-1 hover:shadow-[0_8px_24px_rgba(0,0,0,0.15),0_0_0_1px_rgba(192,132,252,0.35)]"
+              >
+                <div className="flex aspect-[4/3] w-full items-center justify-center bg-purple-400/12">
+                  <span className="text-5xl font-bold text-purple-400 opacity-50">
+                    {item.name[0]}
+                  </span>
+                </div>
+                <div className="flex flex-1 flex-col gap-1 px-4 pt-3.5 pb-2">
+                  <span className="text-[15px] font-medium text-[var(--text-h)]">{item.name}</span>
+                  {item.discounted_price != null ? (
+                    <div className="flex flex-col gap-0.5">
+                      <span className="text-sm text-red-400 line-through opacity-70">
+                        ${parseFloat(item.price).toFixed(2)}
+                      </span>
+                      <span className="text-sm font-bold text-purple-400">
+                        ${parseFloat(item.discounted_price).toFixed(2)}
+                        <span className="ml-1.5 text-[11px] font-semibold text-green-400">
+                          -{item.discount_percent}%
+                        </span>
+                      </span>
+                    </div>
+                  ) : (
+                    <span className="text-sm text-[var(--text)]">
+                      ${parseFloat(item.price).toFixed(2)}
+                    </span>
+                  )}
+                </div>
+                <div className="flex items-center gap-2.5 px-4 pt-3 pb-4">
+                  <button
+                    className={
+                      outOfStock
+                        ? 'flex flex-1 cursor-not-allowed items-center justify-center gap-1.5 rounded-lg border border-[var(--border)] bg-transparent px-3.5 py-2.5 text-[13px] font-semibold text-[var(--text)] opacity-40'
+                        : inCart
+                          ? 'flex flex-1 cursor-pointer items-center justify-center gap-1.5 rounded-lg border border-purple-400 bg-transparent px-3.5 py-2.5 text-[13px] font-semibold text-purple-400 transition-opacity hover:opacity-88'
+                          : 'flex flex-1 cursor-pointer items-center justify-center gap-1.5 rounded-lg border-none bg-purple-400 px-3.5 py-2.5 text-[13px] font-semibold tracking-[0.3px] text-white transition-opacity hover:opacity-88'
+                    }
+                    disabled={outOfStock}
+                    onClick={() => {
+                      if (outOfStock) return
+                      inCart ? onRemoveFromCart(item.id) : onAddToCart(item)
+                    }}
+                  >
+                    <CartIcon />
+                    {outOfStock ? 'Out of Stock' : inCart ? 'Remove from Cart' : 'Add to Cart'}
+                  </button>
+                  <button
+                    className="flex cursor-pointer items-center rounded-lg border border-[var(--border)] bg-transparent p-2.5 text-[var(--text)] transition-colors hover:border-[rgba(232,93,93,0.3)] hover:bg-[rgba(232,93,93,0.1)] hover:text-[#e85d5d]"
+                    onClick={() => onRemove(item.id)}
+                    aria-label="Remove from wishlist"
+                  >
+                    <TrashIcon />
+                  </button>
+                </div>
               </div>
-              <div className="flex flex-1 flex-col gap-1 px-4 pt-3.5 pb-2">
-                <span className="text-[15px] font-medium text-[var(--text-h)]">{item.name}</span>
-                <span className="text-sm text-[var(--text)]">${item.price.toFixed(2)}</span>
-              </div>
-              <div className="flex items-center gap-2.5 px-4 pt-3 pb-4">
-                <button
-                  className="flex flex-1 cursor-pointer items-center justify-center gap-1.5 rounded-lg border-none bg-purple-400 px-3.5 py-2.5 text-[13px] font-semibold tracking-[0.3px] text-white transition-opacity hover:opacity-88"
-                  onClick={() => onAddToCart(item)}
-                >
-                  <CartIcon /> Add to Cart
-                </button>
-                <button
-                  className="flex cursor-pointer items-center rounded-lg border border-[var(--border)] bg-transparent p-2.5 text-[var(--text)] transition-colors hover:border-[rgba(232,93,93,0.3)] hover:bg-[rgba(232,93,93,0.1)] hover:text-[#e85d5d]"
-                  onClick={() => onRemove(item.id)}
-                  aria-label="Remove from wishlist"
-                >
-                  <TrashIcon />
-                </button>
-              </div>
-            </div>
-          ))}
+            )
+          })}
         </div>
       </main>
     </div>
