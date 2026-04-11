@@ -1,6 +1,29 @@
 import { useState, useEffect, useCallback } from 'react'
+import API_BASE from '../../api'
+import {
+  btnBase,
+  btnCreate,
+  btnSearch,
+  btnEdit,
+  fieldInputClass,
+} from '../../styles/dashboardStyles'
 
-const API = 'http://localhost:3000/api/product-manager/products'
+const API = `${API_BASE}/api/product-manager/products`
+
+const tableWrap =
+  'overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--card-bg)] shadow-[var(--shadow)] backdrop-blur-xl'
+const tableClass = 'min-w-full divide-y divide-[var(--border)] text-left text-sm'
+const thClass =
+  'bg-purple-400/12 px-4 py-3 text-xs font-semibold uppercase tracking-wide text-[var(--text)]'
+const tdClass = 'px-4 py-3 text-[var(--text-h)]'
+const emptyClass = 'px-4 py-8 text-center text-[var(--text)]'
+
+function stockBadgeClass(stock) {
+  const n = parseInt(stock)
+  if (n === 0) return 'bg-red-500/10 text-red-400 border-0'
+  if (n < 10) return 'bg-amber-500/10 text-amber-400 border-0'
+  return 'bg-emerald-500/10 text-emerald-400 border-0'
+}
 
 function PMInventory({ token }) {
   const [products, setProducts] = useState([])
@@ -86,94 +109,89 @@ function PMInventory({ token }) {
   }
 
   return (
-    <div className="um">
-      <div className="um-toolbar">
-        <form className="um-search-form" onSubmit={handleSearch}>
+    <div>
+      <div className="mb-6 flex flex-wrap items-center gap-3">
+        <form className="flex min-w-0 flex-1 gap-2" onSubmit={handleSearch}>
           <input
             type="text"
-            className="um-search"
+            className={`${fieldInputClass} min-w-[140px] flex-1`}
             placeholder="Search by name…"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
-          <button type="submit" className="um-btn um-btn-search">
+          <button type="submit" className={btnSearch}>
             Search
           </button>
         </form>
       </div>
 
-      {error && <p className="um-error">{error}</p>}
+      {error && <p className="mb-4 text-sm text-red-400">{error}</p>}
 
-      <div className="um-table-wrap">
-        <table className="um-table">
+      <div className={tableWrap}>
+        <table className={tableClass}>
           <thead>
             <tr>
-              <th>ID</th>
-              <th>Name</th>
-              <th>Category</th>
-              <th>Price</th>
-              <th>Stock</th>
-              <th>Actions</th>
+              <th className={thClass}>ID</th>
+              <th className={thClass}>Name</th>
+              <th className={thClass}>Category</th>
+              <th className={thClass}>Price</th>
+              <th className={thClass}>Stock</th>
+              <th className={thClass}>Actions</th>
             </tr>
           </thead>
-          <tbody>
+          <tbody className="divide-y divide-[var(--border)]">
             {loading ? (
               <tr>
-                <td colSpan="6" className="um-empty">
+                <td colSpan="6" className={emptyClass}>
                   Loading…
                 </td>
               </tr>
             ) : products.length === 0 ? (
               <tr>
-                <td colSpan="6" className="um-empty">
+                <td colSpan="6" className={emptyClass}>
                   No products found
                 </td>
               </tr>
             ) : (
               products.map((p) => (
-                <tr key={p.id}>
-                  <td>{p.id}</td>
-                  <td>{p.name}</td>
-                  <td>{p.category || '—'}</td>
-                  <td>${parseFloat(p.price).toFixed(2)}</td>
-                  <td>
+                <tr key={p.id} className="transition-colors hover:bg-[var(--card-bg)]/60">
+                  <td className={tdClass}>{p.id}</td>
+                  <td className={tdClass}>{p.name}</td>
+                  <td className={tdClass}>{p.category || '—'}</td>
+                  <td className={tdClass}>${parseFloat(p.price).toFixed(2)}</td>
+                  <td className={tdClass}>
                     {editingId === p.id ? (
-                      <div className="pm-stock-cell">
+                      <div className="flex items-center gap-2">
                         <input
                           type="number"
                           min="0"
-                          className="pm-stock-input"
+                          className="w-20 rounded-md border border-[var(--border)] bg-[var(--bg)] px-2 py-1 text-sm text-[var(--text-h)] outline-none focus:border-purple-400"
                           value={draftStock}
                           onChange={(e) => setDraftStock(e.target.value)}
                           autoFocus
                         />
                         <button
-                          className="um-btn um-btn-create"
-                          style={{ fontSize: '12px', padding: '4px 10px' }}
+                          className={`${btnCreate} px-2.5 py-1 text-xs`}
                           disabled={saving}
                           onClick={() => saveStock(p.id)}
                         >
                           {saving ? '…' : 'Save'}
                         </button>
-                        <button
-                          className="um-btn"
-                          style={{ fontSize: '12px', padding: '4px 10px' }}
-                          onClick={cancelEdit}
-                        >
+                        <button className={`${btnBase} px-2.5 py-1 text-xs`} onClick={cancelEdit}>
                           Cancel
                         </button>
                       </div>
                     ) : (
                       <span
-                        className={`um-role-badge ${parseInt(p.stock) === 0 ? 'um-role-admin' : parseInt(p.stock) < 10 ? 'um-role-product_manager' : 'um-role-sales_manager'}`}
+                        className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${stockBadgeClass(p.stock)}`}
                       >
                         {p.stock}
                       </span>
                     )}
                   </td>
-                  <td className="um-actions">
+                  <td className={tdClass}>
                     {editingId !== p.id && (
-                      <button className="um-btn um-btn-edit" onClick={() => startEdit(p)}>
+                      <button className={btnEdit} onClick={() => startEdit(p)}>
                         Edit Stock
                       </button>
                     )}
@@ -186,19 +204,19 @@ function PMInventory({ token }) {
       </div>
 
       {pagination.totalPages > 1 && (
-        <div className="um-pagination">
+        <div className="mt-4 flex items-center justify-between text-sm">
           <button
-            className="um-btn"
+            className={btnBase}
             disabled={pagination.page <= 1}
             onClick={() => fetchProducts(pagination.page - 1)}
           >
             Previous
           </button>
-          <span className="um-page-info">
+          <span className="text-[var(--text)]">
             Page {pagination.page} of {pagination.totalPages} ({pagination.total} products)
           </span>
           <button
-            className="um-btn"
+            className={btnBase}
             disabled={pagination.page >= pagination.totalPages}
             onClick={() => fetchProducts(pagination.page + 1)}
           >

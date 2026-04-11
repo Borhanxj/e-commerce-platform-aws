@@ -1,4 +1,7 @@
 import { useState, useEffect } from 'react'
+import API_BASE from '../../api'
+import { decodeJwtPayload } from '../../utils/jwt'
+import DashboardLayout from '../../components/DashboardLayout'
 import PMProducts from './PMProducts'
 import PMCategories from './PMCategories'
 import PMInventory from './PMInventory'
@@ -6,19 +9,7 @@ import PMOrders from './PMOrders'
 import PMComments from './PMComments'
 import './ProductManagerDashboard.css'
 
-const API_BASE = 'http://localhost:3000/api/product-manager'
-
-function decodeJwtPayload(token) {
-  try {
-    const parts = token.split('.')
-    if (parts.length < 3) return null
-    const base64 = parts[1].replace(/-/g, '+').replace(/_/g, '/')
-    const padded = base64 + '='.repeat((4 - (base64.length % 4)) % 4)
-    return JSON.parse(atob(padded))
-  } catch {
-    return null
-  }
-}
+const PM_API = `${API_BASE}/api/product-manager`
 
 function PMOverview({ token, onNavigate }) {
   const [stats, setStats] = useState({ products: 0, orders: 0, lowStock: 0 })
@@ -28,14 +19,14 @@ function PMOverview({ token, onNavigate }) {
       try {
         const headers = { Authorization: `Bearer ${token}` }
         const [pRes, oRes] = await Promise.all([
-          fetch(`${API_BASE}/products?page=1&limit=1`, { headers }),
-          fetch(`${API_BASE}/orders?page=1&limit=1`, { headers }),
+          fetch(`${PM_API}/products?page=1&limit=1`, { headers }),
+          fetch(`${PM_API}/orders?page=1&limit=1`, { headers }),
         ])
         const pData = pRes.ok ? await pRes.json() : {}
         const oData = oRes.ok ? await oRes.json() : {}
 
         // Fetch low-stock count (stock < 10)
-        const lsRes = await fetch(`${API_BASE}/products?page=1&limit=1&lowStock=true`, { headers })
+        const lsRes = await fetch(`${PM_API}/products?page=1&limit=1&lowStock=true`, { headers })
         const lsData = lsRes.ok ? await lsRes.json() : {}
 
         setStats({
@@ -51,21 +42,40 @@ function PMOverview({ token, onNavigate }) {
   }, [token])
 
   return (
-    <div>
-      <div className="dh-kpi-grid">
-        <button className="dh-kpi" onClick={() => onNavigate('products')}>
-          <span className="dh-kpi-value">{stats.products}</span>
-          <span className="dh-kpi-label">Total Products</span>
-        </button>
-        <button className="dh-kpi" onClick={() => onNavigate('inventory')}>
-          <span className="dh-kpi-value">{stats.lowStock}</span>
-          <span className="dh-kpi-label">Low / Out of Stock</span>
-        </button>
-        <button className="dh-kpi" onClick={() => onNavigate('orders')}>
-          <span className="dh-kpi-value">{stats.orders}</span>
-          <span className="dh-kpi-label">Total Orders</span>
-        </button>
-      </div>
+    <div className="mb-7 grid grid-cols-[repeat(auto-fill,minmax(200px,1fr))] gap-4">
+      <button
+        className="flex cursor-pointer flex-col gap-1 rounded-[10px] border border-[var(--border)] bg-[var(--card-bg)] px-5 py-6 text-left font-[inherit] shadow-[var(--shadow)] transition-all duration-150 hover:border-purple-400 hover:bg-purple-400/12"
+        onClick={() => onNavigate('products')}
+      >
+        <span className="text-[28px] font-semibold tracking-tight text-[var(--text-h)]">
+          {stats.products}
+        </span>
+        <span className="text-[13px] tracking-wide text-[var(--text)] uppercase opacity-70">
+          Total Products
+        </span>
+      </button>
+      <button
+        className="flex cursor-pointer flex-col gap-1 rounded-[10px] border border-[var(--border)] bg-[var(--card-bg)] px-5 py-6 text-left font-[inherit] shadow-[var(--shadow)] transition-all duration-150 hover:border-purple-400 hover:bg-purple-400/12"
+        onClick={() => onNavigate('inventory')}
+      >
+        <span className="text-[28px] font-semibold tracking-tight text-[var(--text-h)]">
+          {stats.lowStock}
+        </span>
+        <span className="text-[13px] tracking-wide text-[var(--text)] uppercase opacity-70">
+          Low / Out of Stock
+        </span>
+      </button>
+      <button
+        className="flex cursor-pointer flex-col gap-1 rounded-[10px] border border-[var(--border)] bg-[var(--card-bg)] px-5 py-6 text-left font-[inherit] shadow-[var(--shadow)] transition-all duration-150 hover:border-purple-400 hover:bg-purple-400/12"
+        onClick={() => onNavigate('orders')}
+      >
+        <span className="text-[28px] font-semibold tracking-tight text-[var(--text-h)]">
+          {stats.orders}
+        </span>
+        <span className="text-[13px] tracking-wide text-[var(--text)] uppercase opacity-70">
+          Total Orders
+        </span>
+      </button>
     </div>
   )
 }
@@ -78,7 +88,7 @@ function ProductManagerDashboard({ token, onLogout }) {
   useEffect(() => {
     async function fetchUser() {
       try {
-        const res = await fetch(`${API_BASE}/me`, {
+        const res = await fetch(`${PM_API}/me`, {
           headers: { Authorization: `Bearer ${token}` },
         })
         if (res.status === 401 || res.status === 403) {
@@ -107,54 +117,21 @@ function ProductManagerDashboard({ token, onLogout }) {
   ]
 
   return (
-    <div className="admin-layout">
-      <aside className="admin-sidebar">
-        <h2 className="admin-sidebar-brand">MODÉ Manager</h2>
-        <nav className="admin-sidebar-nav">
-          {sections.map((s) => (
-            <button
-              key={s.key}
-              className={`admin-sidebar-link${activeSection === s.key ? ' active' : ''}`}
-              onClick={() => setActiveSection(s.key)}
-            >
-              {s.icon}
-              {s.label}
-            </button>
-          ))}
-        </nav>
-        <div className="admin-sidebar-footer">
-          <button className="admin-sidebar-link" onClick={onLogout}>
-            <LogoutIcon />
-            Sign out
-          </button>
-        </div>
-      </aside>
-
-      <div className="admin-main">
-        <header className="admin-header">
-          <h1 className="admin-header-title">
-            {sections.find((s) => s.key === activeSection)?.label}
-          </h1>
-          <div className="admin-header-user">
-            <span>{pmUser?.email}</span>
-            <button className="admin-logout-btn" onClick={onLogout}>
-              Logout
-            </button>
-          </div>
-        </header>
-
-        <main className="admin-content">
-          {activeSection === 'overview' && (
-            <PMOverview token={token} onNavigate={setActiveSection} />
-          )}
-          {activeSection === 'products' && <PMProducts token={token} />}
-          {activeSection === 'categories' && <PMCategories token={token} />}
-          {activeSection === 'inventory' && <PMInventory token={token} />}
-          {activeSection === 'orders' && <PMOrders token={token} />}
-          {activeSection === 'comments' && <PMComments token={token} />}
-        </main>
-      </div>
-    </div>
+    <DashboardLayout
+      title="MODÉ Manager"
+      sections={sections}
+      activeSection={activeSection}
+      onSectionChange={setActiveSection}
+      onLogout={onLogout}
+      userEmail={pmUser?.email}
+    >
+      {activeSection === 'overview' && <PMOverview token={token} onNavigate={setActiveSection} />}
+      {activeSection === 'products' && <PMProducts token={token} />}
+      {activeSection === 'categories' && <PMCategories token={token} />}
+      {activeSection === 'inventory' && <PMInventory token={token} />}
+      {activeSection === 'orders' && <PMOrders token={token} />}
+      {activeSection === 'comments' && <PMComments token={token} />}
+    </DashboardLayout>
   )
 }
 
@@ -256,23 +233,6 @@ function CommentsIcon() {
       strokeLinejoin="round"
     >
       <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
-    </svg>
-  )
-}
-
-function LogoutIcon() {
-  return (
-    <svg
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
-      <polyline points="16 17 21 12 16 7" />
-      <line x1="21" y1="12" x2="9" y2="12" />
     </svg>
   )
 }

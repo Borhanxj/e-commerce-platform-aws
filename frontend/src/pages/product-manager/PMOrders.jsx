@@ -1,14 +1,24 @@
 import { useState, useEffect, useCallback } from 'react'
+import API_BASE from '../../api'
+import { btnBase, btnSearch, btnEdit, fieldInputClass } from '../../styles/dashboardStyles'
 
-const API = 'http://localhost:3000/api/product-manager/orders'
+const API = `${API_BASE}/api/product-manager/orders`
 
-const STATUS_COLORS = {
-  pending: 'um-role-product_manager',
-  processing: 'um-role-customer',
-  shipped: 'um-role-sales_manager',
-  delivered: 'um-role-sales_manager',
-  cancelled: 'um-role-admin',
+const STATUS_BADGE_CLASS = {
+  pending: 'bg-blue-500/10 text-blue-400',
+  processing: 'bg-amber-500/10 text-amber-400',
+  shipped: 'bg-purple-400/12 text-purple-400',
+  delivered: 'bg-emerald-500/10 text-emerald-400',
+  cancelled: 'bg-red-500/10 text-red-400',
 }
+
+const tableWrap =
+  'overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--card-bg)] shadow-[var(--shadow)] backdrop-blur-xl'
+const tableClass = 'min-w-full divide-y divide-[var(--border)] text-left text-sm'
+const thClass =
+  'bg-purple-400/12 px-4 py-3 text-xs font-semibold uppercase tracking-wide text-[var(--text)]'
+const tdClass = 'px-4 py-3 text-[var(--text-h)]'
+const emptyClass = 'px-4 py-8 text-center text-[var(--text)]'
 
 function PMOrders({ token }) {
   const [orders, setOrders] = useState([])
@@ -67,22 +77,23 @@ function PMOrders({ token }) {
   }
 
   return (
-    <div className="um">
-      <div className="um-toolbar">
-        <form className="um-search-form" onSubmit={handleSearch}>
+    <div>
+      <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
+        <form className="flex min-w-0 flex-1 gap-2" onSubmit={handleSearch}>
           <input
             type="text"
-            className="um-search"
-            placeholder="Search by customer or order ID…"
+            className={`${fieldInputClass} min-w-[140px] flex-1`}
+            placeholder="Search by customer email…"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
-          <button type="submit" className="um-btn um-btn-search">
+          <button type="submit" className={btnSearch}>
             Search
           </button>
         </form>
         <select
-          className="um-role-filter"
+          className={fieldInputClass}
+          style={{ width: 'auto' }}
           value={statusFilter}
           onChange={(e) => setStatusFilter(e.target.value)}
         >
@@ -95,49 +106,51 @@ function PMOrders({ token }) {
         </select>
       </div>
 
-      {error && <p className="um-error">{error}</p>}
+      {error && <p className="mb-4 text-sm text-red-400">{error}</p>}
 
-      <div className="um-table-wrap">
-        <table className="um-table">
+      <div className={tableWrap}>
+        <table className={tableClass}>
           <thead>
             <tr>
-              <th>Order ID</th>
-              <th>Customer</th>
-              <th>Status</th>
-              <th>Total</th>
-              <th>Date</th>
-              <th>Actions</th>
+              <th className={thClass}>Order ID</th>
+              <th className={thClass}>Customer</th>
+              <th className={thClass}>Status</th>
+              <th className={thClass}>Total</th>
+              <th className={thClass}>Date</th>
+              <th className={thClass}>Actions</th>
             </tr>
           </thead>
-          <tbody>
+          <tbody className="divide-y divide-[var(--border)]">
             {loading ? (
               <tr>
-                <td colSpan="6" className="um-empty">
+                <td colSpan="6" className={emptyClass}>
                   Loading…
                 </td>
               </tr>
             ) : orders.length === 0 ? (
               <tr>
-                <td colSpan="6" className="um-empty">
+                <td colSpan="6" className={emptyClass}>
                   No orders found
                 </td>
               </tr>
             ) : (
               orders.map((o) => (
-                <tr key={o.id}>
-                  <td>#{o.id}</td>
-                  <td>{o.customer_email || o.user_email || '—'}</td>
-                  <td>
+                <tr key={o.id} className="transition-colors hover:bg-[var(--card-bg)]/60">
+                  <td className={tdClass}>#{o.id}</td>
+                  <td className={tdClass}>{o.user_email || o.customer_email || '—'}</td>
+                  <td className={tdClass}>
                     <span
-                      className={`um-role-badge ${STATUS_COLORS[o.status] || 'um-role-customer'}`}
+                      className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${STATUS_BADGE_CLASS[o.status] || 'bg-slate-500/10 text-slate-400'}`}
                     >
                       {o.status}
                     </span>
                   </td>
-                  <td>${parseFloat(o.total || o.total_price || 0).toFixed(2)}</td>
-                  <td>{new Date(o.created_at).toLocaleDateString()}</td>
-                  <td className="um-actions">
-                    <button className="um-btn um-btn-edit" onClick={() => viewOrder(o.id)}>
+                  <td className={tdClass}>
+                    ${parseFloat(o.total || o.total_price || 0).toFixed(2)}
+                  </td>
+                  <td className={tdClass}>{new Date(o.created_at).toLocaleDateString()}</td>
+                  <td className={tdClass}>
+                    <button className={btnEdit} onClick={() => viewOrder(o.id)}>
                       View
                     </button>
                   </td>
@@ -149,19 +162,19 @@ function PMOrders({ token }) {
       </div>
 
       {pagination.totalPages > 1 && (
-        <div className="um-pagination">
+        <div className="mt-4 flex items-center justify-between text-sm">
           <button
-            className="um-btn"
+            className={btnBase}
             disabled={pagination.page <= 1}
             onClick={() => fetchOrders(pagination.page - 1)}
           >
             Previous
           </button>
-          <span className="um-page-info">
+          <span className="text-[var(--text)]">
             Page {pagination.page} of {pagination.totalPages} ({pagination.total} orders)
           </span>
           <button
-            className="um-btn"
+            className={btnBase}
             disabled={pagination.page >= pagination.totalPages}
             onClick={() => fetchOrders(pagination.page + 1)}
           >
@@ -171,13 +184,23 @@ function PMOrders({ token }) {
       )}
 
       {detail && (
-        <div className="um-overlay" onClick={() => setDetail(null)}>
-          <div className="um-modal om-detail-modal" onClick={(e) => e.stopPropagation()}>
-            <h2>Order #{detail.order?.id ?? detail.id}</h2>
-            <div className="om-detail-grid">
-              <div className="om-detail-item">
-                <span className="om-label">Customer</span>
-                <span>
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm"
+          onClick={() => setDetail(null)}
+        >
+          <div
+            className="max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-2xl border border-[var(--glass-border)] bg-[var(--card-bg)] p-6 shadow-[var(--shadow)]"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h2 className="mb-4 text-lg font-semibold text-[var(--text-h)]">
+              Order #{detail.order?.id ?? detail.id}
+            </h2>
+            <div className="mb-4 grid grid-cols-2 gap-4">
+              <div className="flex flex-col gap-1">
+                <span className="text-xs font-medium tracking-wide text-[var(--text)] uppercase opacity-70">
+                  Customer
+                </span>
+                <span className="text-sm text-[var(--text-h)]">
                   {detail.order?.user_email ??
                     detail.user_email ??
                     detail.order?.customer_email ??
@@ -185,26 +208,32 @@ function PMOrders({ token }) {
                     '—'}
                 </span>
               </div>
-              <div className="om-detail-item">
-                <span className="om-label">Status</span>
+              <div className="flex flex-col gap-1">
+                <span className="text-xs font-medium tracking-wide text-[var(--text)] uppercase opacity-70">
+                  Status
+                </span>
                 <span
-                  className={`um-role-badge ${STATUS_COLORS[detail.order?.status ?? detail.status] || 'um-role-customer'}`}
+                  className={`inline-flex w-fit items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${STATUS_BADGE_CLASS[detail.order?.status ?? detail.status] || 'bg-slate-500/10 text-slate-400'}`}
                 >
                   {detail.order?.status ?? detail.status}
                 </span>
               </div>
-              <div className="om-detail-item">
-                <span className="om-label">Total</span>
-                <span>
+              <div className="flex flex-col gap-1">
+                <span className="text-xs font-medium tracking-wide text-[var(--text)] uppercase opacity-70">
+                  Total
+                </span>
+                <span className="text-sm text-[var(--text-h)]">
                   $
                   {parseFloat(
                     detail.order?.total ?? detail.total ?? detail.total_price ?? 0
                   ).toFixed(2)}
                 </span>
               </div>
-              <div className="om-detail-item">
-                <span className="om-label">Date</span>
-                <span>
+              <div className="flex flex-col gap-1">
+                <span className="text-xs font-medium tracking-wide text-[var(--text)] uppercase opacity-70">
+                  Date
+                </span>
+                <span className="text-sm text-[var(--text-h)]">
                   {new Date(detail.order?.created_at ?? detail.created_at).toLocaleString()}
                 </span>
               </div>
@@ -212,9 +241,11 @@ function PMOrders({ token }) {
                 detail.address ??
                 detail.order?.shipping_address ??
                 detail.shipping_address) && (
-                <div className="om-detail-item om-full">
-                  <span className="om-label">Shipping Address</span>
-                  <span>
+                <div className="col-span-2 flex flex-col gap-1">
+                  <span className="text-xs font-medium tracking-wide text-[var(--text)] uppercase opacity-70">
+                    Shipping Address
+                  </span>
+                  <span className="text-sm text-[var(--text-h)]">
                     {detail.order?.address ??
                       detail.address ??
                       detail.order?.shipping_address ??
@@ -225,22 +256,24 @@ function PMOrders({ token }) {
             </div>
             {(detail.items ?? detail.order?.items)?.length > 0 && (
               <>
-                <p className="om-items-title">Items</p>
-                <div className="um-table-wrap">
-                  <table className="um-table">
+                <p className="mt-4 mb-2 font-medium text-[var(--text-h)]">Items</p>
+                <div className={tableWrap}>
+                  <table className={tableClass}>
                     <thead>
                       <tr>
-                        <th>Product</th>
-                        <th>Qty</th>
-                        <th>Price</th>
+                        <th className={thClass}>Product</th>
+                        <th className={thClass}>Qty</th>
+                        <th className={thClass}>Price</th>
                       </tr>
                     </thead>
-                    <tbody>
+                    <tbody className="divide-y divide-[var(--border)]">
                       {(detail.items ?? detail.order?.items ?? []).map((item, i) => (
                         <tr key={i}>
-                          <td>{item.product_name ?? item.name}</td>
-                          <td>{item.quantity}</td>
-                          <td>${parseFloat(item.price ?? item.unit_price ?? 0).toFixed(2)}</td>
+                          <td className={tdClass}>{item.product_name ?? item.name}</td>
+                          <td className={tdClass}>{item.quantity}</td>
+                          <td className={tdClass}>
+                            ${parseFloat(item.price ?? item.unit_price ?? 0).toFixed(2)}
+                          </td>
                         </tr>
                       ))}
                     </tbody>
@@ -248,8 +281,8 @@ function PMOrders({ token }) {
                 </div>
               </>
             )}
-            <div className="um-modal-actions">
-              <button className="um-btn" onClick={() => setDetail(null)}>
+            <div className="mt-5 flex justify-end">
+              <button className={btnBase} onClick={() => setDetail(null)}>
                 Close
               </button>
             </div>
