@@ -1,8 +1,8 @@
 function requireProductManager(req, res, next) {
   if (!req.user || req.user.role !== 'product_manager') {
-    return res.status(403).json({ error: 'Product manager access required' });
+    return res.status(403).json({ error: 'Product manager access required' })
   }
-  next();
+  next()
 }
 
-module.exports = requireProductManager;
+module.exports = requireProductManager
