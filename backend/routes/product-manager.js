@@ -189,9 +189,15 @@ router.get('/orders', async (req, res) => {
     idx++
   }
   if (search) {
-    where.push(`u.email ILIKE $${idx}`)
-    params.push(`%${search}%`)
-    idx++
+    if (/^\d+$/.test(search)) {
+      where.push(`(u.email ILIKE $${idx} OR o.id = $${idx + 1})`)
+      params.push(`%${search}%`, parseInt(search, 10))
+      idx += 2
+    } else {
+      where.push(`u.email ILIKE $${idx}`)
+      params.push(`%${search}%`)
+      idx++
+    }
   }
 
   const whereClause = where.length ? `WHERE ${where.join(' AND ')}` : ''
