@@ -239,7 +239,7 @@ function ProductModal({ mode, product, categories, onClose, onCreate, onUpdate }
               <select value={category} onChange={(e) => setCategory(e.target.value)}>
                 <option value="">— Select category —</option>
                 {categories.map((c) => (
-                  <option key={c.id} value={c.name}>{c.name}</option>
+                  <option key={c} value={c}>{c}</option>
                 ))}
               </select>
             ) : (

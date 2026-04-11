@@ -86,7 +86,11 @@ function App() {
     localStorage.setItem('token', t)
     setToken(t)
     setUser({ email: payload.email })
-    navigate('/')
+    if (payload.role === 'product_manager') {
+      navigate('/product-manager')
+    } else {
+      navigate('/')
+    }
   }
 
   function handleAdminLogin(t) {

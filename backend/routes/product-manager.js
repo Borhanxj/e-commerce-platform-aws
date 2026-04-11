@@ -32,6 +32,7 @@ router.get('/products', async (req, res) => {
 
   if (search) { where.push(`name ILIKE $${idx}`); params.push(`%${search}%`); idx++; }
   if (category) { where.push(`category = $${idx}`); params.push(category); idx++; }
+  if (req.query.lowStock === 'true') { where.push(`stock < 10`); }
 
   const whereClause = where.length ? `WHERE ${where.join(' AND ')}` : '';
 
@@ -60,12 +61,16 @@ router.get('/products/:id', async (req, res) => {
 router.post('/products', async (req, res) => {
   const { name, description, price, stock, category, image_url } = req.body;
   if (!name || price == null) return res.status(400).json({ error: 'Name and price are required' });
-  if (parseFloat(price) < 0) return res.status(400).json({ error: 'Price must be non-negative' });
+  if (parseFloat(price) < 0 || Number.isNaN(parseFloat(price))) return res.status(400).json({ error: 'Price must be a non-negative number' });
+  const parsedStock = parseInt(stock, 10);
+  if (stock !== undefined && stock !== null && stock !== '' && (!Number.isFinite(parsedStock) || parsedStock < 0)) {
+    return res.status(400).json({ error: 'Stock must be a non-negative integer' });
+  }
 
   const result = await pool.query(
     `INSERT INTO products (name, description, price, stock, category, image_url)
      VALUES ($1, $2, $3, $4, $5, $6) RETURNING *`,
-    [name, description || null, price, Number.isFinite(parseInt(stock)) ? parseInt(stock) : 0, category || null, image_url || null]
+    [name, description || null, price, Number.isFinite(parsedStock) ? parsedStock : 0, category || null, image_url || null]
   );
   res.status(201).json({ product: result.rows[0] });
 });
@@ -85,10 +90,16 @@ router.put('/products/:id', async (req, res) => {
   if (name !== undefined) { sets.push(`name = $${idx}`); params.push(name); idx++; }
   if (description !== undefined) { sets.push(`description = $${idx}`); params.push(description); idx++; }
   if (price !== undefined) {
-    if (parseFloat(price) < 0) return res.status(400).json({ error: 'Price must be non-negative' });
+    if (parseFloat(price) < 0 || Number.isNaN(parseFloat(price))) return res.status(400).json({ error: 'Price must be a non-negative number' });
     sets.push(`price = $${idx}`); params.push(price); idx++;
   }
-  if (stock !== undefined) { sets.push(`stock = $${idx}`); params.push(Number.isFinite(parseInt(stock)) ? parseInt(stock) : 0); idx++; }
+  if (stock !== undefined) {
+    const parsedStock = parseInt(stock, 10);
+    if (!Number.isFinite(parsedStock) || parsedStock < 0) {
+      return res.status(400).json({ error: 'Stock must be a non-negative integer' });
+    }
+    sets.push(`stock = $${idx}`); params.push(parsedStock); idx++;
+  }
   if (category !== undefined) { sets.push(`category = $${idx}`); params.push(category); idx++; }
   if (image_url !== undefined) { sets.push(`image_url = $${idx}`); params.push(image_url); idx++; }
 
@@ -194,6 +205,11 @@ router.get('/comments', async (req, res) => {
   const limit = Math.min(100, Math.max(1, parseInt(req.query.limit) || 15));
   const offset = (page - 1) * limit;
   const status = (req.query.status || '').trim();
+  const VALID_REVIEW_STATUSES = ['pending', 'approved', 'rejected'];
+
+  if (status && !VALID_REVIEW_STATUSES.includes(status)) {
+    return res.status(400).json({ error: 'Invalid status value' });
+  }
 
   let where = [];
   let params = [];

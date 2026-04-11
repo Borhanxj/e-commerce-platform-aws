@@ -138,7 +138,7 @@ function PMOrders({ token }) {
             <div className="om-detail-grid">
               <div className="om-detail-item">
                 <span className="om-label">Customer</span>
-                <span>{detail.order?.customer_email ?? detail.customer_email ?? '—'}</span>
+                <span>{detail.order?.user_email ?? detail.user_email ?? detail.order?.customer_email ?? detail.customer_email ?? '—'}</span>
               </div>
               <div className="om-detail-item">
                 <span className="om-label">Status</span>
@@ -154,10 +154,10 @@ function PMOrders({ token }) {
                 <span className="om-label">Date</span>
                 <span>{new Date(detail.order?.created_at ?? detail.created_at).toLocaleString()}</span>
               </div>
-              {(detail.order?.shipping_address ?? detail.shipping_address) && (
+              {(detail.order?.address ?? detail.address ?? detail.order?.shipping_address ?? detail.shipping_address) && (
                 <div className="om-detail-item om-full">
                   <span className="om-label">Shipping Address</span>
-                  <span>{detail.order?.shipping_address ?? detail.shipping_address}</span>
+                  <span>{detail.order?.address ?? detail.address ?? detail.order?.shipping_address ?? detail.shipping_address}</span>
                 </div>
               )}
             </div>
@@ -170,7 +170,7 @@ function PMOrders({ token }) {
                       <tr><th>Product</th><th>Qty</th><th>Price</th></tr>
                     </thead>
                     <tbody>
-                      {(detail.items ?? detail.order?.items).map((item, i) => (
+                      {(detail.items ?? detail.order?.items ?? []).map((item, i) => (
                         <tr key={i}>
                           <td>{item.product_name ?? item.name}</td>
                           <td>{item.quantity}</td>
