@@ -569,7 +569,7 @@ function App() {
         <Route
           path="/product-manager"
           element={
-            <RequireProductManager>
+            <RequireProductManager token={token}>
               <ProductManagerDashboard
                 token={token}
                 onLogout={() => {
