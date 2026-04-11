@@ -44,10 +44,9 @@ function RequireAuth({ token, children }) {
   return children
 }
 
-function RequireProductManager({ children }) {
-  const t = localStorage.getItem('token')
-  if (!t) return <Navigate to="/login" replace />
-  const payload = decodeJwtPayload(t)
+function RequireProductManager({ token, children }) {
+  if (!token) return <Navigate to="/login" replace />
+  const payload = decodeJwtPayload(token)
   if (!payload || payload.role !== 'product_manager') return <Navigate to="/" replace />
   return children
 }
