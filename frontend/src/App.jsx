@@ -27,7 +27,6 @@ import OrdersPage from './pages/orders/OrdersPage'
 import HelpPage from './pages/help/HelpPage'
 
 import ProductManagerDashboard from './pages/product-manager/ProductManagerDashboard'
-import './App.css'
 import API_BASE from './api'
 import { decodeJwtPayload } from './utils/jwt'
 
