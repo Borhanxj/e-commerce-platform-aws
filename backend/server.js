@@ -1,12 +1,12 @@
-const express = require('express');
-const cors = require('cors');
-require('dotenv').config();
+require('dotenv').config()
 
 if (!process.env.JWT_SECRET || process.env.JWT_SECRET.trim() === '') {
-  console.error('FATAL: JWT_SECRET environment variable is not set. Exiting.');
-  process.exit(1);
+  console.error('FATAL: JWT_SECRET environment variable is not set. Exiting.')
+  process.exit(1)
 }
 
+
+const app = require('./app')
 const pool = require('./db');
 const authRouter = require('./routes/auth');
 const adminRouter = require('./routes/admin');
@@ -15,8 +15,11 @@ const adminOrdersRouter = require('./routes/admin-orders');
 const adminSettingsRouter = require('./routes/admin-settings');
 const productManagerRouter = require('./routes/product-manager');
 
-const app = express();
-const PORT = process.env.PORT || 3000;
+
+
+
+
+const PORT = process.env.PORT || 3000
 
 // Middleware
 app.use(cors());
@@ -32,14 +35,13 @@ app.use('/api/admin', adminRouter);
 // Test endpoint - çalışıyor mu diye kontrol
 app.get('/', async (req, res) => {
   try {
-    await pool.query('SELECT 1');
-    res.json({ message: 'Backend çalışıyor!', db: 'DB bağlı!' });
+    await pool.query('SELECT 1')
+    res.json({ message: 'Backend çalışıyor!', db: 'DB bağlı!' })
   } catch (err) {
-    res.status(500).json({ message: 'DB connection failed', error: err.message });
+    res.status(500).json({ message: 'DB connection failed', error: err.message })
   }
-});
+})
 
-// Sunucuyu başlat
 app.listen(PORT, () => {
-  console.log(`Server ${PORT} portunda çalışıyor`);
-});
+  console.log(`Server ${PORT} portunda çalışıyor`)
+})

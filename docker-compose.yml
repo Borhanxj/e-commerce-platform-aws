@@ -20,6 +20,8 @@ services:
       PORT: 3000
       DATABASE_URL: postgresql://postgres:postgres@db:5432/ecommerce
       JWT_SECRET: dev-secret-change-in-production
+      ADMIN_EMAIL: admin@example.com
+      ADMIN_PASSWORD: admin123456
     depends_on:
       - db
     volumes:

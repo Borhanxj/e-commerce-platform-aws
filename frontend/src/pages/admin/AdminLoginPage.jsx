@@ -1,5 +1,9 @@
 import { useState } from 'react'
-import './AdminLoginPage.css'
+import API_BASE from '../../api'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { decodeJwtPayload } from '../../utils/jwt'
 
 function AdminLoginPage({ onLogin }) {
   const [email, setEmail] = useState('')
@@ -13,7 +17,7 @@ function AdminLoginPage({ onLogin }) {
     setLoading(true)
 
     try {
-      const res = await fetch('http://localhost:3000/api/auth/login', {
+      const res = await fetch(`${API_BASE}/api/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
@@ -25,7 +29,6 @@ function AdminLoginPage({ onLogin }) {
         return
       }
 
-      // Decode JWT to check role before accepting
       const payload = decodeJwtPayload(data.token)
       if (!payload || payload.role !== 'admin') {
         setError('Access denied. Admin credentials required.')
@@ -40,15 +43,23 @@ function AdminLoginPage({ onLogin }) {
     }
   }
 
+  const inputCls =
+    'border-white/10 bg-white/5 text-[#eeeaff] placeholder:text-white/30 focus-visible:ring-purple-400/40 focus-visible:border-purple-400'
+
   return (
-    <div className="admin-login-wrapper">
-      <div className="admin-login-card">
-        <h1>Admin Panel</h1>
-        <p className="admin-login-subtitle">Sign in with your admin account</p>
-        <form onSubmit={handleSubmit} noValidate>
-          <div className="field">
-            <label htmlFor="admin-email">Email</label>
-            <input
+    <div className="flex min-h-svh items-center justify-center bg-[linear-gradient(170deg,#0e0b1c_0%,#160f2a_40%,#1a1035_70%,#100d1e_100%)] p-6">
+      <div className="w-full max-w-sm rounded-[20px] border border-white/15 bg-white/8 p-10 shadow-[0_4px_12px_rgba(0,0,0,0.2),inset_0_1px_0_rgba(255,255,255,0.14)] backdrop-blur-xl">
+        <h1 className="mb-2 text-center text-3xl font-medium text-[#eeeaff]">Admin Panel</h1>
+        <p className="mb-7 text-center text-sm text-[rgba(190,178,215,0.82)]">
+          Sign in with your admin account
+        </p>
+
+        <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-4">
+          <div className="flex flex-col gap-1.5">
+            <Label htmlFor="admin-email" className="text-[#eeeaff]">
+              Email
+            </Label>
+            <Input
               id="admin-email"
               type="email"
               autoComplete="email"
@@ -56,11 +67,15 @@ function AdminLoginPage({ onLogin }) {
               onChange={(e) => setEmail(e.target.value)}
               required
               placeholder="admin@example.com"
+              className={inputCls}
             />
           </div>
-          <div className="field">
-            <label htmlFor="admin-password">Password</label>
-            <input
+
+          <div className="flex flex-col gap-1.5">
+            <Label htmlFor="admin-password" className="text-[#eeeaff]">
+              Password
+            </Label>
+            <Input
               id="admin-password"
               type="password"
               autoComplete="current-password"
@@ -68,31 +83,35 @@ function AdminLoginPage({ onLogin }) {
               onChange={(e) => setPassword(e.target.value)}
               required
               placeholder="••••••••"
+              className={inputCls}
             />
           </div>
-          {error && <p className="admin-login-error" role="alert">{error}</p>}
-          <button type="submit" className="admin-login-btn" disabled={loading}>
+
+          {error && (
+            <p className="text-sm text-red-400" role="alert">
+              {error}
+            </p>
+          )}
+
+          <Button
+            type="submit"
+            disabled={loading}
+            className="mt-1 w-full bg-purple-400 text-[#100d1e] hover:bg-purple-300 disabled:opacity-55"
+          >
             {loading ? 'Signing in…' : 'Sign in'}
-          </button>
+          </Button>
         </form>
-        <button type="button" className="admin-login-back" onClick={() => window.location.href = '/'}>
+
+        <button
+          type="button"
+          onClick={() => (window.location.href = '/')}
+          className="mx-auto mt-5 block cursor-pointer border-0 bg-transparent p-0 text-sm text-purple-400 underline underline-offset-2 hover:opacity-75"
+        >
           Back to store
         </button>
       </div>
     </div>
   )
-}
-
-function decodeJwtPayload(token) {
-  try {
-    const parts = token.split('.')
-    if (parts.length < 3) return null
-    const base64 = parts[1].replace(/-/g, '+').replace(/_/g, '/')
-    const padded = base64 + '='.repeat((4 - (base64.length % 4)) % 4)
-    return JSON.parse(atob(padded))
-  } catch {
-    return null
-  }
 }
 
 export default AdminLoginPage

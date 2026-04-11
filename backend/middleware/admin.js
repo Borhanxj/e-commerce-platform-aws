@@ -1,8 +1,8 @@
 function requireAdmin(req, res, next) {
   if (!req.user || req.user.role !== 'admin') {
-    return res.status(403).json({ error: 'Admin access required' });
+    return res.status(403).json({ error: 'Admin access required' })
   }
-  next();
+  next()
 }
 
-module.exports = requireAdmin;
+module.exports = requireAdmin

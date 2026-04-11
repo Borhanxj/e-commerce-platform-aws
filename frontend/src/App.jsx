@@ -1,6 +1,16 @@
-import { useState } from 'react'
-import { Routes, Route, Navigate, useNavigate, useLocation } from 'react-router-dom'
+import { useState, useEffect } from 'react'
+import {
+  Routes,
+  Route,
+  Navigate,
+  useNavigate,
+  useLocation,
+  useNavigationType,
+  useSearchParams,
+} from 'react-router-dom'
 import AdminLoginPage from './pages/admin/AdminLoginPage'
+import SalesManagerLoginPage from './pages/sales-manager/SalesManagerLoginPage'
+import SalesManagerDashboard from './pages/sales-manager/SalesManagerDashboard'
 import AdminDashboard from './pages/admin/AdminDashboard'
 import LoginPage from './pages/auth/LoginPage'
 import RegisterPage from './pages/auth/RegisterPage'
@@ -8,24 +18,27 @@ import ForgotPasswordPage from './pages/auth/ForgotPasswordPage'
 import ResetPasswordPage from './pages/auth/ResetPasswordPage'
 import HomePage from './pages/home/HomePage'
 import CartPage from './pages/cart/CartPage'
+import CheckoutPage from './pages/checkout/CheckoutPage'
 import WishlistPage from './pages/wishlist/WishlistPage'
 import CategoryPage from './pages/category/CategoryPage'
+import SearchPage from './pages/search/SearchPage'
 import AccountSettingsPage from './pages/account/AccountSettingsPage'
 import OrdersPage from './pages/orders/OrdersPage'
 import HelpPage from './pages/help/HelpPage'
+
 import ProductManagerDashboard from './pages/product-manager/ProductManagerDashboard'
 import './App.css'
+import API_BASE from './api'
+import { decodeJwtPayload } from './utils/jwt'
 
-function decodeJwtPayload(token) {
-  try {
-    const parts = token.split('.')
-    if (parts.length < 3) return null
-    const base64 = parts[1].replace(/-/g, '+').replace(/_/g, '/')
-    const padded = base64 + '='.repeat((4 - (base64.length % 4)) % 4)
-    return JSON.parse(atob(padded))
-  } catch {
-    return null
-  }
+function ScrollToTop() {
+  const { pathname } = useLocation()
+  const navType = useNavigationType()
+  useEffect(() => {
+    if (navType !== 'POP') window.scrollTo(0, 0)
+  }, [pathname, navType])
+  return null
+
 }
 
 function RequireAuth({ token, children }) {
@@ -40,6 +53,13 @@ function RequireProductManager({ children }) {
   if (!payload || payload.role !== 'product_manager') return <Navigate to="/" replace />
   return children
 }
+function RequireSalesManager({ salesManagerToken, children }) {
+  if (!salesManagerToken) return <Navigate to="/sales-manager/login" replace />
+  const payload = decodeJwtPayload(salesManagerToken)
+  if (!payload || payload.role !== 'sales_manager')
+    return <Navigate to="/sales-manager/login" replace />
+  return children
+}
 
 function RequireAdmin({ adminToken, children }) {
   if (!adminToken) return <Navigate to="/admin/login" replace />
@@ -50,7 +70,14 @@ function RequireAdmin({ adminToken, children }) {
   return children
 }
 
-function CategoryRoute() {
+function CategoryRoute({
+  onAddToCart,
+  onRemoveFromCart,
+  onAddToWishlist,
+  onRemoveFromWishlist,
+  cartItems,
+  wishlistItems,
+}) {
   const { state } = useLocation()
   const navigate = useNavigate()
 
@@ -58,7 +85,44 @@ function CategoryRoute() {
     return <Navigate to="/" replace />
   }
 
-  return <CategoryPage category={state.category} onBack={() => navigate(-1)} />
+  return (
+    <CategoryPage
+      category={state.category}
+      onBack={() => navigate(-1)}
+      onAddToCart={onAddToCart}
+      onRemoveFromCart={onRemoveFromCart}
+      onAddToWishlist={onAddToWishlist}
+      onRemoveFromWishlist={onRemoveFromWishlist}
+      cartItems={cartItems}
+      wishlistItems={wishlistItems}
+    />
+  )
+}
+
+function SearchRoute({
+  onAddToCart,
+  onRemoveFromCart,
+  onAddToWishlist,
+  onRemoveFromWishlist,
+  cartItems,
+  wishlistItems,
+}) {
+  const [searchParams] = useSearchParams()
+  const navigate = useNavigate()
+  const q = searchParams.get('q') || ''
+
+  return (
+    <SearchPage
+      searchQuery={q}
+      onBack={() => navigate(-1)}
+      onAddToCart={onAddToCart}
+      onRemoveFromCart={onRemoveFromCart}
+      onAddToWishlist={onAddToWishlist}
+      onRemoveFromWishlist={onRemoveFromWishlist}
+      cartItems={cartItems}
+      wishlistItems={wishlistItems}
+    />
+  )
 }
 
 function App() {
@@ -75,22 +139,238 @@ function App() {
   })
 
   const [adminToken, setAdminToken] = useState(() => localStorage.getItem('adminToken'))
+  const [salesManagerToken, setSalesManagerToken] = useState(() => {
+    const t = localStorage.getItem('salesManagerToken')
+    if (!t) return null
+    const payload = decodeJwtPayload(t)
+    if (!payload || payload.role !== 'sales_manager') {
+      localStorage.removeItem('salesManagerToken')
+      return null
+    }
+    return t
+  })
+  const [cart, setCart] = useState(() => {
+    try {
+      return JSON.parse(localStorage.getItem('guest_cart') || '[]')
+    } catch {
+      return []
+    }
+  })
+  const [wishlist, setWishlist] = useState(() => {
+    try {
+      return JSON.parse(localStorage.getItem('guest_wishlist') || '[]')
+    } catch {
+      return []
+    }
+  })
   const navigate = useNavigate()
 
-  function handleLogin(t) {
+  useEffect(() => {
+    if (!token) localStorage.setItem('guest_cart', JSON.stringify(cart))
+  }, [cart, token])
+
+  // On mount: if already logged in, load cart and wishlist from server
+  useEffect(() => {
+    if (!token) return
+    fetch(`${API_BASE}/api/cart`, { headers: { Authorization: `Bearer ${token}` } })
+      .then((r) => r.json())
+      .then((data) => {
+        if (data.items) setCart(data.items)
+      })
+      .catch(() => {})
+    fetch(`${API_BASE}/api/wishlist`, { headers: { Authorization: `Bearer ${token}` } })
+      .then((r) => r.json())
+      .then((data) => {
+        if (data.items) setWishlist(data.items)
+      })
+      .catch(() => {})
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
+    if (!token) localStorage.setItem('guest_wishlist', JSON.stringify(wishlist))
+  }, [wishlist, token])
+
+  async function addToCart(product) {
+    if (token) {
+      const res = await fetch(`${API_BASE}/api/cart`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ productId: product.id, quantity: 1 }),
+      }).catch(() => null)
+      const data = await res?.json().catch(() => null)
+      if (data?.items) {
+        setCart(data.items)
+        return
+      }
+    }
+    setCart((prev) => {
+      const existing = prev.find((item) => item.id === product.id)
+      if (existing) {
+        return prev.map((item) =>
+          item.id === product.id ? { ...item, quantity: item.quantity + 1 } : item
+        )
+      }
+      return [...prev, { id: product.id, name: product.name, price: product.price, quantity: 1 }]
+    })
+  }
+
+  async function removeFromCart(productId) {
+    if (token) {
+      const res = await fetch(`${API_BASE}/api/cart/${productId}`, {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${token}` },
+      }).catch(() => null)
+      const data = await res?.json().catch(() => null)
+      if (data?.items) {
+        setCart(data.items)
+        return
+      }
+    }
+    setCart((prev) => prev.filter((item) => item.id !== productId))
+  }
+
+  async function updateCartQuantity(productId, quantity) {
+    if (quantity < 1) {
+      removeFromCart(productId)
+      return
+    }
+    if (token) {
+      const res = await fetch(`${API_BASE}/api/cart/${productId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ quantity }),
+      }).catch(() => null)
+      const data = await res?.json().catch(() => null)
+      if (data?.items) {
+        setCart(data.items)
+        return
+      }
+    }
+    setCart((prev) => prev.map((item) => (item.id === productId ? { ...item, quantity } : item)))
+  }
+
+  async function addToWishlist(product) {
+    if (token) {
+      const res = await fetch(`${API_BASE}/api/wishlist`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ productId: product.id }),
+      }).catch(() => null)
+      const data = await res?.json().catch(() => null)
+      if (data?.items) {
+        setWishlist(data.items)
+        return
+      }
+    }
+    setWishlist((prev) => {
+      if (prev.find((item) => item.id === product.id)) return prev
+      return [...prev, { id: product.id, name: product.name, price: product.price }]
+    })
+  }
+
+  async function removeFromWishlist(productId) {
+    if (token) {
+      const res = await fetch(`${API_BASE}/api/wishlist/${productId}`, {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${token}` },
+      }).catch(() => null)
+      const data = await res?.json().catch(() => null)
+      if (data?.items) {
+        setWishlist(data.items)
+        return
+      }
+    }
+    setWishlist((prev) => prev.filter((item) => item.id !== productId))
+  }
+
+  async function handleLogin(t) {
     const payload = decodeJwtPayload(t)
     if (!payload) {
       localStorage.removeItem('token')
       return
     }
     localStorage.setItem('token', t)
+
+    // Login: discard guest cart/wishlist and load from server
+    const [cartRes, wishlistRes] = await Promise.all([
+      fetch(`${API_BASE}/api/cart`, { headers: { Authorization: `Bearer ${t}` } }).catch(
+        () => null
+      ),
+      fetch(`${API_BASE}/api/wishlist`, { headers: { Authorization: `Bearer ${t}` } }).catch(
+        () => null
+      ),
+    ])
+    const cartData = await cartRes?.json().catch(() => null)
+    const wishlistData = await wishlistRes?.json().catch(() => null)
+
     setToken(t)
     setUser({ email: payload.email })
+
+    
+    if (cartData?.items) {
+      localStorage.removeItem('guest_cart')
+      setCart(cartData.items)
+    }
+    if (wishlistData?.items) {
+      localStorage.removeItem('guest_wishlist')
+      setWishlist(wishlistData.items)
+    }
     if (payload.role === 'product_manager') {
       navigate('/product-manager')
     } else {
       navigate('/')
     }
+  }
+
+  async function handleSignup(t) {
+    const payload = decodeJwtPayload(t)
+    if (!payload) return
+    localStorage.setItem('token', t)
+
+    // Signup: merge guest cart and wishlist into the new server records
+    const guestCartItems = cart.filter((item) => item.id)
+    const guestWishlistItems = wishlist.filter((item) => item.id)
+
+    await Promise.all([
+      ...guestCartItems.map((item) =>
+        fetch(`${API_BASE}/api/cart`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${t}` },
+          body: JSON.stringify({ productId: item.id, quantity: item.quantity }),
+        }).catch(() => {})
+      ),
+      ...guestWishlistItems.map((item) =>
+        fetch(`${API_BASE}/api/wishlist`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${t}` },
+          body: JSON.stringify({ productId: item.id }),
+        }).catch(() => {})
+      ),
+    ])
+
+    // Fetch merged cart and wishlist from server
+    const [cartRes, wishlistRes] = await Promise.all([
+      fetch(`${API_BASE}/api/cart`, { headers: { Authorization: `Bearer ${t}` } }).catch(
+        () => null
+      ),
+      fetch(`${API_BASE}/api/wishlist`, { headers: { Authorization: `Bearer ${t}` } }).catch(
+        () => null
+      ),
+    ])
+    const cartData = await cartRes?.json().catch(() => null)
+    const wishlistData = await wishlistRes?.json().catch(() => null)
+
+    setToken(t)
+    setUser({ email: payload.email })
+    if (cartData?.items) {
+      localStorage.removeItem('guest_cart')
+      setCart(cartData.items)
+    }
+    if (wishlistData?.items) {
+      localStorage.removeItem('guest_wishlist')
+      setWishlist(wishlistData.items)
+    }
+    navigate('/')
   }
 
   function handleAdminLogin(t) {
@@ -103,6 +383,29 @@ function App() {
     localStorage.removeItem('adminToken')
     setAdminToken(null)
     navigate('/admin/login')
+  }
+
+  function handleSalesManagerLogin(t) {
+    localStorage.setItem('salesManagerToken', t)
+    setSalesManagerToken(t)
+    navigate('/sales-manager')
+  }
+
+  function handleSalesManagerLogout() {
+    localStorage.removeItem('salesManagerToken')
+    setSalesManagerToken(null)
+    navigate('/sales-manager/login')
+  }
+
+  function handleLogout() {
+    localStorage.removeItem('guest_cart')
+    localStorage.removeItem('guest_wishlist')
+    localStorage.removeItem('token')
+    setToken(null)
+    setUser(null)
+    setCart([])
+    setWishlist([])
+    navigate('/')
   }
 
   function requireAuth() {
@@ -118,61 +421,185 @@ function App() {
   }
 
   return (
-    <Routes>
-      <Route path="/" element={
-        <HomePage
-          isLoggedIn={!!token}
-          userEmail={user?.email}
-          onNavigate={handleNavigate}
-          onRequireAuth={requireAuth}
-          onLogout={() => { localStorage.removeItem('token'); setToken(null); setUser(null); navigate('/') }}
+    <>
+      <ScrollToTop />
+      <Routes>
+        <Route
+          path="/"
+          element={
+            <HomePage
+              isLoggedIn={!!token}
+              userEmail={user?.email}
+              onNavigate={handleNavigate}
+              onRequireAuth={requireAuth}
+              onLogout={handleLogout}
+              cartCount={cart.reduce((sum, item) => sum + item.quantity, 0)}
+              wishlistCount={wishlist.length}
+              onAddToCart={addToCart}
+            />
+          }
         />
-      } />
-      <Route path="/login" element={
-        <LoginPage
-          onLogin={handleLogin}
-          onRegister={() => navigate('/register')}
-          onForgotPassword={() => navigate('/forgot-password')}
+        <Route
+          path="/login"
+          element={
+            <LoginPage
+              onLogin={handleLogin}
+              onRegister={() => navigate('/register')}
+              onForgotPassword={() => navigate('/forgot-password')}
+            />
+          }
         />
-      } />
-      <Route path="/register"        element={<RegisterPage onBack={() => navigate('/login')} />} />
-      <Route path="/forgot-password" element={<ForgotPasswordPage onBack={() => navigate('/login')} />} />
-      <Route path="/reset-password"  element={<ResetPasswordPage onBack={() => navigate('/login')} />} />
-      <Route path="/cart"             element={<CartPage onBack={() => navigate(-1)} />} />
-      <Route path="/wishlist"         element={<WishlistPage onBack={() => navigate(-1)} />} />
-      <Route path="/category"         element={<CategoryRoute />} />
-      <Route path="/account-settings" element={
-        <RequireAuth token={token}>
-          <AccountSettingsPage onBack={() => navigate(-1)} token={token} />
-        </RequireAuth>
-      } />
-      <Route path="/orders"           element={
-        <RequireAuth token={token}>
-          <OrdersPage onBack={() => navigate(-1)} />
-        </RequireAuth>
-      } />
-      <Route path="/help"             element={<HelpPage onBack={() => navigate(-1)} />} />
+        <Route
+          path="/register"
+          element={<RegisterPage onBack={() => navigate('/login')} onSignup={handleSignup} />}
+        />
+        <Route
+          path="/forgot-password"
+          element={<ForgotPasswordPage onBack={() => navigate('/login')} />}
+        />
+        <Route
+          path="/reset-password"
+          element={<ResetPasswordPage onBack={() => navigate('/login')} />}
+        />
+        <Route
+          path="/cart"
+          element={
+            <CartPage
+              onBack={() => navigate(-1)}
+              cartItems={cart}
+              onRemove={removeFromCart}
+              onUpdateQuantity={updateCartQuantity}
+              onAddToWishlist={addToWishlist}
+              wishlistItems={wishlist}
+              isLoggedIn={!!token}
+              token={token}
+            />
+          }
+        />
+        <Route
+          path="/checkout"
+          element={
+            <RequireAuth token={token}>
+              <CheckoutPage
+                cartItems={cart}
+                token={token}
+                onOrderConfirmed={() => {
+                  setCart([])
+                  navigate('/orders')
+                }}
+              />
+            </RequireAuth>
+          }
+        />
+        <Route
+          path="/wishlist"
+          element={
+            <WishlistPage
+              onBack={() => navigate(-1)}
+              wishlistItems={wishlist}
+              onRemove={removeFromWishlist}
+              onAddToCart={addToCart}
+              onRemoveFromCart={removeFromCart}
+              cartItems={cart}
+            />
+          }
+        />
+        <Route
+          path="/category"
+          element={
+            <CategoryRoute
+              onAddToCart={addToCart}
+              onRemoveFromCart={removeFromCart}
+              onAddToWishlist={addToWishlist}
+              onRemoveFromWishlist={removeFromWishlist}
+              cartItems={cart}
+              wishlistItems={wishlist}
+            />
+          }
+        />
+        <Route
+          path="/search"
+          element={
+            <SearchRoute
+              onAddToCart={addToCart}
+              onRemoveFromCart={removeFromCart}
+              onAddToWishlist={addToWishlist}
+              onRemoveFromWishlist={removeFromWishlist}
+              cartItems={cart}
+              wishlistItems={wishlist}
+            />
+          }
+        />
+        <Route
+          path="/account-settings"
+          element={
+            <RequireAuth token={token}>
+              <AccountSettingsPage onBack={() => navigate(-1)} token={token} />
+            </RequireAuth>
+          }
+        />
+        <Route
+          path="/orders"
+          element={
+            <RequireAuth token={token}>
+              <OrdersPage onBack={() => navigate(-1)} />
+            </RequireAuth>
+          }
+        />
+        <Route path="/help" element={<HelpPage onBack={() => navigate(-1)} />} />
 
-      {/* Admin routes */}
-      <Route path="/admin/login" element={
-        adminToken ? <Navigate to="/admin" replace /> : <AdminLoginPage onLogin={handleAdminLogin} />
-      } />
-      <Route path="/admin" element={
-        <RequireAdmin adminToken={adminToken}>
-          <AdminDashboard token={adminToken} onLogout={handleAdminLogout} />
-        </RequireAdmin>
-      } />
-
-      <Route path="/product-manager" element={
+        {/* Sales manager routes */}
+        <Route
+          path="/sales-manager/login"
+          element={
+            salesManagerToken ? (
+              <Navigate to="/sales-manager" replace />
+            ) : (
+              <SalesManagerLoginPage onLogin={handleSalesManagerLogin} />
+            )
+          }
+        />
+        <Route
+          path="/sales-manager"
+          element={
+            <RequireSalesManager salesManagerToken={salesManagerToken}>
+              <SalesManagerDashboard
+                token={salesManagerToken}
+                onLogout={handleSalesManagerLogout}
+              />
+            </RequireSalesManager>
+          }
+        />
+        <Route path="/product-manager" element={
         <RequireProductManager>
           <ProductManagerDashboard token={token} onLogout={() => {
             localStorage.removeItem('token'); setToken(null); setUser(null); navigate('/login')
           }} />
         </RequireProductManager>
       } />
+        {/* Admin routes */}
+        <Route
+          path="/admin/login"
+          element={
+            adminToken ? (
+              <Navigate to="/admin" replace />
+            ) : (
+              <AdminLoginPage onLogin={handleAdminLogin} />
+            )
+          }
+        />
+        <Route
+          path="/admin"
+          element={
+            <RequireAdmin adminToken={adminToken}>
+              <AdminDashboard token={adminToken} onLogout={handleAdminLogout} />
+            </RequireAdmin>
+          }
+        />
 
-      <Route path="*"                 element={<Navigate to="/" replace />} />
-    </Routes>
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    </>
   )
 }
 

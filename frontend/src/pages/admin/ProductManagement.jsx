@@ -1,8 +1,30 @@
 import { useState, useEffect, useCallback } from 'react'
+import API_BASE from '../../api'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table'
+import { Badge } from '@/components/ui/badge'
+import { Input } from '@/components/ui/input'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import {
+  btnBase,
+  btnCreate,
+  btnSearch,
+  btnEdit,
+  btnDelete,
+  btnDanger,
+  fieldInputClass,
+} from '../../styles/dashboardStyles'
 
-const API = 'http://localhost:3000/api/admin/products'
+const API = `${API_BASE}/api/admin/products`
 
 function ProductManagement({ token }) {
+  // ... rest of state stays same ...
   const [products, setProducts] = useState([])
   const [pagination, setPagination] = useState({ page: 1, limit: 10, total: 0, totalPages: 0 })
   const [search, setSearch] = useState('')
@@ -13,25 +35,32 @@ function ProductManagement({ token }) {
 
   const authHeaders = { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' }
 
-  const fetchProducts = useCallback(async (page = 1) => {
-    setLoading(true)
-    setError('')
-    try {
-      const params = new URLSearchParams({ page, limit: 10 })
-      if (search) params.set('search', search)
-      const res = await fetch(`${API}?${params}`, { headers: { Authorization: `Bearer ${token}` } })
-      if (!res.ok) throw new Error('Failed to fetch products')
-      const data = await res.json()
-      setProducts(data.products)
-      setPagination(data.pagination)
-    } catch (err) {
-      setError(err.message)
-    } finally {
-      setLoading(false)
-    }
-  }, [token, search])
+  const fetchProducts = useCallback(
+    async (page = 1) => {
+      setLoading(true)
+      setError('')
+      try {
+        const params = new URLSearchParams({ page, limit: 10 })
+        if (search) params.set('search', search)
+        const res = await fetch(`${API}?${params}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        })
+        if (!res.ok) throw new Error('Failed to fetch products')
+        const data = await res.json()
+        setProducts(data.products)
+        setPagination(data.pagination)
+      } catch (err) {
+        setError(err.message)
+      } finally {
+        setLoading(false)
+      }
+    },
+    [token, search]
+  )
 
-  useEffect(() => { fetchProducts(1) }, [fetchProducts])
+  useEffect(() => {
+    fetchProducts(1)
+  }, [fetchProducts])
 
   function handleSearch(e) {
     e.preventDefault()
@@ -39,7 +68,11 @@ function ProductManagement({ token }) {
   }
 
   async function handleCreate(formData) {
-    const res = await fetch(API, { method: 'POST', headers: authHeaders, body: JSON.stringify(formData) })
+    const res = await fetch(API, {
+      method: 'POST',
+      headers: authHeaders,
+      body: JSON.stringify(formData),
+    })
     const data = await res.json()
     if (!res.ok) throw new Error(data.error || 'Failed to create product')
     setModal(null)
@@ -47,7 +80,11 @@ function ProductManagement({ token }) {
   }
 
   async function handleUpdate(productId, formData) {
-    const res = await fetch(`${API}/${productId}`, { method: 'PUT', headers: authHeaders, body: JSON.stringify(formData) })
+    const res = await fetch(`${API}/${productId}`, {
+      method: 'PUT',
+      headers: authHeaders,
+      body: JSON.stringify(formData),
+    })
     const data = await res.json()
     if (!res.ok) throw new Error(data.error || 'Failed to update product')
     setModal(null)
@@ -69,74 +106,139 @@ function ProductManagement({ token }) {
     }
   }
 
+  function stockBadgeClass(stock) {
+    const n = parseInt(stock)
+    if (n === 0) return 'bg-purple-400/12 text-purple-400 border-0'
+    if (n < 10) return 'bg-amber-500/10 text-amber-400 border-0'
+    return 'bg-emerald-500/10 text-emerald-400 border-0'
+  }
+
   return (
-    <div className="um">
-      <div className="um-toolbar">
-        <form className="um-search-form" onSubmit={handleSearch}>
-          <input
+    <div>
+      {/* Toolbar */}
+      <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
+        <form className="flex min-w-0 flex-1 gap-2" onSubmit={handleSearch}>
+          <Input
             type="text"
-            className="um-search"
+            className="min-w-[140px] flex-1 border-[var(--border)] bg-[var(--card-bg)] text-[var(--text-h)] placeholder:text-[var(--text)]/40"
             placeholder="Search by name…"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
-          <button type="submit" className="um-btn um-btn-search">Search</button>
+          <button type="submit" className={btnSearch}>
+            Search
+          </button>
         </form>
-        <button className="um-btn um-btn-create" onClick={() => setModal({ mode: 'create' })}>
+        <button className={btnCreate} onClick={() => setModal({ mode: 'create' })}>
           + New Product
         </button>
       </div>
 
-      {error && <p className="um-error">{error}</p>}
+      {error && <p className="mb-4 text-sm text-red-400">{error}</p>}
 
-      <div className="um-table-wrap">
-        <table className="um-table">
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Name</th>
-              <th>Category</th>
-              <th>Price</th>
-              <th>Stock</th>
-              <th>Created</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
+      {/* Table */}
+      <div className="overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--card-bg)] shadow-[var(--shadow)] backdrop-blur-xl">
+        <Table>
+          <TableHeader>
+            <TableRow className="border-[var(--border)] hover:bg-transparent">
+              <TableHead className="bg-purple-400/12 text-xs tracking-wide text-[var(--text)] uppercase">
+                ID
+              </TableHead>
+              <TableHead className="bg-purple-400/12 text-xs tracking-wide text-[var(--text)] uppercase">
+                Name
+              </TableHead>
+              <TableHead className="bg-purple-400/12 text-xs tracking-wide text-[var(--text)] uppercase">
+                Category
+              </TableHead>
+              <TableHead className="bg-purple-400/12 text-xs tracking-wide text-[var(--text)] uppercase">
+                Price
+              </TableHead>
+              <TableHead className="bg-purple-400/12 text-xs tracking-wide text-[var(--text)] uppercase">
+                Stock
+              </TableHead>
+              <TableHead className="bg-purple-400/12 text-xs tracking-wide text-[var(--text)] uppercase">
+                Created
+              </TableHead>
+              <TableHead className="bg-purple-400/12 text-xs tracking-wide text-[var(--text)] uppercase">
+                Actions
+              </TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
             {loading ? (
-              <tr><td colSpan="7" className="um-empty">Loading…</td></tr>
+              <TableRow className="border-[var(--border)]">
+                <TableCell colSpan={7} className="py-8 text-center text-[var(--text)]">
+                  Loading…
+                </TableCell>
+              </TableRow>
             ) : products.length === 0 ? (
-              <tr><td colSpan="7" className="um-empty">No products found</td></tr>
-            ) : products.map((p) => (
-              <tr key={p.id}>
-                <td>{p.id}</td>
-                <td>{p.name}</td>
-                <td>{p.category || '—'}</td>
-                <td>${parseFloat(p.price).toFixed(2)}</td>
-                <td>
-                  <span className={`um-role-badge ${parseInt(p.stock) === 0 ? 'um-role-admin' : parseInt(p.stock) < 10 ? 'um-role-product_manager' : 'um-role-sales_manager'}`}>
-                    {p.stock}
-                  </span>
-                </td>
-                <td>{new Date(p.created_at).toLocaleDateString()}</td>
-                <td className="um-actions">
-                  <button className="um-btn um-btn-edit" onClick={() => setModal({ mode: 'edit', product: p })}>Edit</button>
-                  <button className="um-btn um-btn-delete" onClick={() => setDeleteConfirm(p)}>Delete</button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+              <TableRow className="border-[var(--border)]">
+                <TableCell colSpan={7} className="py-8 text-center text-[var(--text)]">
+                  No products found
+                </TableCell>
+              </TableRow>
+            ) : (
+              products.map((p) => (
+                <TableRow
+                  key={p.id}
+                  className="border-[var(--border)] transition-colors hover:bg-purple-400/5"
+                >
+                  <TableCell className="font-mono text-xs text-[var(--text-h)]">{p.id}</TableCell>
+                  <TableCell className="text-[var(--text-h)]">{p.name}</TableCell>
+                  <TableCell className="text-[var(--text-h)]">{p.category || '—'}</TableCell>
+                  <TableCell className="text-[var(--text-h)]">
+                    ${parseFloat(p.price).toFixed(2)}
+                  </TableCell>
+                  <TableCell>
+                    <Badge className={stockBadgeClass(p.stock)}>{p.stock}</Badge>
+                  </TableCell>
+                  <TableCell className="text-[var(--text-h)]">
+                    {new Date(p.created_at).toLocaleDateString()}
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex gap-1.5">
+                      <button
+                        className={btnEdit}
+                        onClick={() => setModal({ mode: 'edit', product: p })}
+                      >
+                        Edit
+                      </button>
+                      <button className={btnDelete} onClick={() => setDeleteConfirm(p)}>
+                        Delete
+                      </button>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))
+            )}
+          </TableBody>
+        </Table>
       </div>
 
+      {/* Pagination */}
       {pagination.totalPages > 1 && (
-        <div className="um-pagination">
-          <button className="um-btn" disabled={pagination.page <= 1} onClick={() => fetchProducts(pagination.page - 1)}>Previous</button>
-          <span className="um-page-info">Page {pagination.page} of {pagination.totalPages} ({pagination.total} products)</span>
-          <button className="um-btn" disabled={pagination.page >= pagination.totalPages} onClick={() => fetchProducts(pagination.page + 1)}>Next</button>
+        <div className="mt-5 flex items-center justify-center gap-4">
+          <button
+            className={btnBase}
+            disabled={pagination.page <= 1}
+            onClick={() => fetchProducts(pagination.page - 1)}
+          >
+            Previous
+          </button>
+          <span className="text-[13px] text-[var(--text)]">
+            Page {pagination.page} of {pagination.totalPages} ({pagination.total} products)
+          </span>
+          <button
+            className={btnBase}
+            disabled={pagination.page >= pagination.totalPages}
+            onClick={() => fetchProducts(pagination.page + 1)}
+          >
+            Next
+          </button>
         </div>
       )}
 
+      {/* Create / Edit Modal */}
       {modal && (
         <ProductModal
           mode={modal.mode}
@@ -147,23 +249,33 @@ function ProductManagement({ token }) {
         />
       )}
 
-      {deleteConfirm && (
-        <div className="um-overlay" onClick={() => setDeleteConfirm(null)}>
-          <div className="um-modal" onClick={(e) => e.stopPropagation()}>
-            <h2>Delete Product</h2>
-            <p>Are you sure you want to delete <strong>{deleteConfirm.name}</strong>? This action cannot be undone.</p>
-            <div className="um-modal-actions">
-              <button className="um-btn" onClick={() => setDeleteConfirm(null)}>Cancel</button>
-              <button className="um-btn um-btn-danger" onClick={() => handleDelete(deleteConfirm.id)}>Delete</button>
-            </div>
+      {/* Delete Confirmation */}
+      <Dialog open={!!deleteConfirm} onOpenChange={(open) => !open && setDeleteConfirm(null)}>
+        <DialogContent className="max-w-md rounded-2xl border border-[var(--glass-border)] bg-[var(--card-bg)] shadow-[var(--shadow)] backdrop-blur-xl">
+          <DialogHeader>
+            <DialogTitle className="text-xl text-[var(--text-h)]">Delete Product</DialogTitle>
+          </DialogHeader>
+          <p className="mb-5 leading-relaxed text-[var(--text)]">
+            Are you sure you want to delete{' '}
+            <strong className="text-[var(--text-h)]">{deleteConfirm?.name}</strong>? This action
+            cannot be undone.
+          </p>
+          <div className="flex justify-end gap-2">
+            <button className={btnBase} onClick={() => setDeleteConfirm(null)}>
+              Cancel
+            </button>
+            <button className={btnDanger} onClick={() => handleDelete(deleteConfirm.id)}>
+              Delete
+            </button>
           </div>
-        </div>
-      )}
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }
 
 function ProductModal({ mode, product, onClose, onCreate, onUpdate }) {
+  // ... rest of state stays same ...
   const [name, setName] = useState(product?.name || '')
   const [description, setDescription] = useState(product?.description || '')
   const [price, setPrice] = useState(product?.price || '')
@@ -179,7 +291,14 @@ function ProductModal({ mode, product, onClose, onCreate, onUpdate }) {
     setSaving(true)
     try {
       const parsedStock = parseInt(stock, 10)
-      const body = { name, description, price: parseFloat(price), stock: Number.isNaN(parsedStock) ? 0 : parsedStock, category, image_url: imageUrl }
+      const body = {
+        name,
+        description,
+        price: parseFloat(price),
+        stock: Number.isNaN(parsedStock) ? 0 : parsedStock,
+        category,
+        image_url: imageUrl,
+      }
       if (mode === 'create') {
         await onCreate(body)
       } else {
@@ -193,46 +312,93 @@ function ProductModal({ mode, product, onClose, onCreate, onUpdate }) {
   }
 
   return (
-    <div className="um-overlay" onClick={onClose}>
-      <div className="um-modal" onClick={(e) => e.stopPropagation()}>
-        <h2>{mode === 'create' ? 'Create Product' : 'Edit Product'}</h2>
+    <Dialog open onOpenChange={(open) => !open && onClose()}>
+      <DialogContent className="max-w-md rounded-2xl border border-[var(--glass-border)] bg-[var(--card-bg)] shadow-[var(--shadow)] backdrop-blur-xl">
+        <DialogHeader>
+          <DialogTitle className="text-xl text-[var(--text-h)]">
+            {mode === 'create' ? 'Create Product' : 'Edit Product'}
+          </DialogTitle>
+        </DialogHeader>
         <form onSubmit={handleSubmit}>
-          <div className="um-field">
-            <label>Name</label>
-            <input type="text" value={name} onChange={(e) => setName(e.target.value)} required placeholder="Product name" />
+          <div className="mb-4 flex flex-col gap-1.5">
+            <label className="text-[13px] font-medium text-[var(--text-h)]">Name</label>
+            <input
+              type="text"
+              className={fieldInputClass}
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              required
+              placeholder="Product name"
+            />
           </div>
-          <div className="um-field">
-            <label>Description</label>
-            <input type="text" value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Brief description" />
+          <div className="mb-4 flex flex-col gap-1.5">
+            <label className="text-[13px] font-medium text-[var(--text-h)]">Description</label>
+            <input
+              type="text"
+              className={fieldInputClass}
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              placeholder="Brief description"
+            />
           </div>
-          <div className="um-field-row">
-            <div className="um-field">
-              <label>Price ($)</label>
-              <input type="number" step="0.01" min="0" value={price} onChange={(e) => setPrice(e.target.value)} required placeholder="0.00" />
+          <div className="mb-4 flex gap-3">
+            <div className="flex flex-1 flex-col gap-1.5">
+              <label className="text-[13px] font-medium text-[var(--text-h)]">Price ($)</label>
+              <input
+                type="number"
+                step="0.01"
+                min="0"
+                className={fieldInputClass}
+                value={price}
+                onChange={(e) => setPrice(e.target.value)}
+                required
+                placeholder="0.00"
+              />
             </div>
-            <div className="um-field">
-              <label>Stock</label>
-              <input type="number" min="0" value={stock} onChange={(e) => setStock(e.target.value)} placeholder="0" />
+            <div className="flex flex-1 flex-col gap-1.5">
+              <label className="text-[13px] font-medium text-[var(--text-h)]">Stock</label>
+              <input
+                type="number"
+                min="0"
+                className={fieldInputClass}
+                value={stock}
+                onChange={(e) => setStock(e.target.value)}
+                placeholder="0"
+              />
             </div>
           </div>
-          <div className="um-field">
-            <label>Category</label>
-            <input type="text" value={category} onChange={(e) => setCategory(e.target.value)} placeholder="e.g. Footwear" />
+          <div className="mb-4 flex flex-col gap-1.5">
+            <label className="text-[13px] font-medium text-[var(--text-h)]">Category</label>
+            <input
+              type="text"
+              className={fieldInputClass}
+              value={category}
+              onChange={(e) => setCategory(e.target.value)}
+              placeholder="e.g. Footwear"
+            />
           </div>
-          <div className="um-field">
-            <label>Image URL</label>
-            <input type="text" value={imageUrl} onChange={(e) => setImageUrl(e.target.value)} placeholder="https://…" />
+          <div className="mb-4 flex flex-col gap-1.5">
+            <label className="text-[13px] font-medium text-[var(--text-h)]">Image URL</label>
+            <input
+              type="text"
+              className={fieldInputClass}
+              value={imageUrl}
+              onChange={(e) => setImageUrl(e.target.value)}
+              placeholder="https://…"
+            />
           </div>
-          {error && <p className="um-error">{error}</p>}
-          <div className="um-modal-actions">
-            <button type="button" className="um-btn" onClick={onClose}>Cancel</button>
-            <button type="submit" className="um-btn um-btn-create" disabled={saving}>
+          {error && <p className="mb-4 text-sm text-red-400">{error}</p>}
+          <div className="mt-6 flex justify-end gap-2">
+            <button type="button" className={btnBase} onClick={onClose}>
+              Cancel
+            </button>
+            <button type="submit" className={btnCreate} disabled={saving}>
               {saving ? 'Saving…' : mode === 'create' ? 'Create' : 'Save Changes'}
             </button>
           </div>
         </form>
-      </div>
-    </div>
+      </DialogContent>
+    </Dialog>
   )
 }
 

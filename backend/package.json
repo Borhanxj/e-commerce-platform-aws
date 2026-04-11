@@ -4,10 +4,14 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "migrate:up": "node-pg-migrate up --migrations-dir migrations/scripts",
-    "migrate:down": "node-pg-migrate down --migrations-dir migrations/scripts",
-    "seed:admin": "node scripts/seed-admin.js"
+    "test": "jest",
+    "lint": "eslint .",
+    "format:check": "prettier --check .",
+    "format": "prettier --write .",
+    "migrate:up": "node-pg-migrate up --migrations-dir migrations",
+    "migrate:down": "node-pg-migrate down --migrations-dir migrations",
+    "seed:admin": "node scripts/seed-admin.js",
+    "dev": "nodemon server.js"
   },
   "keywords": [],
   "author": "",
@@ -20,6 +24,15 @@
     "express": "^5.2.1",
     "jsonwebtoken": "^9.0.3",
     "node-pg-migrate": "^8.0.4",
+    "nodemon": "^3.1.10",
     "pg": "^8.20.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "eslint": "^10.1.0",
+    "globals": "^17.4.0",
+    "jest": "^29.7.0",
+    "prettier": "^3.8.1",
+    "supertest": "^7.1.0"
   }
 }

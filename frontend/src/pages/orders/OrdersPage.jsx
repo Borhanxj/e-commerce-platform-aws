@@ -1,18 +1,21 @@
 import { useState, useEffect, useRef } from 'react'
-import './OrdersPage.css'
 
 /* ── Mock data ───────────────────────────────────────────── */
 
 const TIMELINE_STEPS = [
-  { key: 'placed',            label: 'Order Placed' },
-  { key: 'processing',        label: 'Processing' },
-  { key: 'shipped',           label: 'Shipped' },
-  { key: 'out_for_delivery',  label: 'Out for Delivery' },
-  { key: 'delivered',         label: 'Delivered' },
+  { key: 'placed', label: 'Order Placed' },
+  { key: 'processing', label: 'Processing' },
+  { key: 'shipped', label: 'Shipped' },
+  { key: 'out_for_delivery', label: 'Out for Delivery' },
+  { key: 'delivered', label: 'Delivered' },
 ]
 
 const STATUS_INDEX = {
-  placed: 0, processing: 1, shipped: 2, out_for_delivery: 3, delivered: 4,
+  placed: 0,
+  processing: 1,
+  shipped: 2,
+  out_for_delivery: 3,
+  delivered: 4,
 }
 
 const CURRENT_ORDERS = [
@@ -23,9 +26,7 @@ const CURRENT_ORDERS = [
     status: 'out_for_delivery',
     placedDate: '21 Mar 2026',
     estimatedDelivery: '23 Mar 2026',
-    items: [
-      { name: 'Leather Chelsea Boots', variant: 'EU 42', qty: 1, price: 149.99, hue: 160 },
-    ],
+    items: [{ name: 'Leather Chelsea Boots', variant: 'EU 42', qty: 1, price: 149.99, hue: 160 }],
     total: 149.99,
   },
   {
@@ -36,8 +37,8 @@ const CURRENT_ORDERS = [
     placedDate: '20 Mar 2026',
     estimatedDelivery: '25 Mar 2026',
     items: [
-      { name: 'Oversized Linen Shirt', variant: 'Size M',     qty: 1, price: 79.99,  hue: 280 },
-      { name: 'Slim Fit Chinos',       variant: '32W 32L',    qty: 1, price: 69.99,  hue: 210 },
+      { name: 'Oversized Linen Shirt', variant: 'Size M', qty: 1, price: 79.99, hue: 280 },
+      { name: 'Slim Fit Chinos', variant: '32W 32L', qty: 1, price: 69.99, hue: 210 },
     ],
     total: 149.98,
   },
@@ -49,8 +50,8 @@ const PAST_ORDERS = [
     date: '18 Mar 2026',
     status: 'delivered',
     items: [
-      { name: 'Ribbed Midi Dress',   variant: 'Size S', qty: 1, price: 94.99, hue: 340 },
-      { name: 'Structured Tote',     variant: 'Black',  qty: 1, price: 139.99, hue: 40 },
+      { name: 'Ribbed Midi Dress', variant: 'Size S', qty: 1, price: 94.99, hue: 340 },
+      { name: 'Structured Tote', variant: 'Black', qty: 1, price: 139.99, hue: 40 },
     ],
     total: 234.98,
   },
@@ -58,9 +59,7 @@ const PAST_ORDERS = [
     id: 'ORD-2756',
     date: '10 Mar 2026',
     status: 'delivered',
-    items: [
-      { name: 'Merino Polo',         variant: 'Size L / Navy',   qty: 2, price: 89.99, hue: 190 },
-    ],
+    items: [{ name: 'Merino Polo', variant: 'Size L / Navy', qty: 2, price: 89.99, hue: 190 }],
     total: 179.98,
   },
   {
@@ -68,8 +67,8 @@ const PAST_ORDERS = [
     date: '2 Mar 2026',
     status: 'delivered',
     items: [
-      { name: 'Cropped Blazer',      variant: 'Size 10 / Camel', qty: 1, price: 179.99, hue: 260 },
-      { name: 'Leather Belt',        variant: 'S/M',             qty: 1, price: 44.99,  hue: 40  },
+      { name: 'Cropped Blazer', variant: 'Size 10 / Camel', qty: 1, price: 179.99, hue: 260 },
+      { name: 'Leather Belt', variant: 'S/M', qty: 1, price: 44.99, hue: 40 },
     ],
     total: 224.98,
   },
@@ -77,9 +76,7 @@ const PAST_ORDERS = [
     id: 'ORD-2680',
     date: '25 Feb 2026',
     status: 'delivered',
-    items: [
-      { name: 'Trench Coat',         variant: 'Size 12 / Beige', qty: 1, price: 189.99, hue: 200 },
-    ],
+    items: [{ name: 'Trench Coat', variant: 'Size 12 / Beige', qty: 1, price: 189.99, hue: 200 }],
     total: 189.99,
   },
 ]
@@ -88,15 +85,34 @@ const PAST_ORDERS = [
 
 function BackIcon() {
   return (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <line x1="19" y1="12" x2="5" y2="12" /><polyline points="12 19 5 12 12 5" />
+    <svg
+      width="20"
+      height="20"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <line x1="19" y1="12" x2="5" y2="12" />
+      <polyline points="12 19 5 12 12 5" />
     </svg>
   )
 }
 
 function CheckIcon() {
   return (
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+    <svg
+      width="14"
+      height="14"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
       <polyline points="20 6 9 17 4 12" />
     </svg>
   )
@@ -104,7 +120,16 @@ function CheckIcon() {
 
 function ChevronDownIcon() {
   return (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <svg
+      width="16"
+      height="16"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
       <polyline points="6 9 12 15 18 9" />
     </svg>
   )
@@ -112,10 +137,40 @@ function ChevronDownIcon() {
 
 function CopyIcon() {
   return (
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <rect x="9" y="9" width="13" height="13" rx="2" /><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" />
+    <svg
+      width="14"
+      height="14"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <rect x="9" y="9" width="13" height="13" rx="2" />
+      <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" />
     </svg>
   )
+}
+
+/* ── Status pill helper ──────────────────────────────────── */
+
+function statusPillClass(status) {
+  const base = 'inline-block text-[11px] font-bold tracking-[0.5px] px-2.5 py-1 rounded-full'
+  switch (status) {
+    case 'placed':
+      return `${base} bg-slate-500/15 text-slate-500`
+    case 'processing':
+      return `${base} bg-amber-500/15 text-amber-600`
+    case 'shipped':
+      return `${base} bg-blue-500/15 text-blue-500`
+    case 'out_for_delivery':
+      return `${base} bg-purple-400/15 text-purple-400`
+    case 'delivered':
+      return `${base} bg-green-500/15 text-green-600`
+    default:
+      return base
+  }
 }
 
 /* ── Sub-components ──────────────────────────────────────── */
@@ -123,17 +178,37 @@ function CopyIcon() {
 function DeliveryTimeline({ status }) {
   const activeIdx = STATUS_INDEX[status] ?? 0
   return (
-    <div className="timeline">
+    <div className="mb-6 flex items-start overflow-x-auto pb-1">
       {TIMELINE_STEPS.map((step, i) => {
-        const done    = i < activeIdx
+        const done = i < activeIdx
         const current = i === activeIdx
         return (
-          <div key={step.key} className={`timeline-step${done ? ' done' : ''}${current ? ' current' : ''}`}>
-            {i > 0 && <div className={`timeline-connector${i <= activeIdx ? ' filled' : ''}`} />}
-            <div className="timeline-dot">
-              {done ? <CheckIcon /> : null}
+          <div key={step.key} className="relative flex min-w-[80px] flex-1 flex-col items-center">
+            {i > 0 && (
+              <div
+                className={`absolute top-[13px] right-1/2 z-0 h-0.5 w-full ${i <= activeIdx ? 'bg-purple-400' : 'bg-[var(--border)]'}`}
+              />
+            )}
+            <div
+              className={`relative z-[1] flex h-7 w-7 items-center justify-center rounded-full border-2 transition-colors ${
+                done
+                  ? 'border-purple-400 bg-purple-400 text-white'
+                  : current
+                    ? 'border-purple-400 bg-[var(--bg)] text-[var(--text)] shadow-[0_0_0_4px_rgba(192,132,252,0.12)]'
+                    : 'border-[var(--border)] bg-[var(--bg)] text-[var(--text)]'
+              }`}
+            >
+              {done ? (
+                <CheckIcon />
+              ) : current ? (
+                <span className="block h-2.5 w-2.5 rounded-full bg-purple-400" />
+              ) : null}
             </div>
-            <span className="timeline-label">{step.label}</span>
+            <span
+              className={`mt-2 text-center text-[11px] leading-[1.3] font-medium ${done || current ? 'font-semibold text-[var(--text-h)]' : 'text-[var(--text)]'}`}
+            >
+              {step.label}
+            </span>
           </div>
         )
       })}
@@ -159,13 +234,27 @@ function TrackingRow({ code, carrier }) {
   }
 
   return (
-    <div className="tracking-row">
-      <div className="tracking-info">
-        <span className="tracking-carrier">{carrier}</span>
-        <span className="tracking-code">{code}</span>
+    <div className="mb-5 flex items-center justify-between gap-3 rounded-lg border border-[var(--border)] bg-[var(--bg)] px-4 py-3">
+      <div className="flex flex-col gap-0.5">
+        <span className="text-[11px] font-bold tracking-[1.5px] text-[var(--text)] uppercase">
+          {carrier}
+        </span>
+        <span className="font-mono text-[15px] font-bold tracking-[1px] text-[var(--text-h)]">
+          {code}
+        </span>
       </div>
-      <button className="copy-btn" onClick={copy} aria-label="Copy tracking code">
-        {copied ? 'Copied!' : <><CopyIcon /> Copy</>}
+      <button
+        className="flex cursor-pointer items-center gap-1.5 rounded-[7px] border border-[var(--border)] bg-transparent px-3 py-1.5 text-xs font-semibold whitespace-nowrap text-[var(--text)] transition-colors hover:border-purple-400 hover:text-purple-400"
+        onClick={copy}
+        aria-label="Copy tracking code"
+      >
+        {copied ? (
+          'Copied!'
+        ) : (
+          <>
+            <CopyIcon /> Copy
+          </>
+        )}
       </button>
     </div>
   )
@@ -173,17 +262,35 @@ function TrackingRow({ code, carrier }) {
 
 function OrderItems({ items }) {
   return (
-    <ul className="order-items">
+    <ul className="m-0 mb-4 flex list-none flex-col gap-3 p-0">
       {items.map((item, i) => (
-        <li key={i} className="order-item">
-          <div className="order-item-thumb" style={{ background: `linear-gradient(160deg, hsl(${item.hue},35%,12%) 0%, hsl(${item.hue},45%,20%) 100%)` }}>
-            <span style={{ color: `hsl(${item.hue},70%,70%)`, fontSize: 18, fontWeight: 700, opacity: 0.5 }}>{item.name[0]}</span>
+        <li key={i} className="flex items-center gap-3.5">
+          <div
+            className="flex h-[52px] w-[52px] shrink-0 items-center justify-center rounded-lg border border-[var(--border)]"
+            style={{
+              background: `linear-gradient(160deg, hsl(${item.hue},35%,var(--cat-bg-l,12%)) 0%, hsl(${item.hue},45%,var(--cat-bg-l2,20%)) 100%)`,
+            }}
+          >
+            <span
+              style={{
+                color: `hsl(${item.hue},70%,var(--cat-text-l,70%))`,
+                fontSize: 18,
+                fontWeight: 700,
+                opacity: 0.5,
+              }}
+            >
+              {item.name[0]}
+            </span>
           </div>
-          <div className="order-item-info">
-            <span className="order-item-name">{item.name}</span>
-            <span className="order-item-variant">{item.variant} · Qty {item.qty}</span>
+          <div className="flex flex-1 flex-col gap-0.5">
+            <span className="text-sm font-semibold text-[var(--text-h)]">{item.name}</span>
+            <span className="text-xs text-[var(--text)]">
+              {item.variant} · Qty {item.qty}
+            </span>
           </div>
-          <span className="order-item-price">${(item.price * item.qty).toFixed(2)}</span>
+          <span className="shrink-0 text-sm font-bold text-[var(--text-h)]">
+            ${(item.price * item.qty).toFixed(2)}
+          </span>
         </li>
       ))}
     </ul>
@@ -196,39 +303,54 @@ export default function OrdersPage({ onBack }) {
   const [expandedPast, setExpandedPast] = useState(null)
 
   function togglePast(id) {
-    setExpandedPast(prev => (prev === id ? null : id))
+    setExpandedPast((prev) => (prev === id ? null : id))
   }
 
   return (
-    <div className="orders-page">
-      <header className="orders-header">
-        <div className="orders-header-inner">
-          <button className="back-btn" onClick={onBack}><BackIcon /> Back</button>
-          <span className="brand">MODÉ</span>
+    <div className="flex min-h-svh w-full flex-col bg-[var(--bg)] pt-16">
+      <header className="fixed top-0 right-0 left-0 z-[1000] border-b border-[var(--border)] bg-[rgba(var(--background-rgb),0.75)] px-6 backdrop-blur-[20px]">
+        <div className="mx-auto flex h-16 max-w-[1280px] items-center gap-4">
+          <button
+            className="flex cursor-pointer items-center gap-1.5 rounded-lg border-none bg-transparent px-2.5 py-1.5 text-sm text-[var(--text)] transition-colors hover:bg-purple-400/12 hover:text-purple-400"
+            onClick={onBack}
+          >
+            <BackIcon /> Back
+          </button>
+          <span className="ml-auto text-[22px] font-bold tracking-[4px] text-[var(--text-h)]">
+            FIER
+          </span>
         </div>
       </header>
 
-      <main className="orders-main">
-        <h1 className="orders-title">My Orders</h1>
+      <main className="mx-auto box-border w-full max-w-[860px] px-6 pt-12 pb-20">
+        <h1 className="mb-10 text-[32px] font-extrabold tracking-[-0.5px] text-[var(--text-h)]">
+          My Orders
+        </h1>
 
         {/* ── Current Orders ── */}
-        <section className="orders-section">
-          <h2 className="orders-section-title">Current Orders</h2>
+        <section className="mb-14">
+          <h2 className="mb-5 text-[20px] font-bold text-[var(--text-h)]">Current Orders</h2>
 
           {CURRENT_ORDERS.length === 0 ? (
-            <p className="orders-empty">No active orders.</p>
+            <p className="text-sm text-[var(--text)]">No active orders.</p>
           ) : (
-            CURRENT_ORDERS.map(order => (
-              <div key={order.id} className="order-card order-card--active">
+            CURRENT_ORDERS.map((order) => (
+              <div
+                key={order.id}
+                className="mb-5 rounded-2xl border border-purple-400 bg-[var(--card-bg)] p-6 shadow-[0_0_0_1px_rgba(192,132,252,0.2),var(--shadow)] backdrop-blur-xl"
+              >
                 {/* Card header */}
-                <div className="order-card-header">
-                  <div className="order-meta">
-                    <span className="order-id">{order.id}</span>
-                    <span className="order-date">Placed {order.placedDate}</span>
+                <div className="mb-7 flex flex-wrap items-start justify-between gap-3 max-[600px]:flex-col">
+                  <div className="flex flex-col gap-1">
+                    <span className="text-[15px] font-bold text-[var(--text-h)]">{order.id}</span>
+                    <span className="text-xs text-[var(--text)]">Placed {order.placedDate}</span>
                   </div>
-                  <div className="order-card-header-right">
-                    <span className="order-est">Est. delivery <strong>{order.estimatedDelivery}</strong></span>
-                    <span className={`order-status-pill status-${order.status}`}>
+                  <div className="flex flex-col items-end gap-1.5 max-[600px]:items-start">
+                    <span className="text-[13px] text-[var(--text)]">
+                      Est. delivery{' '}
+                      <strong className="text-[var(--text-h)]">{order.estimatedDelivery}</strong>
+                    </span>
+                    <span className={statusPillClass(order.status)}>
                       {TIMELINE_STEPS[STATUS_INDEX[order.status]]?.label}
                     </span>
                   </div>
@@ -244,9 +366,11 @@ export default function OrdersPage({ onBack }) {
                 <OrderItems items={order.items} />
 
                 {/* Total */}
-                <div className="order-total-row">
+                <div className="flex items-center justify-between border-t border-[var(--border)] pt-3.5 text-sm text-[var(--text)]">
                   <span>Order Total</span>
-                  <span className="order-total-amount">${order.total.toFixed(2)}</span>
+                  <span className="text-[16px] font-bold text-[var(--text-h)]">
+                    ${order.total.toFixed(2)}
+                  </span>
                 </div>
               </div>
             ))
@@ -254,45 +378,51 @@ export default function OrdersPage({ onBack }) {
         </section>
 
         {/* ── Past Orders ── */}
-        <section className="orders-section">
-          <div className="orders-section-header">
-            <h2 className="orders-section-title">Past Orders</h2>
-            <span className="orders-section-sub">Last 30 days</span>
+        <section className="mb-14">
+          <div className="mb-5 flex items-baseline gap-2.5">
+            <h2 className="m-0 text-[20px] font-bold text-[var(--text-h)]">Past Orders</h2>
+            <span className="text-[13px] text-[var(--text)]">Last 30 days</span>
           </div>
 
           {PAST_ORDERS.length === 0 ? (
-            <p className="orders-empty">No orders in the last 30 days.</p>
+            <p className="text-sm text-[var(--text)]">No orders in the last 30 days.</p>
           ) : (
-            <div className="past-orders-list">
-              {PAST_ORDERS.map(order => (
-                <div key={order.id} className="past-order">
+            <div className="overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--card-bg)] shadow-[var(--shadow)] backdrop-blur-xl">
+              {PAST_ORDERS.map((order) => (
+                <div key={order.id} className="border-b border-[var(--border)] last:border-b-0">
                   <button
-                    className="past-order-row"
+                    className="flex w-full cursor-pointer items-center justify-between gap-3 border-none bg-transparent px-5 py-4 text-left transition-colors hover:bg-[var(--border)]"
                     onClick={() => togglePast(order.id)}
                     aria-expanded={expandedPast === order.id}
                   >
-                    <div className="past-order-left">
-                      <span className="order-id">{order.id}</span>
-                      <span className="order-date">{order.date}</span>
+                    <div className="flex flex-col gap-0.5">
+                      <span className="text-[15px] font-bold text-[var(--text-h)]">{order.id}</span>
+                      <span className="text-xs text-[var(--text)]">{order.date}</span>
                     </div>
-                    <div className="past-order-right">
-                      <span className="past-order-summary">
+                    <div className="flex shrink-0 items-center gap-3 max-[600px]:gap-2">
+                      <span className="text-[13px] text-[var(--text)] max-[600px]:hidden">
                         {order.items.length} item{order.items.length !== 1 ? 's' : ''}
                         &nbsp;·&nbsp;${order.total.toFixed(2)}
                       </span>
-                      <span className="order-status-pill status-delivered">Delivered</span>
-                      <span className={`chevron${expandedPast === order.id ? ' chevron--open' : ''}`}>
+                      <span className={statusPillClass('delivered')}>Delivered</span>
+                      <span
+                        className={`flex items-center text-[var(--text)] transition-transform duration-200 ${expandedPast === order.id ? 'rotate-180' : ''}`}
+                      >
                         <ChevronDownIcon />
                       </span>
                     </div>
                   </button>
 
                   {expandedPast === order.id && (
-                    <div className="past-order-detail">
-                      <OrderItems items={order.items} />
-                      <div className="order-total-row">
+                    <div className="animate-[expand-in_0.15s_ease] border-t border-[var(--border)] bg-[var(--bg)] px-5 pb-4">
+                      <div className="pt-4">
+                        <OrderItems items={order.items} />
+                      </div>
+                      <div className="flex items-center justify-between border-t border-[var(--border)] pt-3.5 text-sm text-[var(--text)]">
                         <span>Order Total</span>
-                        <span className="order-total-amount">${order.total.toFixed(2)}</span>
+                        <span className="text-[16px] font-bold text-[var(--text-h)]">
+                          ${order.total.toFixed(2)}
+                        </span>
                       </div>
                     </div>
                   )}
