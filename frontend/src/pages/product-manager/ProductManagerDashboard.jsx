@@ -5,8 +5,7 @@ import PMInventory from './PMInventory'
 import PMOrders from './PMOrders'
 import PMComments from './PMComments'
 import './ProductManagerDashboard.css'
-import '../admin/UserManagement.css'
-import '../admin/Phase4.css'
+
 
 const API_BASE = 'http://localhost:3000/api/product-manager'
 
