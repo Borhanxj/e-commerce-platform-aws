@@ -37,7 +37,6 @@ function ScrollToTop() {
     if (navType !== 'POP') window.scrollTo(0, 0)
   }, [pathname, navType])
   return null
-
 }
 
 function RequireAuth({ token, children }) {
@@ -305,7 +304,6 @@ function App() {
     setToken(t)
     setUser({ email: payload.email })
 
-    
     if (cartData?.items) {
       localStorage.removeItem('guest_cart')
       setCart(cartData.items)
@@ -569,13 +567,22 @@ function App() {
             </RequireSalesManager>
           }
         />
-        <Route path="/product-manager" element={
-        <RequireProductManager>
-          <ProductManagerDashboard token={token} onLogout={() => {
-            localStorage.removeItem('token'); setToken(null); setUser(null); navigate('/login')
-          }} />
-        </RequireProductManager>
-      } />
+        <Route
+          path="/product-manager"
+          element={
+            <RequireProductManager>
+              <ProductManagerDashboard
+                token={token}
+                onLogout={() => {
+                  localStorage.removeItem('token')
+                  setToken(null)
+                  setUser(null)
+                  navigate('/login')
+                }}
+              />
+            </RequireProductManager>
+          }
+        />
         {/* Admin routes */}
         <Route
           path="/admin/login"

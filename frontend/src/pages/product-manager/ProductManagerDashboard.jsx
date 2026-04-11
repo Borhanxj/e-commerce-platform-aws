@@ -6,7 +6,6 @@ import PMOrders from './PMOrders'
 import PMComments from './PMComments'
 import './ProductManagerDashboard.css'
 
-
 const API_BASE = 'http://localhost:3000/api/product-manager'
 
 function decodeJwtPayload(token) {
@@ -99,12 +98,12 @@ function ProductManagerDashboard({ token, onLogout }) {
   }, [token, onLogout])
 
   const sections = [
-    { key: 'overview',   label: 'Overview',    icon: <DashboardIcon /> },
-    { key: 'products',   label: 'Products',    icon: <ProductsIcon /> },
-    { key: 'categories', label: 'Categories',  icon: <CategoriesIcon /> },
-    { key: 'inventory',  label: 'Inventory',   icon: <InventoryIcon /> },
-    { key: 'orders',     label: 'Orders',      icon: <OrdersIcon /> },
-    { key: 'comments',   label: 'Comments',    icon: <CommentsIcon /> },
+    { key: 'overview', label: 'Overview', icon: <DashboardIcon /> },
+    { key: 'products', label: 'Products', icon: <ProductsIcon /> },
+    { key: 'categories', label: 'Categories', icon: <CategoriesIcon /> },
+    { key: 'inventory', label: 'Inventory', icon: <InventoryIcon /> },
+    { key: 'orders', label: 'Orders', icon: <OrdersIcon /> },
+    { key: 'comments', label: 'Comments', icon: <CommentsIcon /> },
   ]
 
   return (
@@ -138,17 +137,21 @@ function ProductManagerDashboard({ token, onLogout }) {
           </h1>
           <div className="admin-header-user">
             <span>{pmUser?.email}</span>
-            <button className="admin-logout-btn" onClick={onLogout}>Logout</button>
+            <button className="admin-logout-btn" onClick={onLogout}>
+              Logout
+            </button>
           </div>
         </header>
 
         <main className="admin-content">
-          {activeSection === 'overview'   && <PMOverview token={token} onNavigate={setActiveSection} />}
-          {activeSection === 'products'   && <PMProducts token={token} />}
+          {activeSection === 'overview' && (
+            <PMOverview token={token} onNavigate={setActiveSection} />
+          )}
+          {activeSection === 'products' && <PMProducts token={token} />}
           {activeSection === 'categories' && <PMCategories token={token} />}
-          {activeSection === 'inventory'  && <PMInventory token={token} />}
-          {activeSection === 'orders'     && <PMOrders token={token} />}
-          {activeSection === 'comments'   && <PMComments token={token} />}
+          {activeSection === 'inventory' && <PMInventory token={token} />}
+          {activeSection === 'orders' && <PMOrders token={token} />}
+          {activeSection === 'comments' && <PMComments token={token} />}
         </main>
       </div>
     </div>
@@ -157,7 +160,14 @@ function ProductManagerDashboard({ token, onLogout }) {
 
 function DashboardIcon() {
   return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
       <rect x="3" y="3" width="7" height="7" rx="1" />
       <rect x="14" y="3" width="7" height="7" rx="1" />
       <rect x="3" y="14" width="7" height="7" rx="1" />
@@ -168,7 +178,14 @@ function DashboardIcon() {
 
 function ProductsIcon() {
   return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
       <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />
       <line x1="3" y1="6" x2="21" y2="6" />
       <path d="M16 10a4 4 0 0 1-8 0" />
@@ -178,7 +195,14 @@ function ProductsIcon() {
 
 function CategoriesIcon() {
   return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
       <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z" />
       <line x1="7" y1="7" x2="7.01" y2="7" />
     </svg>
@@ -187,7 +211,14 @@ function CategoriesIcon() {
 
 function InventoryIcon() {
   return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
       <path d="M2 20h20" />
       <path d="M5 20V8l7-5 7 5v12" />
       <path d="M9 20v-5h6v5" />
@@ -197,7 +228,14 @@ function InventoryIcon() {
 
 function OrdersIcon() {
   return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
       <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
       <polyline points="14 2 14 8 20 8" />
       <line x1="16" y1="13" x2="8" y2="13" />
@@ -209,7 +247,14 @@ function OrdersIcon() {
 
 function CommentsIcon() {
   return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
       <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
     </svg>
   )
@@ -217,7 +262,14 @@ function CommentsIcon() {
 
 function LogoutIcon() {
   return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
       <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
       <polyline points="16 17 21 12 16 7" />
       <line x1="21" y1="12" x2="9" y2="12" />

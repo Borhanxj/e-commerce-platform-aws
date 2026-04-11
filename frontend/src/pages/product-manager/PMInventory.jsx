@@ -14,25 +14,32 @@ function PMInventory({ token }) {
 
   const authHeaders = { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' }
 
-  const fetchProducts = useCallback(async (page = 1) => {
-    setLoading(true)
-    setError('')
-    try {
-      const params = new URLSearchParams({ page, limit: 20 })
-      if (search) params.set('search', search)
-      const res = await fetch(`${API}?${params}`, { headers: { Authorization: `Bearer ${token}` } })
-      if (!res.ok) throw new Error('Failed to fetch inventory')
-      const data = await res.json()
-      setProducts(data.products)
-      setPagination(data.pagination)
-    } catch (err) {
-      setError(err.message)
-    } finally {
-      setLoading(false)
-    }
-  }, [token, search])
+  const fetchProducts = useCallback(
+    async (page = 1) => {
+      setLoading(true)
+      setError('')
+      try {
+        const params = new URLSearchParams({ page, limit: 20 })
+        if (search) params.set('search', search)
+        const res = await fetch(`${API}?${params}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        })
+        if (!res.ok) throw new Error('Failed to fetch inventory')
+        const data = await res.json()
+        setProducts(data.products)
+        setPagination(data.pagination)
+      } catch (err) {
+        setError(err.message)
+      } finally {
+        setLoading(false)
+      }
+    },
+    [token, search]
+  )
 
-  useEffect(() => { fetchProducts(1) }, [fetchProducts])
+  useEffect(() => {
+    fetchProducts(1)
+  }, [fetchProducts])
 
   function handleSearch(e) {
     e.preventDefault()
@@ -68,7 +75,9 @@ function PMInventory({ token }) {
       setEditingId(null)
       setDraftStock('')
       // update local state without full refetch for snappy UX
-      setProducts((prev) => prev.map((p) => p.id === productId ? { ...p, stock: parsedStock } : p))
+      setProducts((prev) =>
+        prev.map((p) => (p.id === productId ? { ...p, stock: parsedStock } : p))
+      )
     } catch (err) {
       setError(err.message)
     } finally {
@@ -87,7 +96,9 @@ function PMInventory({ token }) {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
-          <button type="submit" className="um-btn um-btn-search">Search</button>
+          <button type="submit" className="um-btn um-btn-search">
+            Search
+          </button>
         </form>
       </div>
 
@@ -107,64 +118,92 @@ function PMInventory({ token }) {
           </thead>
           <tbody>
             {loading ? (
-              <tr><td colSpan="6" className="um-empty">Loading…</td></tr>
-            ) : products.length === 0 ? (
-              <tr><td colSpan="6" className="um-empty">No products found</td></tr>
-            ) : products.map((p) => (
-              <tr key={p.id}>
-                <td>{p.id}</td>
-                <td>{p.name}</td>
-                <td>{p.category || '—'}</td>
-                <td>${parseFloat(p.price).toFixed(2)}</td>
-                <td>
-                  {editingId === p.id ? (
-                    <div className="pm-stock-cell">
-                      <input
-                        type="number"
-                        min="0"
-                        className="pm-stock-input"
-                        value={draftStock}
-                        onChange={(e) => setDraftStock(e.target.value)}
-                        autoFocus
-                      />
-                      <button
-                        className="um-btn um-btn-create"
-                        style={{ fontSize: '12px', padding: '4px 10px' }}
-                        disabled={saving}
-                        onClick={() => saveStock(p.id)}
-                      >
-                        {saving ? '…' : 'Save'}
-                      </button>
-                      <button
-                        className="um-btn"
-                        style={{ fontSize: '12px', padding: '4px 10px' }}
-                        onClick={cancelEdit}
-                      >
-                        Cancel
-                      </button>
-                    </div>
-                  ) : (
-                    <span className={`um-role-badge ${parseInt(p.stock) === 0 ? 'um-role-admin' : parseInt(p.stock) < 10 ? 'um-role-product_manager' : 'um-role-sales_manager'}`}>
-                      {p.stock}
-                    </span>
-                  )}
-                </td>
-                <td className="um-actions">
-                  {editingId !== p.id && (
-                    <button className="um-btn um-btn-edit" onClick={() => startEdit(p)}>Edit Stock</button>
-                  )}
+              <tr>
+                <td colSpan="6" className="um-empty">
+                  Loading…
                 </td>
               </tr>
-            ))}
+            ) : products.length === 0 ? (
+              <tr>
+                <td colSpan="6" className="um-empty">
+                  No products found
+                </td>
+              </tr>
+            ) : (
+              products.map((p) => (
+                <tr key={p.id}>
+                  <td>{p.id}</td>
+                  <td>{p.name}</td>
+                  <td>{p.category || '—'}</td>
+                  <td>${parseFloat(p.price).toFixed(2)}</td>
+                  <td>
+                    {editingId === p.id ? (
+                      <div className="pm-stock-cell">
+                        <input
+                          type="number"
+                          min="0"
+                          className="pm-stock-input"
+                          value={draftStock}
+                          onChange={(e) => setDraftStock(e.target.value)}
+                          autoFocus
+                        />
+                        <button
+                          className="um-btn um-btn-create"
+                          style={{ fontSize: '12px', padding: '4px 10px' }}
+                          disabled={saving}
+                          onClick={() => saveStock(p.id)}
+                        >
+                          {saving ? '…' : 'Save'}
+                        </button>
+                        <button
+                          className="um-btn"
+                          style={{ fontSize: '12px', padding: '4px 10px' }}
+                          onClick={cancelEdit}
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    ) : (
+                      <span
+                        className={`um-role-badge ${parseInt(p.stock) === 0 ? 'um-role-admin' : parseInt(p.stock) < 10 ? 'um-role-product_manager' : 'um-role-sales_manager'}`}
+                      >
+                        {p.stock}
+                      </span>
+                    )}
+                  </td>
+                  <td className="um-actions">
+                    {editingId !== p.id && (
+                      <button className="um-btn um-btn-edit" onClick={() => startEdit(p)}>
+                        Edit Stock
+                      </button>
+                    )}
+                  </td>
+                </tr>
+              ))
+            )}
           </tbody>
         </table>
       </div>
 
       {pagination.totalPages > 1 && (
         <div className="um-pagination">
-          <button className="um-btn" disabled={pagination.page <= 1} onClick={() => fetchProducts(pagination.page - 1)}>Previous</button>
-          <span className="um-page-info">Page {pagination.page} of {pagination.totalPages} ({pagination.total} products)</span>
-          <button className="um-btn" disabled={pagination.page >= pagination.totalPages} onClick={() => fetchProducts(pagination.page + 1)}>Next</button>
+          <button
+            className="um-btn"
+            disabled={pagination.page <= 1}
+            onClick={() => fetchProducts(pagination.page - 1)}
+          >
+            Previous
+          </button>
+          <span className="um-page-info">
+            Page {pagination.page} of {pagination.totalPages} ({pagination.total} products)
+          </span>
+          <button
+            className="um-btn"
+            disabled={pagination.page >= pagination.totalPages}
+            onClick={() => fetchProducts(pagination.page + 1)}
+          >
+            Next
+          </button>
         </div>
       )}
     </div>

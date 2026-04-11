@@ -22,7 +22,9 @@ function PMCategories({ token }) {
     }
   }, [token])
 
-  useEffect(() => { fetchCategories() }, [fetchCategories])
+  useEffect(() => {
+    fetchCategories()
+  }, [fetchCategories])
 
   return (
     <div className="um">
@@ -38,15 +40,25 @@ function PMCategories({ token }) {
           </thead>
           <tbody>
             {loading ? (
-              <tr><td colSpan="2" className="um-empty">Loading…</td></tr>
-            ) : categories.length === 0 ? (
-              <tr><td colSpan="2" className="um-empty">No categories found</td></tr>
-            ) : categories.map((name, i) => (
-              <tr key={name}>
-                <td>{i + 1}</td>
-                <td>{name}</td>
+              <tr>
+                <td colSpan="2" className="um-empty">
+                  Loading…
+                </td>
               </tr>
-            ))}
+            ) : categories.length === 0 ? (
+              <tr>
+                <td colSpan="2" className="um-empty">
+                  No categories found
+                </td>
+              </tr>
+            ) : (
+              categories.map((name, i) => (
+                <tr key={name}>
+                  <td>{i + 1}</td>
+                  <td>{name}</td>
+                </tr>
+              ))
+            )}
           </tbody>
         </table>
       </div>
