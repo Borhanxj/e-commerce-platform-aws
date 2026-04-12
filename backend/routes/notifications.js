@@ -26,6 +26,12 @@ router.patch('/read-all', async (req, res) => {
   res.json({ success: true })
 })
 
+// DELETE /api/notifications — delete all notifications for the current user
+router.delete('/', async (req, res) => {
+  await pool.query('DELETE FROM notifications WHERE user_id = $1', [req.user.userId])
+  res.json({ success: true })
+})
+
 // PATCH /api/notifications/:id/read — mark a single notification as read
 router.patch('/:id/read', async (req, res) => {
   const notifId = parseInt(req.params.id, 10)

@@ -72,6 +72,20 @@ export default function NotificationBell({ token }) {
     }
   }
 
+  async function clearAll() {
+    try {
+      const res = await fetch(`${API_BASE}/api/notifications`, {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      if (!res.ok) return
+      setNotifications([])
+      setUnreadCount(0)
+    } catch {
+      // Silently fail
+    }
+  }
+
   function handleToggle() {
     const next = !open
     setOpen(next)
@@ -99,11 +113,24 @@ export default function NotificationBell({ token }) {
         <div className="animate-in fade-in slide-in-from-top-1.5 light:bg-white/92 light:shadow-[0_10px_30px_rgba(0,0,0,0.15)] absolute top-[calc(100%+16px)] right-0 z-[200] w-[320px] overflow-hidden rounded-2xl border border-[var(--border)] bg-[rgba(var(--background-rgb),0.92)] shadow-[var(--shadow)] backdrop-blur-xl">
           <div className="flex items-center justify-between border-b border-[var(--border)] px-4 py-3">
             <span className="text-[13px] font-semibold text-[var(--text-h)]">Notifications</span>
-            {unreadCount > 0 && (
-              <button className="text-[11px] text-purple-400 hover:underline" onClick={markAllRead}>
-                Mark all as read
-              </button>
-            )}
+            <div className="flex items-center gap-3">
+              {unreadCount > 0 && (
+                <button
+                  className="text-[11px] text-purple-400 hover:underline"
+                  onClick={markAllRead}
+                >
+                  Mark all as read
+                </button>
+              )}
+              {notifications.length > 0 && (
+                <button
+                  className="text-[11px] text-[var(--text)] opacity-50 hover:underline hover:opacity-100"
+                  onClick={clearAll}
+                >
+                  Clear all
+                </button>
+              )}
+            </div>
           </div>
 
           {notifications.length === 0 ? (
