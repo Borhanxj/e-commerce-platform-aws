@@ -152,7 +152,8 @@ router.post('/discount', async (req, res) => {
     )
 
     await client.query('COMMIT')
-    res.json({ updated: productsResult.rows.length, notified: wishlistResult.rows.length })
+    const distinctCustomers = new Set(wishlistResult.rows.map((r) => r.user_id)).size
+    res.json({ updated: productsResult.rows.length, notified: distinctCustomers })
   } catch (err) {
     await client.query('ROLLBACK')
     throw err
