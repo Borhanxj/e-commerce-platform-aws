@@ -111,10 +111,18 @@ router.post('/confirm', async (req, res) => {
 
   // Use reservations joined with products as the single source of truth for both
   // stock decrement and order item creation — avoids cart/reservation divergence.
+  // effective_price applies any active discount; falls back to base price when none.
   const reservations = await pool.query(
-    `SELECT sr.product_id, sr.quantity, p.name, p.price
+    `SELECT sr.product_id, sr.quantity, p.name, p.price,
+            COALESCE(
+              ROUND(p.price * (1 - pd.discount_percent / 100.0), 2),
+              p.price
+            ) AS effective_price
      FROM stock_reservations sr
      JOIN products p ON p.id = sr.product_id
+     LEFT JOIN product_discounts pd ON pd.product_id = p.id
+       AND pd.start_at <= NOW()
+       AND (pd.end_at IS NULL OR pd.end_at > NOW())
      WHERE sr.user_id = $1 AND sr.expires_at > NOW()`,
     [userId]
   )
@@ -135,7 +143,7 @@ router.post('/confirm', async (req, res) => {
     }
 
     const total = reservations.rows.reduce(
-      (sum, item) => sum + parseFloat(item.price) * item.quantity,
+      (sum, item) => sum + parseFloat(item.effective_price) * item.quantity,
       0
     )
 
@@ -148,7 +156,7 @@ router.post('/confirm', async (req, res) => {
     for (const item of reservations.rows) {
       await client.query(
         'INSERT INTO order_items (order_id, product_id, quantity, price) VALUES ($1, $2, $3, $4)',
-        [orderId, item.product_id, item.quantity, item.price]
+        [orderId, item.product_id, item.quantity, item.effective_price]
       )
     }
 

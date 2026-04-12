@@ -22,6 +22,12 @@ services:
       JWT_SECRET: dev-secret-change-in-production
       ADMIN_EMAIL: admin@example.com
       ADMIN_PASSWORD: admin123456
+      SALES_MANAGER_EMAIL: salesmanager@example.com
+      SALES_MANAGER_PASSWORD: salesmanager123456
+      SALES_MANAGER_NAME: Jane Smith
+      PRODUCT_MANAGER_EMAIL: productmanager@example.com
+      PRODUCT_MANAGER_PASSWORD: productmanager123456
+      PRODUCT_MANAGER_NAME: John Doe
     depends_on:
       - db
     volumes:

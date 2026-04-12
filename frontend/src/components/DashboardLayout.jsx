@@ -47,12 +47,6 @@ export default function DashboardLayout({
           </h1>
           <div className="flex items-center gap-3 text-sm text-[var(--text)]">
             <span>{userEmail}</span>
-            <button
-              className="cursor-pointer rounded-md border border-[var(--border)] bg-transparent px-3.5 py-1.5 font-[inherit] text-[13px] text-[var(--text)] transition-all duration-150 hover:border-purple-400 hover:text-purple-400"
-              onClick={onLogout}
-            >
-              Logout
-            </button>
           </div>
         </header>
 
