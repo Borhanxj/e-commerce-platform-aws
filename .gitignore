@@ -2,3 +2,12 @@ node_modules/
 .env
 .DS_Store
 dist/
+coverage/
+
+# remove screenshot folder
+.screenshots/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo

@@ -1,11 +1,20 @@
 import { useState } from 'react'
-import './LoginPage.css'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { useTheme } from '../../context/ThemeContext'
+import { SunIcon, MoonIcon } from '../../components/icons'
+
+const wrapperCls = 'flex min-h-svh items-center justify-center p-6 bg-[var(--bg)]'
+const cardCls =
+  'relative z-10 w-full max-w-sm rounded-[20px] border border-[var(--glass-border)] bg-[var(--card-bg)] p-10 shadow-[var(--shadow)] backdrop-blur-xl'
 
 function ForgotPasswordPage({ onBack }) {
   const [email, setEmail] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
   const [submitted, setSubmitted] = useState(false)
+  const { theme, toggleTheme } = useTheme()
 
   async function handleSubmit(e) {
     e.preventDefault()
@@ -32,32 +41,66 @@ function ForgotPasswordPage({ onBack }) {
     }
   }
 
+  const ambientBg = (
+    <div
+      className="pointer-events-none fixed inset-0 z-0 overflow-hidden"
+      style={{
+        background:
+          'linear-gradient(170deg, var(--bg) 0%, var(--bg-gradient-to) 25%, var(--accent-bg) 50%, var(--bg-gradient-to) 75%, var(--bg) 100%)',
+      }}
+      aria-hidden="true"
+    />
+  )
+
+  const themeToggle = (
+    <button
+      onClick={toggleTheme}
+      className="fixed top-6 right-6 z-[200] flex h-10 w-10 cursor-pointer items-center justify-center rounded-lg border border-[var(--border)] bg-[var(--card-bg)] text-[var(--text-h)] shadow-[var(--shadow)] backdrop-blur-xl transition-all hover:border-purple-400/40 hover:bg-purple-400/12 hover:text-purple-400"
+      aria-label={theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+    >
+      {theme === 'dark' ? <SunIcon /> : <MoonIcon />}
+    </button>
+  )
+
   if (submitted) {
     return (
-      <div className="login-wrapper">
-        <div className="login-card">
-          <h1>Check your email</h1>
-          <p style={{ marginBottom: '24px', color: 'var(--text)' }}>
-            If an account exists for <strong>{email}</strong>, you'll receive a
-            password reset link shortly.
+      <div className={wrapperCls}>
+        {ambientBg}
+        {themeToggle}
+        <div className={cardCls}>
+          <h1 className="mb-7 text-center text-3xl font-medium text-[var(--text-h)]">
+            Check your email
+          </h1>
+          <p className="mb-6 text-[var(--text)]">
+            If an account exists for <strong>{email}</strong>, you'll receive a password reset link
+            shortly.
           </p>
-          <button className="login-btn" onClick={onBack}>Back to sign in</button>
+          <Button onClick={onBack} className="w-full bg-purple-400 text-white hover:bg-purple-300">
+            Back to sign in
+          </Button>
         </div>
       </div>
     )
   }
 
   return (
-    <div className="login-wrapper">
-      <div className="login-card">
-        <h1>Reset password</h1>
-        <p style={{ marginBottom: '24px', color: 'var(--text)', textAlign: 'left' }}>
+    <div className={wrapperCls}>
+      {ambientBg}
+      {themeToggle}
+      <div className={cardCls}>
+        <h1 className="mb-7 text-center text-3xl font-medium text-[var(--text-h)]">
+          Reset password
+        </h1>
+        <p className="mb-6 text-left text-[var(--text)]">
           Enter your email and we'll send you a link to reset your password.
         </p>
-        <form onSubmit={handleSubmit} noValidate>
-          <div className="field">
-            <label htmlFor="forgot-email">Email</label>
-            <input
+
+        <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-4">
+          <div className="flex flex-col gap-1.5">
+            <Label htmlFor="forgot-email" className="text-[var(--text-h)]">
+              Email
+            </Label>
+            <Input
               id="forgot-email"
               type="email"
               autoComplete="email"
@@ -65,15 +108,31 @@ function ForgotPasswordPage({ onBack }) {
               onChange={(e) => setEmail(e.target.value)}
               required
               placeholder="you@example.com"
+              className="border-[var(--border)] bg-[var(--bg)] text-[var(--text-h)] placeholder:text-[var(--text)]/40 focus-visible:border-purple-400 focus-visible:ring-purple-400/40"
             />
           </div>
-          {error && <p className="login-error" role="alert">{error}</p>}
-          <button type="submit" className="login-btn" disabled={loading}>
+
+          {error && (
+            <p className="text-sm text-red-400" role="alert">
+              {error}
+            </p>
+          )}
+
+          <Button
+            type="submit"
+            disabled={loading}
+            className="mt-1 w-full bg-purple-400 text-white hover:bg-purple-300 disabled:opacity-55"
+          >
             {loading ? 'Sending…' : 'Send reset link'}
-          </button>
+          </Button>
         </form>
-        <div className="login-links">
-          <button type="button" className="link-btn" onClick={onBack}>
+
+        <div className="mt-5 flex flex-col items-center gap-2">
+          <button
+            type="button"
+            onClick={onBack}
+            className="cursor-pointer border-0 bg-transparent p-0 text-sm text-purple-400 underline underline-offset-2 hover:opacity-75"
+          >
             Back to sign in
           </button>
         </div>

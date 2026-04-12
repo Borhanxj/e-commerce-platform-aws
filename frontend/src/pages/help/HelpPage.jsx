@@ -1,5 +1,4 @@
 import { useState, useMemo } from 'react'
-import './HelpPage.css'
 
 /* ── FAQ data ─────────────────────────────────────────────── */
 
@@ -8,7 +7,16 @@ const FAQ_CATEGORIES = [
     id: 'products',
     label: 'Products',
     icon: (
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <svg
+        width="18"
+        height="18"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
         <path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z" />
         <circle cx="7" cy="7" r="1.5" fill="currentColor" stroke="none" />
       </svg>
@@ -20,11 +28,11 @@ const FAQ_CATEGORIES = [
       },
       {
         q: 'How do I find the right size?',
-        a: 'Each product page includes a Size Guide button with our full measurement chart. We recommend measuring your chest, waist, and hips and comparing against the guide. If you\'re between sizes, we generally suggest sizing up for a relaxed fit or sizing down for a tailored look.',
+        a: "Each product page includes a Size Guide button with our full measurement chart. We recommend measuring your chest, waist, and hips and comparing against the guide. If you're between sizes, we generally suggest sizing up for a relaxed fit or sizing down for a tailored look.",
       },
       {
         q: 'Are your products ethically made?',
-        a: 'Yes. All MODÉ suppliers are audited against our Code of Conduct, which requires fair wages, safe working conditions, and no forced or child labour. We publish our full supplier list on our Sustainability page and are working towards B Corp certification.',
+        a: 'Yes. All FIER suppliers are audited against our Code of Conduct, which requires fair wages, safe working conditions, and no forced or child labour. We publish our full supplier list on our Sustainability page and are working towards B Corp certification.',
       },
       {
         q: 'How should I care for my garments?',
@@ -32,7 +40,7 @@ const FAQ_CATEGORIES = [
       },
       {
         q: 'Can I see more photos of a product?',
-        a: 'Each product page includes multiple photography angles and, where available, on-model shots across different sizes. If you\'d like additional views, our customer service team can often provide extra images on request.',
+        a: "Each product page includes multiple photography angles and, where available, on-model shots across different sizes. If you'd like additional views, our customer service team can often provide extra images on request.",
       },
       {
         q: 'Do you restock sold-out items?',
@@ -44,7 +52,16 @@ const FAQ_CATEGORIES = [
     id: 'returns',
     label: 'Returns & Exchanges',
     icon: (
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <svg
+        width="18"
+        height="18"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
         <polyline points="1 4 1 10 7 10" />
         <path d="M3.51 15a9 9 0 102.13-9.36L1 10" />
       </svg>
@@ -68,7 +85,7 @@ const FAQ_CATEGORIES = [
       },
       {
         q: 'What if my item arrives damaged or incorrect?',
-        a: 'We\'re sorry to hear that! Please contact us within 48 hours of delivery via the Help & Support chat or by emailing support@mode.com. Attach photos of the issue and your order number, and we\'ll arrange a free replacement or full refund straight away.',
+        a: "We're sorry to hear that! Please contact us within 48 hours of delivery via the Help & Support chat or by emailing support@fier.com. Attach photos of the issue and your order number, and we'll arrange a free replacement or full refund straight away.",
       },
     ],
   },
@@ -76,7 +93,16 @@ const FAQ_CATEGORIES = [
     id: 'payment',
     label: 'Payment & Refunds',
     icon: (
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <svg
+        width="18"
+        height="18"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
         <rect x="1" y="4" width="22" height="16" rx="2" ry="2" />
         <line x1="1" y1="10" x2="23" y2="10" />
       </svg>
@@ -104,7 +130,7 @@ const FAQ_CATEGORIES = [
       },
       {
         q: 'How does Klarna work?',
-        a: 'Klarna lets you split your purchase into 3 equal interest-free payments. The first is taken at checkout; the remaining two are billed automatically every 30 days. A soft credit check may be performed, which doesn\'t affect your credit score.',
+        a: "Klarna lets you split your purchase into 3 equal interest-free payments. The first is taken at checkout; the remaining two are billed automatically every 30 days. A soft credit check may be performed, which doesn't affect your credit score.",
       },
     ],
   },
@@ -112,7 +138,16 @@ const FAQ_CATEGORIES = [
     id: 'orders',
     label: 'Orders & Shipping',
     icon: (
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <svg
+        width="18"
+        height="18"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
         <rect x="1" y="3" width="15" height="13" rx="1" />
         <path d="M16 8h4l3 3v5h-7V8z" />
         <circle cx="5.5" cy="18.5" r="2.5" />
@@ -122,7 +157,7 @@ const FAQ_CATEGORIES = [
     items: [
       {
         q: 'How do I track my order?',
-        a: 'Once your order ships, you\'ll receive a confirmation email with your tracking number and a link to the carrier\'s tracking page. You can also view live tracking under My Orders in your account — we show each step from dispatch through to delivery.',
+        a: "Once your order ships, you'll receive a confirmation email with your tracking number and a link to the carrier's tracking page. You can also view live tracking under My Orders in your account — we show each step from dispatch through to delivery.",
       },
       {
         q: 'How long does delivery take?',
@@ -141,7 +176,7 @@ const FAQ_CATEGORIES = [
         a: 'Orders can be amended or cancelled within 1 hour of being placed, before they enter our fulfilment system. Go to My Orders and select "Cancel Order" or contact support immediately. Once dispatched, orders cannot be cancelled — you\'ll need to return the item instead.',
       },
       {
-        q: 'What happens if I\'m not in when my parcel arrives?',
+        q: "What happens if I'm not in when my parcel arrives?",
         a: 'The carrier will leave a card with instructions to rearrange delivery, redirect to a neighbour, or collect from a local depot or parcel locker. Most carriers also provide a link in the delivery notification email to manage your delivery preferences.',
       },
     ],
@@ -150,35 +185,44 @@ const FAQ_CATEGORIES = [
     id: 'company',
     label: 'Company',
     icon: (
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <svg
+        width="18"
+        height="18"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
         <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z" />
         <polyline points="9 22 9 12 15 12 15 22" />
       </svg>
     ),
     items: [
       {
-        q: 'Who is MODÉ?',
-        a: 'MODÉ is a contemporary fashion brand founded with a simple belief: great style shouldn\'t come at the cost of quality or conscience. We design versatile, considered clothing for everyday life — made to last and meant to be worn.',
+        q: 'Who is FIER?',
+        a: "FIER is a contemporary fashion brand founded with a simple belief: great style shouldn't come at the cost of quality or conscience. We design versatile, considered clothing for everyday life — made to last and meant to be worn.",
       },
       {
         q: 'Where are you based?',
-        a: 'MODÉ is headquartered in London, UK. Our design studio is in Shoreditch, and our primary fulfilment centre operates out of the East Midlands. We work with manufacturing partners across Portugal, Italy, and Turkey.',
+        a: 'FIER is headquartered in London, UK. Our design studio is in Shoreditch, and our primary fulfilment centre operates out of the East Midlands. We work with manufacturing partners across Portugal, Italy, and Turkey.',
       },
       {
         q: 'Do you have any physical stores?',
-        a: 'Currently MODÉ is an online-only brand. We do host occasional pop-up events in London and Manchester — follow us on Instagram or sign up to our newsletter to be notified of upcoming dates.',
+        a: 'Currently FIER is an online-only brand. We do host occasional pop-up events in London and Manchester — follow us on Instagram or sign up to our newsletter to be notified of upcoming dates.',
       },
       {
         q: 'How can I contact customer support?',
-        a: 'Our support team is available Monday–Friday 9 am–6 pm GMT. You can reach us via the live chat on this page, by emailing support@mode.com, or by calling +44 20 1234 5678. We aim to respond to all queries within 4 business hours.',
+        a: 'Our support team is available Monday–Friday 9 am–6 pm GMT. You can reach us via the live chat on this page, by emailing support@fier.com, or by calling +44 20 1234 5678. We aim to respond to all queries within 4 business hours.',
       },
       {
         q: 'Do you have a loyalty programme?',
-        a: 'Yes! MODÉ Rewards lets you earn 1 point for every £1 spent. Points can be redeemed against future orders (100 points = £1 off). Members also get early access to sales, birthday discounts, and exclusive new-arrival previews. Enrol free in your account settings.',
+        a: 'Yes! FIER Rewards lets you earn 1 point for every £1 spent. Points can be redeemed against future orders (100 points = £1 off). Members also get early access to sales, birthday discounts, and exclusive new-arrival previews. Enrol free in your account settings.',
       },
       {
         q: 'How do I stay up to date with new collections?',
-        a: 'Subscribe to our newsletter for weekly new-arrival edits, style guides, and exclusive member offers. You can also follow @modeofficial on Instagram, TikTok, and Pinterest for daily inspiration and behind-the-scenes content.',
+        a: 'Subscribe to our newsletter for weekly new-arrival edits, style guides, and exclusive member offers. You can also follow @fierofficial on Instagram, TikTok, and Pinterest for daily inspiration and behind-the-scenes content.',
       },
     ],
   },
@@ -188,23 +232,52 @@ const FAQ_CATEGORIES = [
 
 function BackIcon() {
   return (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <line x1="19" y1="12" x2="5" y2="12" /><polyline points="12 19 5 12 12 5" />
+    <svg
+      width="20"
+      height="20"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <line x1="19" y1="12" x2="5" y2="12" />
+      <polyline points="12 19 5 12 12 5" />
     </svg>
   )
 }
 
 function SearchIcon() {
   return (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" />
+    <svg
+      width="18"
+      height="18"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <circle cx="11" cy="11" r="8" />
+      <line x1="21" y1="21" x2="16.65" y2="16.65" />
     </svg>
   )
 }
 
 function ChevronDownIcon() {
   return (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <svg
+      width="16"
+      height="16"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
       <polyline points="6 9 12 15 18 9" />
     </svg>
   )
@@ -215,14 +288,24 @@ function ChevronDownIcon() {
 function FaqItem({ question, answer }) {
   const [open, setOpen] = useState(false)
   return (
-    <div className={`faq-item${open ? ' faq-item--open' : ''}`}>
-      <button className="faq-question" onClick={() => setOpen(o => !o)} aria-expanded={open}>
+    <div className={`border-b border-[var(--border)] last:border-b-0${open ? ' faq-open' : ''}`}>
+      <button
+        className={`flex w-full cursor-pointer items-center justify-between gap-4 border-none bg-transparent px-5 py-[18px] text-left text-sm font-semibold transition-colors ${open ? 'bg-purple-400/12 text-purple-400' : 'text-[var(--text-h)] hover:bg-[var(--border)]'}`}
+        onClick={() => setOpen((o) => !o)}
+        aria-expanded={open}
+      >
         <span>{question}</span>
-        <span className={`faq-chevron${open ? ' faq-chevron--open' : ''}`}><ChevronDownIcon /></span>
+        <span
+          className={`ease flex shrink-0 items-center transition-transform duration-250 ${open ? 'rotate-180 text-purple-400' : 'text-[var(--text)]'}`}
+        >
+          <ChevronDownIcon />
+        </span>
       </button>
       {open && (
-        <div className="faq-answer">
-          <p>{answer}</p>
+        <div className="animate-[faq-expand_0.2s_ease] bg-[var(--bg)] px-5 pb-[18px]">
+          <p className="m-0 border-t border-[var(--border)] pt-4 text-sm leading-[1.75] text-[var(--text)]">
+            {answer}
+          </p>
         </div>
       )}
     </div>
@@ -237,60 +320,80 @@ export default function HelpPage({ onBack }) {
 
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase()
-    return FAQ_CATEGORIES.map(cat => ({
+    return FAQ_CATEGORIES.map((cat) => ({
       ...cat,
       items: cat.items.filter(
-        item =>
-          item.q.toLowerCase().includes(q) ||
-          item.a.toLowerCase().includes(q)
+        (item) => item.q.toLowerCase().includes(q) || item.a.toLowerCase().includes(q)
       ),
-    })).filter(cat =>
-      (activeCategory === 'all' || cat.id === activeCategory) && cat.items.length > 0
+    })).filter(
+      (cat) => (activeCategory === 'all' || cat.id === activeCategory) && cat.items.length > 0
     )
   }, [search, activeCategory])
 
   return (
-    <div className="help-page">
-      <header className="help-header">
-        <div className="help-header-inner">
-          <button className="back-btn" onClick={onBack}><BackIcon /> Back</button>
-          <span className="brand">MODÉ</span>
+    <div className="flex min-h-svh w-full flex-col bg-[var(--bg)] pt-16">
+      <header className="fixed top-0 right-0 left-0 z-[1000] border-b border-[var(--border)] bg-[rgba(var(--background-rgb),0.75)] px-6 backdrop-blur-[20px]">
+        <div className="mx-auto flex h-16 max-w-[1280px] items-center gap-4">
+          <button
+            className="flex cursor-pointer items-center gap-1.5 rounded-lg border-none bg-transparent px-2.5 py-1.5 text-sm text-[var(--text)] transition-colors hover:bg-purple-400/12 hover:text-purple-400"
+            onClick={onBack}
+          >
+            <BackIcon /> Back
+          </button>
+          <span className="ml-auto text-[22px] font-bold tracking-[4px] text-[var(--text-h)]">
+            FIER
+          </span>
         </div>
       </header>
 
       {/* Hero */}
-      <div className="help-hero">
-        <p className="help-eyebrow">Support</p>
-        <h1 className="help-title">How can we help?</h1>
-        <p className="help-sub">Browse answers below, or search for a specific topic.</p>
-        <div className="help-search">
-          <span className="help-search-icon"><SearchIcon /></span>
+      <div className="flex flex-col items-center gap-3 bg-[linear-gradient(135deg,var(--bg)_0%,var(--bg-gradient-to)_50%,var(--accent-bg)_100%)] px-6 py-16 text-center">
+        <p className="m-0 text-[11px] font-bold tracking-[5px] text-purple-400 uppercase">
+          Support
+        </p>
+        <h1 className="m-0 text-[48px] leading-[1.1] font-extrabold tracking-[-1.5px] text-[var(--text-h)] max-[600px]:text-[34px]">
+          How can we help?
+        </h1>
+        <p className="m-0 mb-2 text-[15px] text-[var(--text)] opacity-80">
+          Browse answers below, or search for a specific topic.
+        </p>
+        <div className="relative mt-1 w-full max-w-[520px]">
+          <span className="pointer-events-none absolute top-1/2 left-3.5 flex -translate-y-1/2 text-[var(--text)] opacity-50">
+            <SearchIcon />
+          </span>
           <input
             type="text"
             placeholder="Search FAQs…"
             value={search}
-            onChange={e => setSearch(e.target.value)}
+            onChange={(e) => setSearch(e.target.value)}
             aria-label="Search FAQs"
+            className="box-border w-full rounded-[10px] border border-[var(--border)] bg-[var(--card-bg)] py-3.5 pr-11 pl-11 text-[15px] text-[var(--text-h)] transition-colors outline-none placeholder:text-[var(--text)]/40 focus:border-purple-400 focus:bg-[var(--bg)]"
           />
           {search && (
-            <button className="help-search-clear" onClick={() => setSearch('')} aria-label="Clear search">×</button>
+            <button
+              className="absolute top-1/2 right-3 -translate-y-1/2 cursor-pointer border-none bg-none p-1 text-[20px] leading-none text-[var(--text)] transition-colors hover:text-[var(--text-h)]"
+              onClick={() => setSearch('')}
+              aria-label="Clear search"
+            >
+              ×
+            </button>
           )}
         </div>
       </div>
 
-      <main className="help-main">
+      <main className="mx-auto box-border w-full max-w-[860px] px-6 pt-12 pb-20">
         {/* Category tabs */}
-        <div className="help-tabs">
+        <div className="mb-10 flex flex-wrap gap-2">
           <button
-            className={`help-tab${activeCategory === 'all' ? ' help-tab--active' : ''}`}
+            className={`flex cursor-pointer items-center gap-1.5 rounded-full border px-4 py-2 text-[13px] font-medium whitespace-nowrap transition-colors ${activeCategory === 'all' ? 'border-purple-400 bg-purple-400 text-white hover:text-white' : 'border-[var(--border)] bg-transparent text-[var(--text)] hover:border-purple-400 hover:text-[var(--text-h)]'}`}
             onClick={() => setActiveCategory('all')}
           >
             All Topics
           </button>
-          {FAQ_CATEGORIES.map(cat => (
+          {FAQ_CATEGORIES.map((cat) => (
             <button
               key={cat.id}
-              className={`help-tab${activeCategory === cat.id ? ' help-tab--active' : ''}`}
+              className={`flex cursor-pointer items-center gap-1.5 rounded-full border px-4 py-2 text-[13px] font-medium whitespace-nowrap transition-colors ${activeCategory === cat.id ? 'border-purple-400 bg-purple-400 text-white hover:text-white' : 'border-[var(--border)] bg-transparent text-[var(--text)] hover:border-purple-400 hover:text-[var(--text-h)]'}`}
               onClick={() => setActiveCategory(cat.id)}
             >
               {cat.icon}
@@ -301,18 +404,29 @@ export default function HelpPage({ onBack }) {
 
         {/* FAQ sections */}
         {filtered.length === 0 ? (
-          <div className="help-no-results">
-            <p className="help-no-results-title">No results for "{search}"</p>
-            <p className="help-no-results-sub">Try different keywords, or <button onClick={() => setSearch('')}>clear your search</button>.</p>
+          <div className="px-6 py-16 text-center">
+            <p className="m-0 mb-2 text-[18px] font-semibold text-[var(--text-h)]">
+              No results for &ldquo;{search}&rdquo;
+            </p>
+            <p className="m-0 text-sm text-[var(--text)]">
+              Try different keywords, or{' '}
+              <button
+                className="cursor-pointer border-none bg-none p-0 text-sm text-purple-400 underline underline-offset-[3px]"
+                onClick={() => setSearch('')}
+              >
+                clear your search
+              </button>
+              .
+            </p>
           </div>
         ) : (
-          filtered.map(cat => (
-            <section key={cat.id} className="faq-section">
-              <div className="faq-section-header">
-                <span className="faq-section-icon">{cat.icon}</span>
-                <h2 className="faq-section-title">{cat.label}</h2>
+          filtered.map((cat) => (
+            <section key={cat.id} className="mb-12">
+              <div className="mb-4 flex items-center gap-2.5 border-b-2 border-purple-400 pb-3.5">
+                <span className="flex items-center text-purple-400">{cat.icon}</span>
+                <h2 className="m-0 text-[19px] font-bold text-[var(--text-h)]">{cat.label}</h2>
               </div>
-              <div className="faq-list">
+              <div className="flex flex-col overflow-hidden rounded-2xl border border-[var(--glass-border)] bg-[var(--card-bg)] shadow-[var(--shadow)] backdrop-blur-xl">
                 {cat.items.map((item, i) => (
                   <FaqItem key={i} question={item.q} answer={item.a} />
                 ))}
@@ -322,14 +436,20 @@ export default function HelpPage({ onBack }) {
         )}
 
         {/* Contact strip */}
-        <div className="help-contact-strip">
-          <div className="help-contact-text">
-            <p className="help-contact-title">Still need help?</p>
-            <p className="help-contact-sub">Our support team is available Monday–Friday, 9 am–6 pm GMT.</p>
+        <div className="mt-4 flex flex-wrap items-center justify-between gap-6 rounded-[14px] border border-[var(--border)] bg-[linear-gradient(135deg,var(--bg)_0%,var(--bg-gradient-to)_50%,var(--accent-bg)_100%)] px-8 py-7 max-[600px]:flex-col max-[600px]:items-start max-[600px]:px-6">
+          <div>
+            <p className="m-0 mb-1 text-[17px] font-bold text-[var(--text-h)]">Still need help?</p>
+            <p className="m-0 text-[13px] text-[var(--text)] opacity-70">
+              Our support team is available Monday–Friday, 9 am–6 pm GMT.
+            </p>
           </div>
-          <div className="help-contact-actions">
-            <button className="help-contact-btn help-contact-btn--primary">Live Chat</button>
-            <button className="help-contact-btn">Email Us</button>
+          <div className="flex shrink-0 gap-2.5">
+            <button className="cursor-pointer rounded-lg border border-purple-400 bg-purple-400 px-5 py-2.5 text-[13px] font-semibold text-white transition-opacity hover:opacity-85">
+              Live Chat
+            </button>
+            <button className="cursor-pointer rounded-lg border border-[var(--border)] bg-[var(--card-bg)] px-5 py-2.5 text-[13px] font-semibold text-[var(--text-h)] transition-opacity hover:opacity-85">
+              Email Us
+            </button>
           </div>
         </div>
       </main>

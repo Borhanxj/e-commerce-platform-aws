@@ -1,38 +1,212 @@
-import './WishlistPage.css'
-
 function BackIcon() {
   return (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <svg
+      width="20"
+      height="20"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
       <line x1="19" y1="12" x2="5" y2="12" />
       <polyline points="12 19 5 12 12 5" />
     </svg>
   )
 }
 
-export default function WishlistPage({ onBack }) {
+function TrashIcon() {
   return (
-    <div className="wishlist-page">
-      <header className="wishlist-header">
-        <div className="wishlist-header-inner">
-          <button className="back-btn" onClick={onBack}>
+    <svg
+      width="16"
+      height="16"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <polyline points="3 6 5 6 21 6" />
+      <path d="M19 6l-1 14H6L5 6" />
+      <path d="M10 11v6M14 11v6" />
+      <path d="M9 6V4h6v2" />
+    </svg>
+  )
+}
+
+function CartIcon() {
+  return (
+    <svg
+      width="16"
+      height="16"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z" />
+      <line x1="3" y1="6" x2="21" y2="6" />
+      <path d="M16 10a4 4 0 01-8 0" />
+    </svg>
+  )
+}
+
+export default function WishlistPage({
+  onBack,
+  wishlistItems,
+  onRemove,
+  onAddToCart,
+  onRemoveFromCart,
+  cartItems = [],
+}) {
+  if (wishlistItems.length === 0) {
+    return (
+      <div className="flex min-h-svh w-full flex-col bg-[var(--bg)] pt-16">
+        <header className="fixed top-0 right-0 left-0 z-[1000] border-b border-[var(--border)] bg-[rgba(var(--background-rgb),0.75)] px-6 backdrop-blur-[20px]">
+          <div className="mx-auto flex h-16 max-w-[1280px] items-center gap-4">
+            <button
+              className="flex cursor-pointer items-center gap-1.5 rounded-lg border-none bg-transparent px-2.5 py-1.5 text-sm text-[var(--text)] transition-colors hover:bg-purple-400/12 hover:text-purple-400"
+              onClick={onBack}
+            >
+              <BackIcon /> Back
+            </button>
+            <span className="ml-auto text-[22px] font-bold tracking-[4px] text-[var(--text-h)]">
+              FIER
+            </span>
+          </div>
+        </header>
+        <main className="mx-auto box-border w-full max-w-[1280px] px-6 pt-12 pb-16">
+          <h1 className="mb-10 text-[32px] font-bold tracking-[-0.5px] text-[var(--text-h)]">
+            Wishlist
+          </h1>
+          <div className="flex flex-col items-center justify-center gap-3 px-6 py-20 text-center">
+            <div className="mb-2 text-purple-400 opacity-50">
+              <svg
+                width="64"
+                height="64"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z" />
+              </svg>
+            </div>
+            <p className="m-0 text-[20px] font-semibold text-[var(--text-h)]">
+              Your wishlist is empty
+            </p>
+            <p className="m-0 mb-4 text-sm text-[var(--text)]">
+              Save items you love and come back to them anytime.
+            </p>
+            <button
+              className="cursor-pointer rounded-lg border-none bg-purple-400 px-7 py-3 text-sm font-semibold tracking-[0.5px] text-white transition-opacity hover:opacity-88"
+              onClick={onBack}
+            >
+              Start Shopping
+            </button>
+          </div>
+        </main>
+      </div>
+    )
+  }
+
+  return (
+    <div className="flex min-h-svh w-full flex-col bg-[var(--bg)] pt-16">
+      <header className="fixed top-0 right-0 left-0 z-[1000] border-b border-[var(--border)] bg-[rgba(var(--background-rgb),0.75)] px-6 backdrop-blur-[20px]">
+        <div className="mx-auto flex h-16 max-w-[1280px] items-center gap-4">
+          <button
+            className="flex cursor-pointer items-center gap-1.5 rounded-lg border-none bg-transparent px-2.5 py-1.5 text-sm text-[var(--text)] transition-colors hover:bg-purple-400/12 hover:text-purple-400"
+            onClick={onBack}
+          >
             <BackIcon /> Back
           </button>
-          <span className="brand">MODÉ</span>
+          <span className="ml-auto text-[22px] font-bold tracking-[4px] text-[var(--text-h)]">
+            FIER
+          </span>
         </div>
       </header>
 
-      <main className="wishlist-main">
-        <h1 className="wishlist-title">Wishlist</h1>
+      <main className="mx-auto box-border w-full max-w-[1280px] px-6 pt-12 pb-16">
+        <h1 className="mb-10 text-[32px] font-bold tracking-[-0.5px] text-[var(--text-h)]">
+          Wishlist
+        </h1>
 
-        <div className="wishlist-empty">
-          <div className="empty-icon">
-            <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z" />
-            </svg>
-          </div>
-          <p className="empty-title">Your wishlist is empty</p>
-          <p className="empty-sub">Save items you love and come back to them anytime.</p>
-          <button className="cta-btn" onClick={onBack}>Start Shopping</button>
+        <div className="grid [grid-template-columns:repeat(auto-fill,minmax(260px,1fr))] gap-5">
+          {wishlistItems.map((item) => {
+            const availableStock = parseInt(item.available_stock ?? 0)
+            const outOfStock = availableStock === 0
+            const lowStock = availableStock > 0 && availableStock <= 10
+            const inCart = cartItems.some((c) => c.id === item.id)
+            return (
+              <div
+                key={item.id}
+                className="flex flex-col overflow-hidden rounded-2xl border border-[var(--glass-border)] bg-[var(--card-bg)] shadow-[var(--shadow)] backdrop-blur-xl transition-[transform,box-shadow] duration-250 hover:-translate-y-1 hover:shadow-[0_8px_24px_rgba(0,0,0,0.15),0_0_0_1px_rgba(192,132,252,0.35)]"
+              >
+                <div className="flex aspect-[4/3] w-full items-center justify-center bg-purple-400/12">
+                  <span className="text-5xl font-bold text-purple-400 opacity-50">
+                    {item.name[0]}
+                  </span>
+                </div>
+                <div className="flex flex-1 flex-col gap-1 px-4 pt-3.5 pb-2">
+                  <span className="text-[15px] font-medium text-[var(--text-h)]">{item.name}</span>
+                  {item.discounted_price != null ? (
+                    <div className="flex flex-col gap-0.5">
+                      <span className="text-sm text-red-400 line-through opacity-70">
+                        ${parseFloat(item.price).toFixed(2)}
+                      </span>
+                      <span className="text-sm font-bold text-purple-400">
+                        ${parseFloat(item.discounted_price).toFixed(2)}
+                        <span className="ml-1.5 text-[11px] font-semibold text-green-400">
+                          -{item.discount_percent}%
+                        </span>
+                      </span>
+                    </div>
+                  ) : (
+                    <span className="text-sm text-[var(--text)]">
+                      ${parseFloat(item.price).toFixed(2)}
+                    </span>
+                  )}
+                  {lowStock && (
+                    <span className="text-[11px] font-semibold text-red-400">
+                      Only {availableStock} left
+                    </span>
+                  )}
+                </div>
+                <div className="flex items-center gap-2.5 px-4 pt-3 pb-4">
+                  <button
+                    className={
+                      outOfStock
+                        ? 'flex flex-1 cursor-not-allowed items-center justify-center gap-1.5 rounded-lg border border-[var(--border)] bg-transparent px-3.5 py-2.5 text-[13px] font-semibold text-[var(--text)] opacity-40'
+                        : inCart
+                          ? 'flex flex-1 cursor-pointer items-center justify-center gap-1.5 rounded-lg border border-purple-400 bg-transparent px-3.5 py-2.5 text-[13px] font-semibold text-purple-400 transition-opacity hover:opacity-88'
+                          : 'flex flex-1 cursor-pointer items-center justify-center gap-1.5 rounded-lg border-none bg-purple-400 px-3.5 py-2.5 text-[13px] font-semibold tracking-[0.3px] text-white transition-opacity hover:opacity-88'
+                    }
+                    disabled={outOfStock}
+                    onClick={() => {
+                      if (outOfStock) return
+                      inCart ? onRemoveFromCart(item.id) : onAddToCart(item)
+                    }}
+                  >
+                    <CartIcon />
+                    {outOfStock ? 'Out of Stock' : inCart ? 'Remove from Cart' : 'Add to Cart'}
+                  </button>
+                  <button
+                    className="flex cursor-pointer items-center rounded-lg border border-[var(--border)] bg-transparent p-2.5 text-[var(--text)] transition-colors hover:border-[rgba(232,93,93,0.3)] hover:bg-[rgba(232,93,93,0.1)] hover:text-[#e85d5d]"
+                    onClick={() => onRemove(item.id)}
+                    aria-label="Remove from wishlist"
+                  >
+                    <TrashIcon />
+                  </button>
+                </div>
+              </div>
+            )
+          })}
         </div>
       </main>
     </div>

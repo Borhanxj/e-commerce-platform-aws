@@ -1,87 +1,201 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+This file provides guidance to Claude Code, Codex, and Gemini CLI when working with code in this repository.
 
 ## Project Overview
 
-An e-commerce platform with a React frontend (Vite) and Express.js backend.
+An e-commerce platform (Sabanci University CS308 course project) with a React frontend (Vite) and Express.js backend. Full product requirements are in [`.claude/project_description.md`](.claude/project_description.md) — consult it to ensure all implementations align with the specified role responsibilities and feature scope.
+
+## Git Conventions
+
+When writing commit messages, follow [Conventional Commits](.claude/conventional-commits.md). Do **not** add `Co-Authored-By: Claude ...` trailers.
 
 ## Commands
 
 ### Frontend (`frontend/`)
+
 ```bash
-npm run dev       # Start Vite dev server with HMR
-npm run build     # Production build
-npm run lint      # ESLint
-npm run preview   # Preview production build
+npm run dev           # Start Vite dev server with HMR
+npm run build         # Production build
+npm run lint          # ESLint
+npm run preview       # Preview production build
+npm run format        # Prettier auto-fix
+npm run format:check  # Prettier validation (used in CI)
+npm test              # Vitest (single run)
+npm run test:watch    # Vitest (watch mode)
 ```
 
 ### Backend (`backend/`)
+
 ```bash
-node server.js    # Start Express server (default port 3000)
+node server.js        # Start Express server (default port 3000)
+npm run lint          # ESLint
+npm run format        # Prettier auto-fix
+npm run format:check  # Prettier validation (used in CI)
+npm test              # Jest (single run)
 ```
 
-No test runner is configured yet in either package.
+### Before committing
+
+Run these in both packages before every commit — CI enforces all four:
+
+```bash
+# Frontend
+cd frontend && npm run lint && npm run format:check
+
+# Backend
+cd backend && npm run lint && npm run format:check
+
+# Auto-fix formatting (then re-check)
+npm run format
+```
+
+### Running a single test
+
+```bash
+# Frontend — pass a filename pattern
+cd frontend && npx vitest run LoginPage
+
+# Backend — pass a test name pattern
+cd backend && npx jest --testNamePattern "returns 201"
+```
 
 ### Docker
+
 ```bash
 docker compose up --build   # First run, or after package.json changes
 docker compose up           # Subsequent runs
 docker compose down         # Stop and remove containers
+docker compose down -v      # Stop and remove containers AND all volumes (see warning below)
 ```
 
-Services: frontend → http://localhost:5173, backend → http://localhost:3000, PostgreSQL → localhost:5432
+> **Warning — `down -v`:** Removes **all** volumes, including the named `postgres_data` volume. All database data (users, products, orders) will be lost. Only use this to fix stale anonymous `node_modules` volumes when `nodemon` or other packages are not found inside the container despite being in `package.json`. After running, bring the stack back up — seeds run automatically.
+
+On every `docker compose up`, the backend entrypoint (`backend/entrypoint.sh`) automatically:
+1. Waits for PostgreSQL to accept connections
+2. Runs all pending migrations (`npm run migrate:up`)
+3. Seeds all dev accounts and products (all seeds are idempotent — safe to re-run)
+
+**Dev credentials (defined in `docker-compose.yml`):**
+
+| Role | Email | Password |
+|------|-------|----------|
+| Admin | `admin@example.com` | `admin123456` |
+| Sales Manager | `salesmanager@example.com` | `salesmanager123456` |
+| Product Manager | `productmanager@example.com` | `productmanager123456` |
+
+Products (56 items across 8 categories) are also seeded automatically.
+
+Services: frontend → <http://localhost:5173>, backend → <http://localhost:3000>, PostgreSQL → localhost:5432, invoice-api → <http://localhost:8080>, MailHog UI → <http://localhost:8025>
 
 Each service has a `Dockerfile` (production) and `Dockerfile.dev` (development). `docker-compose.yml` uses the dev Dockerfiles with volume mounts for hot reload.
 
 ## Database
 
 ```bash
-docker compose exec db psql -U postgres -d ecommerce   # Open psql shell
-docker compose exec db psql -U postgres -d ecommerce -c "\dt"   # List tables
-docker compose exec db psql -U postgres -d ecommerce -c "\d auth.users"   # Describe a table
-```
-
-### Querying the database
-
-```bash
-# List all registered users (id, email, role, created_at — password_hash excluded)
-docker compose exec db psql -U postgres -d ecommerce -c "SELECT id, email, role, created_at FROM auth.users;"
-
-# Count users
-docker compose exec db psql -U postgres -d ecommerce -c "SELECT COUNT(*) FROM auth.users;"
-
-# Find a specific user by email
-docker compose exec db psql -U postgres -d ecommerce -c "SELECT id, email, role, created_at FROM auth.users WHERE email = 'user@example.com';"
-
-# Delete a user by email (useful for re-testing registration)
-docker compose exec db psql -U postgres -d ecommerce -c "DELETE FROM auth.users WHERE email = 'user@example.com';"
+docker compose exec db psql -U postgres -d ecommerce        # Open psql shell
+docker compose exec db psql -U postgres -d ecommerce -c "\dt"              # List tables
+docker compose exec db psql -U postgres -d ecommerce -c "\d auth.users"    # Describe a table
 ```
 
 ### Running migrations
 
-Migrations are managed with `node-pg-migrate`. Migration scripts live in `backend/migrations/scripts/`.
+Migrations are managed with `node-pg-migrate`. Migration scripts live in `backend/migrations/`.
 
 ```bash
 docker compose exec backend npm run migrate:up    # Apply all pending migrations
 docker compose exec backend npm run migrate:down  # Roll back the last migration
 ```
 
-To add a new migration, create `backend/migrations/scripts/<N>_description.js` (increment N) with `exports.up` and `exports.down` functions, then run `migrate:up`.
+To add a new migration, create `backend/migrations/<N>_description.js` (increment N) with `exports.up` and `exports.down` functions, then run `migrate:up`.
 
-The runner tracks applied migrations in a `pgmigrations` table in the database. Never edit a migration file that has already been applied — write a new one instead.
+Never edit a migration file that has already been applied — write a new one instead.
+
+### Manually re-seeding individual accounts
+
+Seeds run automatically on startup, but individual scripts can be invoked directly if needed:
+
+```bash
+docker compose exec backend node scripts/seed-admin.js
+docker compose exec backend node scripts/seed-sales-manager.js
+docker compose exec backend node scripts/seed-product-manager.js
+docker compose exec backend node scripts/seed-products.js
+```
+
+To wipe and re-seed products:
+
+```bash
+docker compose exec db psql -U postgres -d ecommerce -c "TRUNCATE products RESTART IDENTITY CASCADE;"
+docker compose exec backend node scripts/seed-products.js
+```
 
 ## Architecture
 
-**Frontend:** React 19 + Vite. Entry point: `src/main.jsx` → `src/App.jsx`. Styling via CSS custom properties in `src/index.css` (supports light/dark mode). ESLint uses the modern flat config format (`eslint.config.js`).
+### Backend
 
-**Backend:** Express 5 server (`server.js`). PostgreSQL connection via `db.js` (uses `DATABASE_URL`). Auth routes live in `routes/auth.js` — `POST /api/auth/register` and `POST /api/auth/login` — using `bcrypt` for password hashing and `jsonwebtoken` for JWT issuance. `GET /` is a health-check that also verifies DB connectivity.
+`server.js` is the entry point; all Express setup lives in `app.js`. `db.js` exports a single `pg.Pool` instance.
 
-**No monorepo tooling** — frontend and backend are independent npm workspaces; run `npm install` separately in each directory.
+Route files in `backend/routes/`:
+
+- `auth.js` — `POST /api/auth/register`, `POST /api/auth/login`, password reset endpoints
+- `products.js` — public; `GET /api/products` (`?category=`, `?limit=`), `GET /api/products/search` (`?q=`)
+- `cart.js` — authenticated; `GET/POST /api/cart`, `PUT /api/cart/:productId`, `DELETE /api/cart/:productId`, `DELETE /api/cart`
+- `checkout.js` — authenticated; `POST /api/checkout/reserve`, `DELETE /api/checkout/reserve`, `POST /api/checkout/confirm`
+- `admin.js` — `GET/POST/PUT/DELETE /api/admin/users`, `GET /api/admin/me`
+- `admin-products.js` — product CRUD at `/api/admin/products`
+- `admin-orders.js` — order management at `/api/admin/orders`
+- `admin-settings.js` — system settings + dashboard stats at `/api/admin/settings`
+- `sales-manager-products.js` — `GET /api/sales-manager/products` (`?category=`, `?q=`), `GET /api/sales-manager/products/categories`, `PATCH /api/sales-manager/products/:id/price`, `POST /api/sales-manager/products/discount`, `DELETE /api/sales-manager/products/:id/discount`
+- `notifications.js` — authenticated; `GET /api/notifications`, `PATCH /api/notifications/:id/read`, `PATCH /api/notifications/read-all`, `DELETE /api/notifications`
+- `wishlist.js` — authenticated; `GET/POST /api/wishlist`, `DELETE /api/wishlist/:productId`
+
+Middleware in `backend/middleware/`:
+
+- `auth.js` — verifies Bearer JWT and sets `req.user`
+- `admin.js` — requires `role === 'admin'`; stack with `auth.js` on all admin routes
+- `sales-manager.js` — requires `role === 'sales_manager'`; stack with `auth.js` on all SM routes
+
+### Invoice service (`backend/invoice_api/`, `backend/pkg/`)
+
+A separate Python FastAPI microservice on port 8080. Entry point: `invoice_api/main.py`. Shared library in `backend/pkg/`: `pkg/mailer/` (SMTP via MailHog), `pkg/invoice/` (PDF via wkhtmltopdf + Jinja2). Dependencies: `backend/requirements-invoice.txt`.
+
+### Frontend
+
+`src/main.jsx` wraps `<App>` in `<BrowserRouter>`. All routing in `src/App.jsx` (React Router v7).
+
+Auth state (`token`, `adminToken`, `salesManagerToken`) held in `App`, initialised from `localStorage`. JWT decoded client-side via `src/utils/jwt.js`.
+
+Shared: `src/styles/dashboardStyles.js` (Tailwind constants), `src/components/DashboardLayout.jsx` (sidebar+header shell for admin and SM dashboards).
+
+**Route guards:**
+
+- Customers: `localStorage.token` → `RequireAuth` → `/login`
+- Sales managers: `localStorage.salesManagerToken` → `RequireSalesManager` → `/sales-manager/login`
+- Admin: `localStorage.adminToken` → `RequireAdmin` → `/admin/login`
+
+`src/api.js` exports `API_BASE` from `VITE_API_BASE_URL`, falling back to `http://localhost:3000`.
+
+Pages live in `src/pages/<section>/`. Key SM pages:
+- `DiscountManagement` (`src/pages/sales-manager/DiscountManagement.jsx`) — paginated product table with category filter, search bar, and bulk discount apply/remove
+- `NotificationBell` (`src/pages/home/components/NotificationBell.jsx`) — price-drop notifications for logged-in customers; mark-read, mark-all-read, clear-all
+
+### Database schema
+
+Auth schema: `auth.users`, `auth.customers`, `auth.sales_managers`, `auth.product_managers`.
+Public schema: `products`, `orders`, `order_items`, `system_settings`, `cart_items`, `stock_reservations`, `wishlist_items`, `product_discounts`, `notifications`.
+Role enum: `auth.user_role` — `customer`, `sales_manager`, `product_manager`, `admin`.
+
+### Testing
+
+**Frontend** — Vitest + React Testing Library. Tests in `frontend/test/`. Setup in `frontend/test/setup.js`.
+
+**Backend** — Jest + Supertest. Tests in `backend/test/`. DB pool always mocked.
+
+**Invoice service** — pytest. Tests in `backend/tests/`. `backend/conftest.py` adds `backend/` to `sys.path`.
 
 ## Environment
 
-Create a `.env` in `backend/` for local config (already gitignored). Required variables:
+`backend/.env` (gitignored):
 
 ```
 PORT=3000
@@ -89,4 +203,8 @@ DATABASE_URL=postgres://postgres:password@localhost:5432/ecommerce
 JWT_SECRET=your_secret_here
 ```
 
-`PORT` defaults to `3000` if not set.
+`frontend/.env` (optional, for deployment):
+
+```
+VITE_API_BASE_URL=https://your-backend-host.com
+```
