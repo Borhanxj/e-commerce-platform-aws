@@ -98,7 +98,7 @@ export default function NotificationBell({ token }) {
         className="relative flex h-10 w-10 items-center justify-center rounded-lg border border-[var(--border)] bg-[var(--card-bg)] text-[var(--text-h)] transition-colors hover:border-purple-400/40 hover:bg-purple-400/12 hover:text-purple-400"
         aria-label="Notifications"
         aria-expanded={open}
-        aria-haspopup="listbox"
+        aria-haspopup="menu"
         onClick={handleToggle}
       >
         <BellIcon />
@@ -110,12 +110,16 @@ export default function NotificationBell({ token }) {
       </button>
 
       {open && (
-        <div className="animate-in fade-in slide-in-from-top-1.5 light:bg-white/92 light:shadow-[0_10px_30px_rgba(0,0,0,0.15)] absolute top-[calc(100%+16px)] right-0 z-[200] w-[320px] overflow-hidden rounded-2xl border border-[var(--border)] bg-[rgba(var(--background-rgb),0.92)] shadow-[var(--shadow)] backdrop-blur-xl">
+        <div
+          role="menu"
+          className="animate-in fade-in slide-in-from-top-1.5 light:bg-white/92 light:shadow-[0_10px_30px_rgba(0,0,0,0.15)] absolute top-[calc(100%+16px)] right-0 z-[200] w-[320px] overflow-hidden rounded-2xl border border-[var(--border)] bg-[rgba(var(--background-rgb),0.92)] shadow-[var(--shadow)] backdrop-blur-xl"
+        >
           <div className="flex items-center justify-between border-b border-[var(--border)] px-4 py-3">
             <span className="text-[13px] font-semibold text-[var(--text-h)]">Notifications</span>
             <div className="flex items-center gap-3">
               {unreadCount > 0 && (
                 <button
+                  role="menuitem"
                   className="text-[11px] text-purple-400 hover:underline"
                   onClick={markAllRead}
                 >
@@ -124,6 +128,7 @@ export default function NotificationBell({ token }) {
               )}
               {notifications.length > 0 && (
                 <button
+                  role="menuitem"
                   className="text-[11px] text-[var(--text)] opacity-50 hover:underline hover:opacity-100"
                   onClick={clearAll}
                 >
@@ -142,6 +147,7 @@ export default function NotificationBell({ token }) {
               {notifications.map((n) => (
                 <button
                   key={n.id}
+                  role="menuitem"
                   className={`flex w-full flex-col gap-0.5 border-b border-[var(--border)] px-4 py-3 text-left transition-colors last:border-b-0 hover:bg-purple-400/5 ${!n.is_read ? 'bg-purple-400/5' : ''}`}
                   onClick={() => !n.is_read && markRead(n.id)}
                 >
