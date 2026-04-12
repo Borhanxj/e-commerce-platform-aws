@@ -21,13 +21,19 @@ export default function PriceManagement({ token }) {
   const [editingPrice, setEditingPrice] = useState('')
   const [editError, setEditError] = useState('')
   const [saving, setSaving] = useState(false)
+  const [categories, setCategories] = useState([])
+  const [filterCategory, setFilterCategory] = useState('')
+  const [searchInput, setSearchInput] = useState('')
+  const [searchQuery, setSearchQuery] = useState('')
 
   const fetchProducts = useCallback(
-    async (page = 1) => {
+    async (page = 1, category = '', search = '') => {
       setLoading(true)
       setError('')
       try {
         const params = new URLSearchParams({ page, limit: 15 })
+        if (category) params.set('category', category)
+        if (search) params.set('q', search)
         const res = await fetch(`${API}?${params}`, {
           headers: { Authorization: `Bearer ${token}` },
         })
@@ -45,8 +51,32 @@ export default function PriceManagement({ token }) {
   )
 
   useEffect(() => {
-    fetchProducts(1)
+    fetchProducts(1, '', '')
   }, [fetchProducts])
+
+  useEffect(() => {
+    fetch(`${API}/categories`, { headers: { Authorization: `Bearer ${token}` } })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((data) => {
+        if (data) setCategories(data.categories)
+      })
+      .catch(() => {})
+  }, [token])
+
+  // Debounce search input — wait 300 ms after the user stops typing
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setSearchQuery(searchInput)
+      fetchProducts(1, filterCategory, searchInput)
+    }, 300)
+    return () => clearTimeout(timer)
+  }, [searchInput]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  function handleCategoryChange(e) {
+    const cat = e.target.value
+    setFilterCategory(cat)
+    fetchProducts(1, cat, searchQuery)
+  }
 
   function startEdit(product) {
     setEditingId(product.id)
@@ -93,8 +123,42 @@ export default function PriceManagement({ token }) {
   }
 
   return (
-    <div>
-      {error && <p className="mb-4 text-sm text-red-400">{error}</p>}
+    <div className="flex flex-col gap-6">
+      {error && <p className="text-sm text-red-400">{error}</p>}
+
+      {/* Filters */}
+      <div className="flex flex-wrap items-end gap-4 rounded-2xl border border-[var(--border)] bg-[var(--card-bg)] p-5 shadow-[var(--shadow)] backdrop-blur-xl">
+        <div className="flex flex-col gap-1.5">
+          <label className="text-[11px] font-semibold tracking-[1px] text-[var(--text)] uppercase">
+            Category
+          </label>
+          <select
+            className={`${fieldInputClass} !w-44`}
+            value={filterCategory}
+            onChange={handleCategoryChange}
+          >
+            <option value="">All categories</option>
+            {categories.map((cat) => (
+              <option key={cat} value={cat}>
+                {cat}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div className="flex flex-col gap-1.5">
+          <label className="text-[11px] font-semibold tracking-[1px] text-[var(--text)] uppercase">
+            Search
+          </label>
+          <input
+            type="text"
+            placeholder="Search products…"
+            className={`${fieldInputClass} !w-48`}
+            value={searchInput}
+            onChange={(e) => setSearchInput(e.target.value)}
+          />
+        </div>
+      </div>
 
       <div className="overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--card-bg)] shadow-[var(--shadow)] backdrop-blur-xl">
         <Table>
@@ -189,7 +253,7 @@ export default function PriceManagement({ token }) {
           <button
             className={btnBase}
             disabled={pagination.page <= 1}
-            onClick={() => fetchProducts(pagination.page - 1)}
+            onClick={() => fetchProducts(pagination.page - 1, filterCategory, searchQuery)}
           >
             Previous
           </button>
@@ -199,7 +263,7 @@ export default function PriceManagement({ token }) {
           <button
             className={btnBase}
             disabled={pagination.page >= pagination.totalPages}
-            onClick={() => fetchProducts(pagination.page + 1)}
+            onClick={() => fetchProducts(pagination.page + 1, filterCategory, searchQuery)}
           >
             Next
           </button>
