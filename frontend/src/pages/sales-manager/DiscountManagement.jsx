@@ -21,13 +21,19 @@ export default function DiscountManagement({ token }) {
   const [selectedIds, setSelectedIds] = useState(new Set())
   const [discountPercent, setDiscountPercent] = useState('')
   const [applying, setApplying] = useState(false)
+  const [categories, setCategories] = useState([])
+  const [filterCategory, setFilterCategory] = useState('')
+  const [searchInput, setSearchInput] = useState('')
+  const [searchQuery, setSearchQuery] = useState('')
 
   const fetchProducts = useCallback(
-    async (page = 1) => {
+    async (page = 1, category = '', search = '') => {
       setLoading(true)
       setError('')
       try {
         const params = new URLSearchParams({ page, limit: 15 })
+        if (category) params.set('category', category)
+        if (search) params.set('q', search)
         const res = await fetch(`${API}?${params}`, {
           headers: { Authorization: `Bearer ${token}` },
         })
@@ -35,7 +41,6 @@ export default function DiscountManagement({ token }) {
         const data = await res.json()
         setProducts(data.products)
         setPagination(data.pagination)
-        setSelectedIds(new Set())
       } catch (err) {
         setError(err.message)
       } finally {
@@ -46,8 +51,32 @@ export default function DiscountManagement({ token }) {
   )
 
   useEffect(() => {
-    fetchProducts(1)
+    fetchProducts(1, '', '')
   }, [fetchProducts])
+
+  useEffect(() => {
+    fetch(`${API}/categories`, { headers: { Authorization: `Bearer ${token}` } })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((data) => {
+        if (data) setCategories(data.categories)
+      })
+      .catch(() => {})
+  }, [token])
+
+  // Debounce search input — wait 300 ms after the user stops typing
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setSearchQuery(searchInput)
+      fetchProducts(1, filterCategory, searchInput)
+    }, 300)
+    return () => clearTimeout(timer)
+  }, [searchInput]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  function handleCategoryChange(e) {
+    const cat = e.target.value
+    setFilterCategory(cat)
+    fetchProducts(1, cat, searchQuery)
+  }
 
   function toggleSelect(id) {
     setSelectedIds((prev) => {
@@ -59,10 +88,19 @@ export default function DiscountManagement({ token }) {
   }
 
   function toggleAll() {
-    if (selectedIds.size === products.length) {
-      setSelectedIds(new Set())
+    const allOnPage = products.every((p) => selectedIds.has(p.id))
+    if (allOnPage) {
+      setSelectedIds((prev) => {
+        const next = new Set(prev)
+        products.forEach((p) => next.delete(p.id))
+        return next
+      })
     } else {
-      setSelectedIds(new Set(products.map((p) => p.id)))
+      setSelectedIds((prev) => {
+        const next = new Set(prev)
+        products.forEach((p) => next.add(p.id))
+        return next
+      })
     }
   }
 
@@ -100,7 +138,8 @@ export default function DiscountManagement({ token }) {
         `Discount applied to ${data.updated} product(s). ${data.notified} customer(s) notified.`
       )
       setDiscountPercent('')
-      await fetchProducts(pagination.page)
+      setSelectedIds(new Set())
+      await fetchProducts(pagination.page, filterCategory, searchQuery)
     } catch {
       setError('Could not connect to server')
     } finally {
@@ -121,13 +160,13 @@ export default function DiscountManagement({ token }) {
         setError(data.error || 'Failed to remove discount')
         return
       }
-      await fetchProducts(pagination.page)
+      await fetchProducts(pagination.page, filterCategory, searchQuery)
     } catch {
       setError('Could not connect to server')
     }
   }
 
-  const allSelected = products.length > 0 && selectedIds.size === products.length
+  const allSelected = products.length > 0 && products.every((p) => selectedIds.has(p.id))
 
   return (
     <div className="flex flex-col gap-6">
@@ -146,6 +185,37 @@ export default function DiscountManagement({ token }) {
             className={`${fieldInputClass} !w-36`}
             value={discountPercent}
             onChange={(e) => setDiscountPercent(e.target.value)}
+          />
+        </div>
+
+        <div className="flex flex-col gap-1.5">
+          <label className="text-[11px] font-semibold tracking-[1px] text-[var(--text)] uppercase">
+            Category
+          </label>
+          <select
+            className={`${fieldInputClass} !w-44`}
+            value={filterCategory}
+            onChange={handleCategoryChange}
+          >
+            <option value="">All categories</option>
+            {categories.map((cat) => (
+              <option key={cat} value={cat}>
+                {cat}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div className="flex flex-col gap-1.5">
+          <label className="text-[11px] font-semibold tracking-[1px] text-[var(--text)] uppercase">
+            Search
+          </label>
+          <input
+            type="text"
+            placeholder="Search products…"
+            className={`${fieldInputClass} !w-48`}
+            value={searchInput}
+            onChange={(e) => setSearchInput(e.target.value)}
           />
         </div>
 
@@ -179,7 +249,7 @@ export default function DiscountManagement({ token }) {
                   checked={allSelected}
                   onChange={toggleAll}
                   className="accent-purple-400"
-                  aria-label="Select all"
+                  aria-label="Select all on this page"
                 />
               </TableHead>
               <TableHead className="bg-purple-400/12 text-xs tracking-wide text-[var(--text)] uppercase">
@@ -284,7 +354,7 @@ export default function DiscountManagement({ token }) {
           <button
             className={btnBase}
             disabled={pagination.page <= 1}
-            onClick={() => fetchProducts(pagination.page - 1)}
+            onClick={() => fetchProducts(pagination.page - 1, filterCategory, searchQuery)}
           >
             Previous
           </button>
@@ -294,7 +364,7 @@ export default function DiscountManagement({ token }) {
           <button
             className={btnBase}
             disabled={pagination.page >= pagination.totalPages}
-            onClick={() => fetchProducts(pagination.page + 1)}
+            onClick={() => fetchProducts(pagination.page + 1, filterCategory, searchQuery)}
           >
             Next
           </button>
