@@ -70,9 +70,24 @@ docker compose down         # Stop and remove containers
 docker compose down -v      # Stop and remove containers AND all volumes (see warning below)
 ```
 
-> **Warning — `down -v`:** Removes **all** volumes, including the named `postgres_data` volume. All database data (users, products, orders) will be lost. Only use this to fix stale anonymous `node_modules` volumes when `nodemon` or other packages are not found inside the container despite being in `package.json`. After running, re-seed the database.
+> **Warning — `down -v`:** Removes **all** volumes, including the named `postgres_data` volume. All database data (users, products, orders) will be lost. Only use this to fix stale anonymous `node_modules` volumes when `nodemon` or other packages are not found inside the container despite being in `package.json`. After running, bring the stack back up — seeds run automatically.
 
-Services: frontend → <http://localhost:5173>, backend → <http://localhost:3000>, PostgreSQL → localhost:5432
+On every `docker compose up`, the backend entrypoint (`backend/entrypoint.sh`) automatically:
+1. Waits for PostgreSQL to accept connections
+2. Runs all pending migrations (`npm run migrate:up`)
+3. Seeds all dev accounts and products (all seeds are idempotent — safe to re-run)
+
+**Dev credentials (defined in `docker-compose.yml`):**
+
+| Role | Email | Password |
+|------|-------|----------|
+| Admin | `admin@example.com` | `admin123456` |
+| Sales Manager | `salesmanager@example.com` | `salesmanager123456` |
+| Product Manager | `productmanager@example.com` | `productmanager123456` |
+
+Products (56 items across 8 categories) are also seeded automatically.
+
+Services: frontend → <http://localhost:5173>, backend → <http://localhost:3000>, PostgreSQL → localhost:5432, invoice-api → <http://localhost:8080>, MailHog UI → <http://localhost:8025>
 
 Each service has a `Dockerfile` (production) and `Dockerfile.dev` (development). `docker-compose.yml` uses the dev Dockerfiles with volume mounts for hot reload.
 
@@ -113,31 +128,19 @@ To add a new migration, create `backend/migrations/<N>_description.js` (incremen
 
 The runner tracks applied migrations in a `pgmigrations` table in the database. Never edit a migration file that has already been applied — write a new one instead.
 
-### Seeding an admin user
+### Manually re-seeding individual accounts
+
+Seeds run automatically on startup, but individual scripts can still be invoked directly if needed:
 
 ```bash
-docker compose exec -e ADMIN_EMAIL=admin@example.com -e ADMIN_PASSWORD=yourpassword backend node scripts/seed-admin.js
-```
-
-Both env vars are required — the script exits if either is missing.
-
-### Seeding a sales manager user
-
-```bash
-docker compose exec -e SALES_MANAGER_EMAIL=sm@example.com -e SALES_MANAGER_PASSWORD=yourpassword -e "SALES_MANAGER_NAME=Jane Doe" backend node scripts/seed-sales-manager.js
-```
-
-Must be run via `docker compose exec` so the container's `DATABASE_URL` is available. All three env vars are required. The script inserts into both `auth.users` (role=`sales_manager`) and `auth.sales_managers` (name). Sales managers log in at `/sales-manager/login`.
-
-### Seeding products
-
-```bash
+# Seed scripts read credentials from the container's env vars (set in docker-compose.yml)
+docker compose exec backend node scripts/seed-admin.js
+docker compose exec backend node scripts/seed-sales-manager.js
+docker compose exec backend node scripts/seed-product-manager.js
 docker compose exec backend node scripts/seed-products.js
 ```
 
-Inserts 56 products across all 8 categories. The script is safe to run multiple times — it exits early if the table already has rows.
-
-To wipe and re-seed:
+To wipe and re-seed products:
 
 ```bash
 docker compose exec db psql -U postgres -d ecommerce -c "TRUNCATE products RESTART IDENTITY CASCADE;"
@@ -178,6 +181,10 @@ All admin routes use `router.use(authenticate); router.use(requireAdmin)` at the
 
 JWT payload shape: `{ userId, email, role }`. Tokens expire in 7 days.
 
+### Invoice service (`backend/invoice_api/`, `backend/pkg/`)
+
+A separate Python FastAPI microservice built with `Dockerfile.invoice-api` and served on port 8080. Entry point is `invoice_api/main.py`. Shared library code lives in `backend/pkg/`: `pkg/mailer/` (SMTP via MailHog) and `pkg/invoice/` (PDF generation via wkhtmltopdf + Jinja2 template). Python dependencies are in `backend/requirements-invoice.txt`. The Node.js backend calls `POST /api/invoices/generate` to trigger async PDF generation and email delivery.
+
 ### Frontend
 
 `src/main.jsx` wraps `<App>` in `<BrowserRouter>`. All routing is in `src/App.jsx` using React Router v7.
@@ -215,7 +222,9 @@ User roles are a PostgreSQL enum `auth.user_role`: `customer`, `sales_manager`, 
 
 **Frontend** — Vitest + React Testing Library. Test files live in `frontend/test/`. Setup in `frontend/test/setup.js` imports `@testing-library/jest-dom` and sets `globalThis.React`. Globals (`describe`, `it`, `expect`, `vi`) are enabled via `vite.config.js`.
 
-**Backend** — Jest + Supertest. Test files live in `backend/test/`. The DB pool is always mocked (`jest.mock('../db', ...)`) so tests run without a real database.
+**Backend (Node.js)** — Jest + Supertest. Test files live in `backend/test/`. The DB pool is always mocked (`jest.mock('../db', ...)`) so tests run without a real database.
+
+**Invoice service (Python)** — pytest. Test files live in `backend/tests/`. `backend/conftest.py` adds `backend/` to `sys.path` so `pkg.*` and `invoice_api.*` resolve regardless of where pytest is invoked from.
 
 ### CI/CD
 
@@ -241,7 +250,9 @@ DATABASE_URL=postgres://postgres:password@localhost:5432/ecommerce
 JWT_SECRET=your_secret_here
 ```
 
-`PORT` defaults to `3000` if not set. For frontend API URL override, create `frontend/.env`:
+`PORT` defaults to `3000` if not set. The invoice service reads `SMTP_HOST` (default `mailserver`), `SMTP_PORT` (default `1025`), `SMTP_USER`, `SMTP_PASS`, and `SENDER_EMAIL` (default `invoices@fier.com`) from its environment — these are set via `docker-compose.yml` for Docker runs.
+
+For frontend API URL override, create `frontend/.env`:
 
 ```
 VITE_API_BASE_URL=https://your-backend-host.com
