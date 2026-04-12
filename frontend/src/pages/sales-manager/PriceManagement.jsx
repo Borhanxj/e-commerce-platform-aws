@@ -51,10 +51,6 @@ export default function PriceManagement({ token }) {
   )
 
   useEffect(() => {
-    fetchProducts(1, '', '')
-  }, [fetchProducts])
-
-  useEffect(() => {
     fetch(`${API}/categories`, { headers: { Authorization: `Bearer ${token}` } })
       .then((r) => (r.ok ? r.json() : null))
       .then((data) => {
@@ -65,17 +61,17 @@ export default function PriceManagement({ token }) {
 
   // Debounce search input — wait 300 ms after the user stops typing
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setSearchQuery(searchInput)
-      fetchProducts(1, filterCategory, searchInput)
-    }, 300)
+    const timer = setTimeout(() => setSearchQuery(searchInput), 300)
     return () => clearTimeout(timer)
-  }, [searchInput]) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [searchInput])
+
+  // Fetch whenever the committed search query or category changes
+  useEffect(() => {
+    fetchProducts(1, filterCategory, searchQuery)
+  }, [fetchProducts, filterCategory, searchQuery])
 
   function handleCategoryChange(e) {
-    const cat = e.target.value
-    setFilterCategory(cat)
-    fetchProducts(1, cat, searchQuery)
+    setFilterCategory(e.target.value)
   }
 
   function startEdit(product) {
