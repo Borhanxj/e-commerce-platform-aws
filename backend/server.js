@@ -10,6 +10,7 @@ const pool = require('./db')
 
 const PORT = process.env.PORT || 3000
 
+// Test endpoint - çalışıyor mu diye kontrol
 app.get('/', async (req, res) => {
   try {
     await pool.query('SELECT 1')

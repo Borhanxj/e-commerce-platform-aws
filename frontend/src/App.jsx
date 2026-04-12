@@ -25,6 +25,8 @@ import SearchPage from './pages/search/SearchPage'
 import AccountSettingsPage from './pages/account/AccountSettingsPage'
 import OrdersPage from './pages/orders/OrdersPage'
 import HelpPage from './pages/help/HelpPage'
+
+import ProductManagerDashboard from './pages/product-manager/ProductManagerDashboard'
 import API_BASE from './api'
 import { decodeJwtPayload } from './utils/jwt'
 
@@ -42,6 +44,12 @@ function RequireAuth({ token, children }) {
   return children
 }
 
+function RequireProductManager({ token, children }) {
+  if (!token) return <Navigate to="/login" replace />
+  const payload = decodeJwtPayload(token)
+  if (!payload || payload.role !== 'product_manager') return <Navigate to="/" replace />
+  return children
+}
 function RequireSalesManager({ salesManagerToken, children }) {
   if (!salesManagerToken) return <Navigate to="/sales-manager/login" replace />
   const payload = decodeJwtPayload(salesManagerToken)
@@ -297,6 +305,7 @@ function App() {
 
     setToken(t)
     setUser({ email: payload.email })
+
     if (cartData?.items) {
       localStorage.removeItem('guest_cart')
       setCart(cartData.items)
@@ -305,7 +314,11 @@ function App() {
       localStorage.removeItem('guest_wishlist')
       setWishlist(wishlistData.items)
     }
-    navigate('/')
+    if (payload.role === 'product_manager') {
+      navigate('/product-manager')
+    } else {
+      navigate('/')
+    }
   }
 
   async function handleSignup(t) {
@@ -557,7 +570,22 @@ function App() {
             </RequireSalesManager>
           }
         />
-
+        <Route
+          path="/product-manager"
+          element={
+            <RequireProductManager token={token}>
+              <ProductManagerDashboard
+                token={token}
+                onLogout={() => {
+                  localStorage.removeItem('token')
+                  setToken(null)
+                  setUser(null)
+                  navigate('/login')
+                }}
+              />
+            </RequireProductManager>
+          }
+        />
         {/* Admin routes */}
         <Route
           path="/admin/login"
