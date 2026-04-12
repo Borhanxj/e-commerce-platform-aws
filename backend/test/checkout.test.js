@@ -232,7 +232,9 @@ describe('POST /api/checkout/confirm', () => {
   it('returns { order_id } on success and clears cart and reservations', async () => {
     pool.query.mockResolvedValueOnce({
       // reservations joined with products (single source of truth)
-      rows: [{ product_id: 1, quantity: 2, name: 'Widget', price: '9.99' }],
+      rows: [
+        { product_id: 1, quantity: 2, name: 'Widget', price: '9.99', effective_price: '9.99' },
+      ],
     })
 
     const client = makeClient([
@@ -258,7 +260,9 @@ describe('POST /api/checkout/confirm', () => {
 
   it('accepts confirm without address', async () => {
     pool.query.mockResolvedValueOnce({
-      rows: [{ product_id: 1, quantity: 1, name: 'Widget', price: '5.00' }],
+      rows: [
+        { product_id: 1, quantity: 1, name: 'Widget', price: '5.00', effective_price: '5.00' },
+      ],
     })
 
     const client = makeClient([
@@ -279,6 +283,47 @@ describe('POST /api/checkout/confirm', () => {
 
     expect(res.status).toBe(200)
     expect(res.body.order_id).toBe(99)
+  })
+
+  it('uses effective_price (discounted) for order total and order_items, not base price', async () => {
+    // Product base price $20.00, 20% discount → effective_price $16.00
+    pool.query.mockResolvedValueOnce({
+      rows: [
+        { product_id: 1, quantity: 2, name: 'Widget', price: '20.00', effective_price: '16.00' },
+      ],
+    })
+
+    const client = makeClient([
+      { rows: [] }, // BEGIN
+      { rows: [] }, // UPDATE products stock
+      { rows: [{ id: 77 }] }, // INSERT order RETURNING id
+      { rows: [] }, // INSERT order_items
+      { rows: [] }, // DELETE cart_items
+      { rows: [] }, // DELETE stock_reservations
+      { rows: [] }, // COMMIT
+    ])
+    pool.connect.mockResolvedValueOnce(client)
+
+    const res = await request(app)
+      .post('/api/checkout/confirm')
+      .set('Authorization', `Bearer ${userToken}`)
+      .send({ address: '123 Main St' })
+
+    expect(res.status).toBe(200)
+
+    // Verify order_items INSERT used effective_price ('16.00'), not base price ('20.00')
+    const orderItemsInsert = client.query.mock.calls.find(
+      (call) => typeof call[0] === 'string' && call[0].includes('INSERT INTO order_items')
+    )
+    expect(orderItemsInsert).toBeDefined()
+    expect(orderItemsInsert[1][3]).toBe('16.00') // price param = effective_price
+
+    // Verify order total = 2 × 16.00 = 32.00
+    const orderInsert = client.query.mock.calls.find(
+      (call) => typeof call[0] === 'string' && call[0].includes('INSERT INTO orders')
+    )
+    expect(orderInsert).toBeDefined()
+    expect(orderInsert[1][1]).toBe('32.00') // total param
   })
 
   it('returns 500 on database error', async () => {
