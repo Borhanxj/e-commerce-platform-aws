@@ -8,13 +8,30 @@ const router = express.Router()
 router.use(authenticate)
 router.use(requireSalesManager)
 
+// GET /api/sales-manager/products/categories — distinct category list
+router.get('/categories', async (req, res) => {
+  const result = await pool.query(
+    'SELECT DISTINCT category FROM products WHERE category IS NOT NULL ORDER BY category'
+  )
+  res.json({ categories: result.rows.map((r) => r.category) })
+})
+
 // GET /api/sales-manager/products — paginated product list with active discount info
+// Supports optional ?category= and ?q= filters
 router.get('/', async (req, res) => {
   const page = Math.max(1, parseInt(req.query.page) || 1)
   const limit = Math.min(100, Math.max(1, parseInt(req.query.limit) || 15))
   const offset = (page - 1) * limit
 
-  const countResult = await pool.query('SELECT COUNT(*) FROM products')
+  const category = req.query.category || null
+  const q = req.query.q && req.query.q.trim().length >= 2 ? `%${req.query.q.trim()}%` : null
+
+  const countResult = await pool.query(
+    `SELECT COUNT(*) FROM products p
+     WHERE ($1::text IS NULL OR p.category = $1)
+       AND ($2::text IS NULL OR p.name ILIKE $2)`,
+    [category, q]
+  )
   const total = parseInt(countResult.rows[0].count)
 
   const dataResult = await pool.query(
@@ -28,8 +45,10 @@ router.get('/', async (req, res) => {
      LEFT JOIN product_discounts pd ON pd.product_id = p.id
        AND pd.start_at <= NOW()
        AND (pd.end_at IS NULL OR pd.end_at > NOW())
+     WHERE ($3::text IS NULL OR p.category = $3)
+       AND ($4::text IS NULL OR p.name ILIKE $4)
      ORDER BY p.name ASC LIMIT $1 OFFSET $2`,
-    [limit, offset]
+    [limit, offset, category, q]
   )
 
   res.json({
