@@ -97,7 +97,7 @@ describe('NotificationBell', () => {
 
     await userEvent.click(screen.getByRole('button', { name: /notifications/i }))
 
-    expect(await screen.findByRole('button', { name: /mark all as read/i })).toBeInTheDocument()
+    expect(await screen.findByRole('menuitem', { name: /mark all as read/i })).toBeInTheDocument()
   })
 
   it('does not show "Mark all as read" when all notifications are read', async () => {
@@ -107,7 +107,7 @@ describe('NotificationBell', () => {
     await userEvent.click(screen.getByRole('button', { name: /notifications/i }))
 
     await screen.findByText('Old Deal')
-    expect(screen.queryByRole('button', { name: /mark all as read/i })).not.toBeInTheDocument()
+    expect(screen.queryByRole('menuitem', { name: /mark all as read/i })).not.toBeInTheDocument()
   })
 
   it('calls PATCH /read when an unread notification is clicked and marks it read', async () => {
@@ -130,7 +130,7 @@ describe('NotificationBell', () => {
     render(<NotificationBell token={TOKEN} />)
 
     await userEvent.click(screen.getByRole('button', { name: /notifications/i }))
-    const notifButton = await screen.findByRole('button', { name: /cool gadget/i })
+    const notifButton = await screen.findByRole('menuitem', { name: /cool gadget/i })
     await userEvent.click(notifButton)
 
     await waitFor(() => {
@@ -161,7 +161,7 @@ describe('NotificationBell', () => {
     render(<NotificationBell token={TOKEN} />)
 
     await userEvent.click(screen.getByRole('button', { name: /notifications/i }))
-    const markAllBtn = await screen.findByRole('button', { name: /mark all as read/i })
+    const markAllBtn = await screen.findByRole('menuitem', { name: /mark all as read/i })
     await userEvent.click(markAllBtn)
 
     await waitFor(() => {
@@ -171,6 +171,41 @@ describe('NotificationBell', () => {
       expect(patchCall).toBeDefined()
     })
     // Badge should be gone
+    expect(screen.queryByText('1')).not.toBeInTheDocument()
+  })
+
+  it('calls DELETE /api/notifications and clears list and badge when "Clear all" is clicked', async () => {
+    const mockFetch = vi
+      .fn()
+      // Initial load
+      .mockResolvedValueOnce({
+        ok: true,
+        json: () => Promise.resolve({ notifications: [unreadNotification], unreadCount: 1 }),
+      })
+      // Bell open refetch
+      .mockResolvedValueOnce({
+        ok: true,
+        json: () => Promise.resolve({ notifications: [unreadNotification], unreadCount: 1 }),
+      })
+      // DELETE /api/notifications
+      .mockResolvedValueOnce({ ok: true })
+    vi.stubGlobal('fetch', mockFetch)
+
+    render(<NotificationBell token={TOKEN} />)
+
+    await userEvent.click(screen.getByRole('button', { name: /notifications/i }))
+    const clearAllBtn = await screen.findByRole('menuitem', { name: /clear all/i })
+    await userEvent.click(clearAllBtn)
+
+    await waitFor(() => {
+      const deleteCall = mockFetch.mock.calls.find(
+        (call) => call[1]?.method === 'DELETE' && call[0].includes('/api/notifications')
+      )
+      expect(deleteCall).toBeDefined()
+    })
+    // List should be empty
+    expect(await screen.findByText(/no notifications yet/i)).toBeInTheDocument()
+    // Unread badge should be gone
     expect(screen.queryByText('1')).not.toBeInTheDocument()
   })
 

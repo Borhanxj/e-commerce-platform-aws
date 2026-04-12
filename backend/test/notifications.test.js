@@ -130,3 +130,27 @@ describe('PATCH /api/notifications/read-all', () => {
     )
   })
 })
+
+describe('DELETE /api/notifications', () => {
+  beforeEach(() => jest.clearAllMocks())
+
+  it('returns 401 without token', async () => {
+    const res = await request(app).delete('/api/notifications')
+    expect(res.status).toBe(401)
+  })
+
+  it('deletes all notifications for the authenticated user', async () => {
+    pool.query.mockResolvedValueOnce({ rows: [] })
+
+    const res = await request(app)
+      .delete('/api/notifications')
+      .set('Authorization', `Bearer ${customerToken}`)
+
+    expect(res.status).toBe(200)
+    expect(res.body.success).toBe(true)
+    expect(pool.query).toHaveBeenCalledWith(
+      expect.stringContaining('DELETE FROM notifications'),
+      [2] // userId from token
+    )
+  })
+})
