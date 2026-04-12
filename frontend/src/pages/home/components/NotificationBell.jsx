@@ -7,8 +7,7 @@ export default function NotificationBell({ token }) {
   const [unreadCount, setUnreadCount] = useState(0)
   const ref = useRef(null)
 
-  // Load notifications on mount using a .then chain so setState is called in a callback,
-  // which satisfies the react-hooks/set-state-in-effect rule.
+  // Load notifications when a token is available.
   useEffect(() => {
     if (!token) return
     fetch(`${API_BASE}/api/notifications`, {

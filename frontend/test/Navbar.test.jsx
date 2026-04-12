@@ -29,6 +29,10 @@ function renderNavbar(props = {}) {
 }
 
 describe('Navbar', () => {
+  afterEach(() => {
+    vi.unstubAllGlobals()
+  })
+
   it('renders the brand name', () => {
     renderNavbar()
 
@@ -95,7 +99,6 @@ describe('Navbar', () => {
     })
 
     expect(screen.getByRole('button', { name: /notifications/i })).toBeInTheDocument()
-    vi.unstubAllGlobals()
   })
 
   it('does not render NotificationBell when logged out', () => {
