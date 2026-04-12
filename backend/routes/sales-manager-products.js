@@ -110,6 +110,16 @@ router.post('/discount', async (req, res) => {
       [ids, pct, req.user.userId]
     )
 
+    // Remove existing unread notifications for these products so users aren't spammed
+    // when a discount is updated. Already-read notifications are preserved.
+    await client.query(
+      `DELETE FROM notifications
+       WHERE product_id = ANY($1)
+         AND NOT is_read
+         AND user_id IN (SELECT user_id FROM wishlist_items WHERE product_id = ANY($1))`,
+      [ids]
+    )
+
     const wishlistResult = await client.query(
       `INSERT INTO notifications (user_id, product_id, product_name, original_price, discounted_price, discount_percent)
        SELECT wi.user_id, p.id, p.name, p.price,

@@ -99,8 +99,8 @@ describe('POST /api/sales-manager/products/discount', () => {
       {}, // BEGIN
       { rows: [{ id: 1, name: 'Shirt', price: '100.00' }] }, // SELECT products
       {}, // INSERT product_discounts (upsert)
-      { rows: [{ user_id: 5, product_id: 1 }] }, // SELECT wishlist_items
-      {}, // INSERT notification
+      {}, // DELETE existing unread notifications
+      { rows: [{ user_id: 5, product_id: 1 }] }, // INSERT notifications RETURNING
       {}, // COMMIT
     ])
     pool.connect.mockResolvedValue(client)
@@ -121,7 +121,8 @@ describe('POST /api/sales-manager/products/discount', () => {
       {}, // BEGIN
       { rows: [{ id: 2, name: 'Jacket', price: '200.00' }] }, // SELECT products
       {}, // INSERT product_discounts
-      { rows: [] }, // SELECT wishlist_items — nobody has it wishlisted
+      {}, // DELETE existing unread notifications
+      { rows: [] }, // INSERT notifications RETURNING — nobody wishlisted it
       {}, // COMMIT
     ])
     pool.connect.mockResolvedValue(client)
