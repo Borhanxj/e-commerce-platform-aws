@@ -154,6 +154,9 @@ function App() {
     }
   })
   const [wishlist, setWishlist] = useState(() => {
+    // Authenticated users get server data on mount — skip stale guest_wishlist
+    // (guest items lack available_stock, causing false out-of-stock display)
+    if (localStorage.getItem('token')) return []
     try {
       return JSON.parse(localStorage.getItem('guest_wishlist') || '[]')
     } catch {
@@ -426,6 +429,7 @@ function App() {
             <HomePage
               isLoggedIn={!!token}
               userEmail={user?.email}
+              token={token}
               onNavigate={handleNavigate}
               onRequireAuth={requireAuth}
               onLogout={handleLogout}

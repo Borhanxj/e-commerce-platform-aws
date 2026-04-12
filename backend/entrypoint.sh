@@ -14,5 +14,14 @@ npm run migrate:up
 echo "Seeding admin user..."
 node scripts/seed-admin.js
 
+echo "Seeding sales manager..."
+node scripts/seed-sales-manager.js
+
+echo "Seeding product manager..."
+node scripts/seed-product-manager.js
+
+echo "Seeding products..."
+node scripts/seed-products.js
+
 echo "Starting server..."
 exec npm run dev

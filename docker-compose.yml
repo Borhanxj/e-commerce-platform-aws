@@ -22,6 +22,12 @@ services:
       JWT_SECRET: dev-secret-change-in-production
       ADMIN_EMAIL: admin@example.com
       ADMIN_PASSWORD: admin123456
+      SALES_MANAGER_EMAIL: salesmanager@example.com
+      SALES_MANAGER_PASSWORD: salesmanager123456
+      SALES_MANAGER_NAME: Jane Smith
+      PRODUCT_MANAGER_EMAIL: productmanager@example.com
+      PRODUCT_MANAGER_PASSWORD: productmanager123456
+      PRODUCT_MANAGER_NAME: John Doe
     depends_on:
       - db
     volumes:
@@ -39,6 +45,24 @@ services:
     volumes:
       - ./frontend:/app
       - /app/node_modules
+  mailserver:
+    image: mailhog/mailhog
+    ports:
+      - "1025:1025" # SMTP port
+      - "8025:8025" # Web interface port
+
+  invoice-api:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.invoice-api
+    ports:
+      - "8080:8080"
+    environment:
+      - SMTP_HOST=mailserver
+    depends_on:
+      - mailserver
+    volumes:
+      - ./backend:/app
 
 volumes:
   postgres_data:
