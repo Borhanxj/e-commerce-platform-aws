@@ -8,8 +8,7 @@ An e-commerce platform (Sabanci University CS308 course project) with a React fr
 
 ## Git Conventions
 
-- Every commit message must reference the SCRUM item it belongs to (e.g. `SCRUM-66: add middleware`).
-- Do **not** add `Co-Authored-By: Claude ...` trailers to commit messages.
+When writing commit messages, follow [Conventional Commits](.claude/conventional-commits.md). Do **not** add `Co-Authored-By: Claude ...` trailers.
 
 ## Commands
 
@@ -94,25 +93,9 @@ Each service has a `Dockerfile` (production) and `Dockerfile.dev` (development).
 ## Database
 
 ```bash
-docker compose exec db psql -U postgres -d ecommerce   # Open psql shell
-docker compose exec db psql -U postgres -d ecommerce -c "\dt"   # List tables
-docker compose exec db psql -U postgres -d ecommerce -c "\d auth.users"   # Describe a table
-```
-
-### Querying the database
-
-```bash
-# List all registered users (id, email, role, created_at — password_hash excluded)
-docker compose exec db psql -U postgres -d ecommerce -c "SELECT id, email, role, created_at FROM auth.users;"
-
-# Count users
-docker compose exec db psql -U postgres -d ecommerce -c "SELECT COUNT(*) FROM auth.users;"
-
-# Find a specific user by email
-docker compose exec db psql -U postgres -d ecommerce -c "SELECT id, email, role, created_at FROM auth.users WHERE email = 'user@example.com';"
-
-# Delete a user by email (useful for re-testing registration)
-docker compose exec db psql -U postgres -d ecommerce -c "DELETE FROM auth.users WHERE email = 'user@example.com';"
+docker compose exec db psql -U postgres -d ecommerce        # Open psql shell
+docker compose exec db psql -U postgres -d ecommerce -c "\dt"              # List tables
+docker compose exec db psql -U postgres -d ecommerce -c "\d auth.users"    # Describe a table
 ```
 
 ### Running migrations
@@ -126,14 +109,13 @@ docker compose exec backend npm run migrate:down  # Roll back the last migration
 
 To add a new migration, create `backend/migrations/<N>_description.js` (increment N) with `exports.up` and `exports.down` functions, then run `migrate:up`.
 
-The runner tracks applied migrations in a `pgmigrations` table in the database. Never edit a migration file that has already been applied — write a new one instead.
+Never edit a migration file that has already been applied — write a new one instead.
 
 ### Manually re-seeding individual accounts
 
-Seeds run automatically on startup, but individual scripts can still be invoked directly if needed:
+Seeds run automatically on startup, but individual scripts can be invoked directly if needed:
 
 ```bash
-# Seed scripts read credentials from the container's env vars (set in docker-compose.yml)
 docker compose exec backend node scripts/seed-admin.js
 docker compose exec backend node scripts/seed-sales-manager.js
 docker compose exec backend node scripts/seed-product-manager.js
@@ -147,102 +129,73 @@ docker compose exec db psql -U postgres -d ecommerce -c "TRUNCATE products RESTA
 docker compose exec backend node scripts/seed-products.js
 ```
 
-`RESTART IDENTITY` resets the `id` sequence back to 1. `CASCADE` also truncates `cart_items` (which foreign-keys into `products`). `order_items` is now protected by `ON DELETE RESTRICT` — if any orders exist, you must delete them first before truncating products.
-
 ## Architecture
 
 ### Backend
 
-`server.js` is the entry point: it loads `.env`, validates `JWT_SECRET`, then calls `app.listen()`. All Express setup lives in `app.js` (middleware, route mounting, global error handler) and is exported without starting a server — this separation makes the app importable in tests without binding a port.
+`server.js` is the entry point; all Express setup lives in `app.js`. `db.js` exports a single `pg.Pool` instance.
 
-`db.js` exports a single `pg.Pool` instance connected via `DATABASE_URL`.
+Route files in `backend/routes/`:
 
-Route files live in `backend/routes/`:
-
-- `auth.js` — `POST /api/auth/register`, `POST /api/auth/login`, and password reset endpoints
-- `products.js` — public (no auth); `GET /api/products` supports `?category=` and `?limit=`; `GET /api/products/search` supports `?q=` (case-insensitive partial match on name + description, ordered by name ASC; single-char queries return empty; empty q returns all)
-- `cart.js` — authenticated cart CRUD at `/api/cart`; `GET` returns items, `POST` upserts (increments if already present), `PUT /:productId` sets exact quantity, `DELETE /:productId` removes one item, `DELETE /` clears the cart
-- `checkout.js` — authenticated checkout flow at `/api/checkout`; `POST /reserve` soft-locks stock for 10 min, `DELETE /reserve` releases the lock, `POST /confirm` hard-decrements stock and creates the order
-- `admin.js` — user CRUD at `/api/admin/users` and `GET /api/admin/me`
+- `auth.js` — `POST /api/auth/register`, `POST /api/auth/login`, password reset endpoints
+- `products.js` — public; `GET /api/products` (`?category=`, `?limit=`), `GET /api/products/search` (`?q=`)
+- `cart.js` — authenticated; `GET/POST /api/cart`, `PUT /api/cart/:productId`, `DELETE /api/cart/:productId`, `DELETE /api/cart`
+- `checkout.js` — authenticated; `POST /api/checkout/reserve`, `DELETE /api/checkout/reserve`, `POST /api/checkout/confirm`
+- `admin.js` — `GET/POST/PUT/DELETE /api/admin/users`, `GET /api/admin/me`
 - `admin-products.js` — product CRUD at `/api/admin/products`
 - `admin-orders.js` — order management at `/api/admin/orders`
 - `admin-settings.js` — system settings + dashboard stats at `/api/admin/settings`
-- `sales-manager-products.js` — `GET /api/sales-manager/products` (paginated list), `PATCH /api/sales-manager/products/:id/price` (price-only update), `POST /api/sales-manager/products/discount` (bulk upsert discounts + notify wishlist holders), `DELETE /api/sales-manager/products/:id/discount` (remove discount)
-- `notifications.js` — authenticated (any role); `GET /api/notifications`, `PATCH /api/notifications/:id/read`, `PATCH /api/notifications/read-all`
-- `wishlist.js` — authenticated wishlist at `/api/wishlist`; `GET` returns items, `POST` adds item (idempotent), `DELETE /:productId` removes one item; responses include `available_stock`, `discount_percent`, and `discounted_price`
+- `sales-manager-products.js` — `GET /api/sales-manager/products` (`?category=`, `?q=`), `GET /api/sales-manager/products/categories`, `PATCH /api/sales-manager/products/:id/price`, `POST /api/sales-manager/products/discount`, `DELETE /api/sales-manager/products/:id/discount`
+- `notifications.js` — authenticated; `GET /api/notifications`, `PATCH /api/notifications/:id/read`, `PATCH /api/notifications/read-all`, `DELETE /api/notifications`
+- `wishlist.js` — authenticated; `GET/POST /api/wishlist`, `DELETE /api/wishlist/:productId`
 
 Middleware in `backend/middleware/`:
 
-- `auth.js` — verifies Bearer JWT and sets `req.user` (`{ userId, email, role }`)
-- `admin.js` — requires `req.user.role === 'admin'`; all admin routes stack both middlewares
-- `sales-manager.js` — requires `req.user.role === 'sales_manager'`; stack with `authenticate` the same way as admin routes
-
-All admin routes use `router.use(authenticate); router.use(requireAdmin)` at the top of their file. Sales manager routes follow the same pattern with `requireSalesManager`.
-
-JWT payload shape: `{ userId, email, role }`. Tokens expire in 7 days.
+- `auth.js` — verifies Bearer JWT and sets `req.user`
+- `admin.js` — requires `role === 'admin'`; stack with `auth.js` on all admin routes
+- `sales-manager.js` — requires `role === 'sales_manager'`; stack with `auth.js` on all SM routes
 
 ### Invoice service (`backend/invoice_api/`, `backend/pkg/`)
 
-A separate Python FastAPI microservice built with `Dockerfile.invoice-api` and served on port 8080. Entry point is `invoice_api/main.py`. Shared library code lives in `backend/pkg/`: `pkg/mailer/` (SMTP via MailHog) and `pkg/invoice/` (PDF generation via wkhtmltopdf + Jinja2 template). Python dependencies are in `backend/requirements-invoice.txt`. The Node.js backend calls `POST /api/invoices/generate` to trigger async PDF generation and email delivery.
+A separate Python FastAPI microservice on port 8080. Entry point: `invoice_api/main.py`. Shared library in `backend/pkg/`: `pkg/mailer/` (SMTP via MailHog), `pkg/invoice/` (PDF via wkhtmltopdf + Jinja2). Dependencies: `backend/requirements-invoice.txt`.
 
 ### Frontend
 
-`src/main.jsx` wraps `<App>` in `<BrowserRouter>`. All routing is in `src/App.jsx` using React Router v7.
+`src/main.jsx` wraps `<App>` in `<BrowserRouter>`. All routing in `src/App.jsx` (React Router v7).
 
-Auth state (`token`, `user`), admin auth state (`adminToken`), and sales manager auth state (`salesManagerToken`) are held in `App` state, initialised from `localStorage`. The JWT payload is decoded client-side via `src/utils/jwt.js` (`decodeJwtPayload`) to extract email and role.
+Auth state (`token`, `adminToken`, `salesManagerToken`) held in `App`, initialised from `localStorage`. JWT decoded client-side via `src/utils/jwt.js`.
 
-Shared frontend utilities: `src/utils/jwt.js` (JWT decode), `src/styles/dashboardStyles.js` (shared Tailwind button/input constants), `src/components/DashboardLayout.jsx` (shared sidebar+header shell used by admin and sales manager dashboards).
+Shared: `src/styles/dashboardStyles.js` (Tailwind constants), `src/components/DashboardLayout.jsx` (sidebar+header shell for admin and SM dashboards).
 
-**Auth sessions and route guards:**
+**Route guards:**
 
-- Regular users: `localStorage.token` → `RequireAuth` guard → login at `/login`
-- Sales managers: `localStorage.salesManagerToken` → `RequireSalesManager` guard (checks `payload.role === 'sales_manager'`) → login at `/sales-manager/login`
-- Admin: `localStorage.adminToken` → `RequireAdmin` guard (checks `payload.role === 'admin'`) → login at `/admin/login`
+- Customers: `localStorage.token` → `RequireAuth` → `/login`
+- Sales managers: `localStorage.salesManagerToken` → `RequireSalesManager` → `/sales-manager/login`
+- Admin: `localStorage.adminToken` → `RequireAdmin` → `/admin/login`
 
-Each role has a fully isolated session. Sales manager pages live in `src/pages/sales-manager/`.
+`src/api.js` exports `API_BASE` from `VITE_API_BASE_URL`, falling back to `http://localhost:3000`.
 
-`src/api.js` exports `API_BASE` read from `import.meta.env.VITE_API_BASE_URL`, falling back to `http://localhost:3000`. Every page that calls the backend imports this; set `VITE_API_BASE_URL` in `frontend/.env` when deploying.
-
-Pages are colocated with their CSS under `src/pages/<section>/`. Admin pages live in `src/pages/admin/` and are self-contained (own CSS, inline SVG icons).
-
-**Product data is fetched from the API, not hardcoded:**
-- `CategoryPage` — fetches `GET /api/products?category={category.title}` on mount; shows a loading state while the request is in flight
-- `HomePage` new releases — fetches `GET /api/products?limit=8` on mount; the 8 most recently added products are shown as new releases (insertion order drives this — no explicit "featured" flag exists)
-- `SearchPage` (`src/pages/search/SearchPage.jsx`) — public route at `/search?q=`; fetches `GET /api/products/search?q=`; accessible to guests; Navbar search bar navigates here on submit
-- `DiscountManagement` (`src/pages/sales-manager/DiscountManagement.jsx`) — sales manager dashboard section; multi-select product table with discount % input and apply/remove actions
-- `NotificationBell` (`src/pages/home/components/NotificationBell.jsx`) — rendered in Navbar for logged-in customers only; shows unread badge and dropdown of price-drop notifications
+Pages live in `src/pages/<section>/`. Key SM pages:
+- `DiscountManagement` (`src/pages/sales-manager/DiscountManagement.jsx`) — paginated product table with category filter, search bar, and bulk discount apply/remove
+- `NotificationBell` (`src/pages/home/components/NotificationBell.jsx`) — price-drop notifications for logged-in customers; mark-read, mark-all-read, clear-all
 
 ### Database schema
 
-All user/auth tables live in the `auth` schema (`auth.users`, `auth.customers`, `auth.sales_managers`, `auth.product_managers`). Product and order tables are in `public` (`products`, `orders`, `order_items`, `system_settings`, `cart_items`, `stock_reservations`, `wishlist_items`, `product_discounts`, `notifications`).
-
-User roles are a PostgreSQL enum `auth.user_role`: `customer`, `sales_manager`, `product_manager`, `admin`.
+Auth schema: `auth.users`, `auth.customers`, `auth.sales_managers`, `auth.product_managers`.
+Public schema: `products`, `orders`, `order_items`, `system_settings`, `cart_items`, `stock_reservations`, `wishlist_items`, `product_discounts`, `notifications`.
+Role enum: `auth.user_role` — `customer`, `sales_manager`, `product_manager`, `admin`.
 
 ### Testing
 
-**Frontend** — Vitest + React Testing Library. Test files live in `frontend/test/`. Setup in `frontend/test/setup.js` imports `@testing-library/jest-dom` and sets `globalThis.React`. Globals (`describe`, `it`, `expect`, `vi`) are enabled via `vite.config.js`.
+**Frontend** — Vitest + React Testing Library. Tests in `frontend/test/`. Setup in `frontend/test/setup.js`.
 
-**Backend (Node.js)** — Jest + Supertest. Test files live in `backend/test/`. The DB pool is always mocked (`jest.mock('../db', ...)`) so tests run without a real database.
+**Backend** — Jest + Supertest. Tests in `backend/test/`. DB pool always mocked.
 
-**Invoice service (Python)** — pytest. Test files live in `backend/tests/`. `backend/conftest.py` adds `backend/` to `sys.path` so `pkg.*` and `invoice_api.*` resolve regardless of where pytest is invoked from.
-
-### CI/CD
-
-`.github/workflows/ci-cd.yml` runs three independent jobs on every push/PR:
-
-1. **Lint & Format** — ESLint + Prettier for both packages
-2. **Test** — Vitest (frontend) + Jest (backend); no database service needed since backend tests mock the DB
-3. **Build** — `npm run build` in `frontend/`
-
-### Root setup
-
-`package.json` at the repo root installs Husky and lint-staged only. Run `npm install` at the root to set up git hooks, then separately in `frontend/` and `backend/`.
-
-The pre-commit hook runs lint-staged, which lints and checks formatting on staged `.js`/`.jsx` files only (scoped per package so each uses its own ESLint config and node_modules).
+**Invoice service** — pytest. Tests in `backend/tests/`. `backend/conftest.py` adds `backend/` to `sys.path`.
 
 ## Environment
 
-Create a `.env` in `backend/` for local config (already gitignored). Required variables:
+`backend/.env` (gitignored):
 
 ```
 PORT=3000
@@ -250,9 +203,7 @@ DATABASE_URL=postgres://postgres:password@localhost:5432/ecommerce
 JWT_SECRET=your_secret_here
 ```
 
-`PORT` defaults to `3000` if not set. The invoice service reads `SMTP_HOST` (default `mailserver`), `SMTP_PORT` (default `1025`), `SMTP_USER`, `SMTP_PASS`, and `SENDER_EMAIL` (default `invoices@fier.com`) from its environment — these are set via `docker-compose.yml` for Docker runs.
-
-For frontend API URL override, create `frontend/.env`:
+`frontend/.env` (optional, for deployment):
 
 ```
 VITE_API_BASE_URL=https://your-backend-host.com
