@@ -56,21 +56,48 @@ We will deploy the following components:
 ---
 
 ## Phase 4: Container Orchestration (ECS)
-1.  Search for **ECS**.
-2.  **Step 1: Create Cluster**
-    - Click **Create Cluster**.
-    - Name: `ecommerce-cluster`.
-    - Infrastructure: **AWS Fargate** (Serverless).
-3.  **Step 2: Create Task Definitions**
-    - You need to create one for `api`, `web`, and `invoice`.
-    - Set Memory/CPU (e.g., 0.5 vCPU, 1 GB RAM).
-    - Add Container: Use the ECR Image URI from Phase 3.
-    - Set Environment Variables (DB URL, Port, Secret Key).
-4.  **Step 3: Create Services**
-    - Inside your cluster, create a "Service".
-    - select the Task Definition you created.
-    - Set Desired tasks to 1 (or 2 for redundancy).
-    - **Networking**: Select your Private Subnets.
+This is where your code actually runs. We need to create a **Cluster** (the home for your services), **Task Definitions** (the blueprint for your containers), and **Services** (the actual running instances).
+
+### Step 1: Create Cluster
+1. Search for **Elastic Container Service (ECS)** in the AWS Console.
+2. Click **Create Cluster**.
+3. **Cluster name**: `ecommerce-cluster`.
+4. **Infrastructure**: Ensure **AWS Fargate (serverless)** is selected.
+5. Click **Create**.
+
+### Step 2: Create Task Definitions (The Blueprint)
+*Repeat this for `api`, `web`, and `invoice`.*
+
+1. In the ECS left sidebar, click **Task Definitions** > **Create new task definition** > **Create new task definition with JSON** (or use the UI).
+2. **Task definition family**: `ecommerce-api` (example).
+3. **Launch type**: Fargate.
+4. **Task size**: 0.5 vCPU and 1 GB Memory (sufficient for most services).
+5. **Container details**:
+   - **Name**: `api`.
+   - **Image URI**: Paste the URI from your ECR repository (found in Phase 3).
+   - **Port mappings**: 
+     - API: Container Port `3000`
+     - Web: Container Port `80`
+     - Invoice: Container Port `8080`
+6. **Environment variables**: Add keys like `DATABASE_URL`, `JWT_SECRET`, etc.
+7. Click **Create**.
+
+### Step 3: Create Services (The Running Instances)
+*Go back to your Cluster (Phase 4, Step 1) and click on it.*
+
+1. Under the **Services** tab, click **Create**.
+2. **Deployment configuration**:
+   - **Family**: Select the Task Definition you just created (e.g., `ecommerce-api`).
+   - **Service name**: `api-service`.
+   - **Desired tasks**: `1` (for dev) or `2` (for high availability).
+3. **Networking**:
+   - **VPC**: Select `ecommerce-project-vpc`.
+   - **Subnets**: Select both **Private Subnets**. (Your code should run in private subnets for security).
+   - **Security group**: Create new. Allow port `3000` (for API), `80` (for Web), or `8080` (for Invoice).
+4. **Load balancing** (Optional but recommended):
+   - Select **Application Load Balancer**.
+   - Use the one created in Phase 5.
+5. Click **Create**.
 
 ---
 
