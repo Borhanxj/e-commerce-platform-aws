@@ -45,10 +45,10 @@ docker-compose -f docker-compose.dev.yml up --build
 aws configure
 
 # 2. Deploy to development
-./scripts/deploy.sh dev us-east-1
+./scripts/deploy.sh dev eu-west-1
 
 # 3. Verify deployment
-./scripts/health-check.sh dev us-east-1
+./scripts/health-check.sh dev eu-west-1
 ```
 
 See [AWS Deployment Guide](docs/AWS_DEPLOYMENT.md) for detailed steps.
@@ -219,10 +219,10 @@ terraform plan -var-file="environments/dev.tfvars"
 terraform apply
 
 # 3. Push images
-./scripts/deploy.sh dev us-east-1
+./scripts/deploy.sh dev eu-west-1
 
 # 4. Health check
-./scripts/health-check.sh dev us-east-1
+./scripts/health-check.sh dev eu-west-1
 ```
 
 Full guide in [AWS_DEPLOYMENT.md](docs/AWS_DEPLOYMENT.md)

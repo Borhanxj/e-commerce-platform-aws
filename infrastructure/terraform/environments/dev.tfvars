@@ -1,6 +1,6 @@
 # Development environment configuration
 environment = "dev"
-aws_region  = "us-east-1"
+aws_region  = "eu-west-1"
 
 # VPC
 vpc_cidr               = "10.0.0.0/16"

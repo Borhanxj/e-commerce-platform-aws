@@ -7,7 +7,7 @@ set -e
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
 ENVIRONMENT="${1:-dev}"
-AWS_REGION="${2:-us-east-1}"
+AWS_REGION="${2:-eu-west-1}"
 
 # Color output
 RED='\033[0;31m'

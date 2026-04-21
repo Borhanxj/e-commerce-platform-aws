@@ -1,6 +1,6 @@
 # Staging environment configuration
 environment = "staging"
-aws_region  = "us-east-1"
+aws_region  = "eu-west-1"
 
 # VPC
 vpc_cidr               = "10.1.0.0/16"

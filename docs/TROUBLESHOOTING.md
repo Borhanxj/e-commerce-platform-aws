@@ -58,8 +58,8 @@ aws ec2 authorize-security-group-ingress \
 
 ```bash
 # Solution: Re-authenticate with ECR
-aws ecr get-login-password --region us-east-1 | \
-  docker login --username AWS --password-stdin <ACCOUNT_ID>.dkr.ecr.us-east-1.amazonaws.com
+aws ecr get-login-password --region eu-west-1 | \
+  docker login --username AWS --password-stdin <ACCOUNT_ID>.dkr.ecr.eu-west-1.amazonaws.com
 
 # Verify repository exists
 aws ecr describe-repositories --repository-names ecommerce-api

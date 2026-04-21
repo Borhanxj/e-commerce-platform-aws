@@ -22,7 +22,7 @@ jobs:
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
-          aws-region: us-east-1
+          aws-region: eu-west-1
 
       - name: Set up Terraform
         uses: hashicorp/setup-terraform@v2
@@ -37,7 +37,7 @@ jobs:
         run: |
           terraform plan \
             -var-file="environments/staging.tfvars" \
-            -var="aws_region=us-east-1" \
+            -var="aws_region=eu-west-1" \
             -out=tfplan
         working-directory: infrastructure/terraform
 
@@ -51,14 +51,14 @@ jobs:
             --cluster ecommerce-cluster-staging \
             --service ecommerce-api-service-staging \
             --force-new-deployment \
-            --region us-east-1
+            --region eu-west-1
 
       - name: Wait for deployment
         run: |
           aws ecs wait services-stable \
             --cluster ecommerce-cluster-staging \
             --services ecommerce-api-service-staging \
-            --region us-east-1 || true
+            --region eu-west-1 || true
 
       - name: Run tests in staging
-        run: ./scripts/health-check.sh staging us-east-1
+        run: ./scripts/health-check.sh staging eu-west-1

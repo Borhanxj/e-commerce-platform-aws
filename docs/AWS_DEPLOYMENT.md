@@ -37,14 +37,14 @@ infrastructure/
 aws configure
 ```
 
-Provide your AWS Access Key ID, Secret Access Key, default region (e.g., `us-east-1`), and output format (e.g., `json`).
+Provide your AWS Access Key ID, Secret Access Key, default region (e.g., `eu-west-1`), and output format (e.g., `json`).
 
 ### 1.2 Create S3 Backend for Terraform State
 
 Create an S3 bucket to store Terraform state:
 
 ```bash
-aws s3 mb s3://ecommerce-tf-state-$(date +%s) --region us-east-1
+aws s3 mb s3://ecommerce-tf-state-$(date +%s) --region eu-west-1
 aws s3api put-bucket-versioning \
   --bucket ecommerce-tf-state-xxx \
   --versioning-configuration Status=Enabled
@@ -57,7 +57,7 @@ terraform {
   backend "s3" {
     bucket         = "ecommerce-tf-state-xxx"
     key            = "prod/terraform.tfstate"
-    region         = "us-east-1"
+    region         = "eu-west-1"
     encrypt        = true
     dynamodb_table = "terraform-locks"
   }
@@ -72,7 +72,7 @@ aws dynamodb create-table \
   --attribute-definitions AttributeName=LockID,AttributeType=S \
   --key-schema AttributeName=LockID,KeyType=HASH \
   --provisioned-throughput ReadCapacityUnits=5,WriteCapacityUnits=5 \
-  --region us-east-1
+  --region eu-west-1
 ```
 
 ## Phase 2: Infrastructure Provisioning
@@ -156,15 +156,15 @@ docker build -t ecommerce-web:latest .
 
 ```bash
 # Login to ECR
-aws ecr get-login-password --region us-east-1 | \
-  docker login --username AWS --password-stdin <ACCOUNT_ID>.dkr.ecr.us-east-1.amazonaws.com
+aws ecr get-login-password --region eu-west-1 | \
+  docker login --username AWS --password-stdin <ACCOUNT_ID>.dkr.ecr.eu-west-1.amazonaws.com
 
 # Tag images
 docker tag ecommerce-api:latest \
-  <ACCOUNT_ID>.dkr.ecr.us-east-1.amazonaws.com/ecommerce-api:latest
+  <ACCOUNT_ID>.dkr.ecr.eu-west-1.amazonaws.com/ecommerce-api:latest
 
 # Push to ECR
-docker push <ACCOUNT_ID>.dkr.ecr.us-east-1.amazonaws.com/ecommerce-api:latest
+docker push <ACCOUNT_ID>.dkr.ecr.eu-west-1.amazonaws.com/ecommerce-api:latest
 ```
 
 ## Phase 4: Database Setup
@@ -232,7 +232,7 @@ aws ecs register-task-definition \
   --container-definitions '[
     {
       "name": "api",
-      "image": "<ACCOUNT_ID>.dkr.ecr.us-east-1.amazonaws.com/ecommerce-api:latest",
+      "image": "<ACCOUNT_ID>.dkr.ecr.eu-west-1.amazonaws.com/ecommerce-api:latest",
       "essential": true,
       "portMappings": [{"containerPort": 3000}],
       "environment": [
@@ -242,14 +242,14 @@ aws ecs register-task-definition \
       "secrets": [
         {
           "name": "DATABASE_URL",
-          "valueFrom": "arn:aws:secretsmanager:us-east-1:xxx:secret:db-url"
+          "valueFrom": "arn:aws:secretsmanager:eu-west-1:xxx:secret:db-url"
         }
       ],
       "logConfiguration": {
         "logDriver": "awslogs",
         "options": {
           "awslogs-group": "/ecs/ecommerce-api",
-          "awslogs-region": "us-east-1",
+          "awslogs-region": "eu-west-1",
           "awslogs-stream-prefix": "ecs"
         }
       }
@@ -287,7 +287,7 @@ aws route53 change-resource-record-sets \
           "Type": "A",
           "AliasTarget": {
             "HostedZoneId": "Z35SXDOTRQ7X7K",
-            "DNSName": "ecom-alb-123.us-east-1.elb.amazonaws.com",
+            "DNSName": "ecom-alb-123.eu-west-1.elb.amazonaws.com",
             "EvaluateTargetHealth": true
           }
         }
@@ -302,7 +302,7 @@ Update Terraform or create distribution:
 
 ```bash
 aws cloudfront create-distribution \
-  --origin-domain-name ecom-bucket.s3.us-east-1.amazonaws.com \
+  --origin-domain-name ecom-bucket.s3.eu-west-1.amazonaws.com \
   --default-root-object index.html
 ```
 
@@ -332,7 +332,7 @@ aws sns create-topic --name ecommerce-alerts
 
 # Subscribe to alerts
 aws sns subscribe \
-  --topic-arn arn:aws:sns:us-east-1:xxx:ecommerce-alerts \
+  --topic-arn arn:aws:sns:eu-west-1:xxx:ecommerce-alerts \
   --protocol email \
   --notification-endpoint admin@example.com
 ```
@@ -346,8 +346,8 @@ aws sns subscribe \
 
 AWS_ACCESS_KEY_ID=xxx
 AWS_SECRET_ACCESS_KEY=xxx
-AWS_REGION=us-east-1
-ECR_REGISTRY=<ACCOUNT_ID>.dkr.ecr.us-east-1.amazonaws.com
+AWS_REGION=eu-west-1
+ECR_REGISTRY=<ACCOUNT_ID>.dkr.ecr.eu-west-1.amazonaws.com
 ECS_CLUSTER_DEV=ecommerce-dev
 ECS_CLUSTER_PROD=ecommerce-prod
 ```
@@ -405,7 +405,7 @@ aws logs tail /ecs/ecommerce-api --follow
 # Describe task
 aws ecs describe-tasks \
   --cluster ecommerce-dev \
-  --tasks arn:aws:ecs:us-east-1:xxx:task/ecommerce-api/xxx
+  --tasks arn:aws:ecs:eu-west-1:xxx:task/ecommerce-api/xxx
 ```
 
 ### Image Push Failures
@@ -415,7 +415,7 @@ aws ecs describe-tasks \
 aws ecr describe-repositories
 
 # Re-authenticate if needed
-aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin xxx.dkr.ecr.us-east-1.amazonaws.com
+aws ecr get-login-password --region eu-west-1 | docker login --username AWS --password-stdin xxx.dkr.ecr.eu-west-1.amazonaws.com
 ```
 
 ## Rollback Procedure

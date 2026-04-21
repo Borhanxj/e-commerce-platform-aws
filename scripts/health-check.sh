@@ -3,7 +3,7 @@
 # Health Check Script - Verify service health
 
 ENVIRONMENT="${1:-dev}"
-AWS_REGION="${2:-us-east-1}"
+AWS_REGION="${2:-eu-west-1}"
 
 RED='\033[0;31m'
 GREEN='\033[0;32m'

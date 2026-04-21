@@ -22,7 +22,7 @@ jobs:
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
-          aws-region: us-east-1
+          aws-region: eu-west-1
 
       - name: Set up Terraform
         uses: hashicorp/setup-terraform@v2
@@ -46,7 +46,7 @@ jobs:
         run: |
           terraform plan \
             -var-file="environments/dev.tfvars" \
-            -var="aws_region=us-east-1" \
+            -var="aws_region=eu-west-1" \
             -out=tfplan
         working-directory: infrastructure/terraform
 
@@ -62,21 +62,21 @@ jobs:
       - name: Deploy services
         run: |
           ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
-          ECR_REGISTRY="$ACCOUNT_ID.dkr.ecr.us-east-1.amazonaws.com"
+          ECR_REGISTRY="$ACCOUNT_ID.dkr.ecr.eu-west-1.amazonaws.com"
           
           # Update ECS services with new images
           aws ecs update-service \
             --cluster ecommerce-cluster-dev \
             --service ecommerce-api-service-dev \
             --force-new-deployment \
-            --region us-east-1
+            --region eu-west-1
 
       - name: Wait for service deployment
         run: |
           aws ecs wait services-stable \
             --cluster ecommerce-cluster-dev \
             --services ecommerce-api-service-dev \
-            --region us-east-1 || true
+            --region eu-west-1 || true
 
       - name: Run database migrations
         run: |
@@ -91,7 +91,7 @@ jobs:
                 "command": ["npm", "run", "migrate:up"]
               }]
             }' \
-            --region us-east-1 || true
+            --region eu-west-1 || true
 
       - name: Verify deployment
         run: |

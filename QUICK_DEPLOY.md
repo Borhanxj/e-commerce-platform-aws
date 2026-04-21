@@ -26,7 +26,7 @@ aws configure
 # Enter:
 # AWS Access Key ID: [your-access-key]
 # AWS Secret Access Key: [your-secret-key]
-# Default region name: us-east-1
+# Default region name: eu-west-1
 # Default output format: json
 
 # Verify
@@ -40,7 +40,7 @@ aws sts get-caller-identity
 ### 2.1 Create S3 Bucket for Terraform State
 ```bash
 BUCKET_NAME="ecommerce-tf-state-$(date +%s)"
-aws s3 mb s3://$BUCKET_NAME --region us-east-1
+aws s3 mb s3://$BUCKET_NAME --region eu-west-1
 aws s3api put-bucket-versioning --bucket $BUCKET_NAME --versioning-configuration Status=Enabled
 echo "Bucket Name: $BUCKET_NAME"
 ```
@@ -52,7 +52,7 @@ aws dynamodb create-table \
   --attribute-definitions AttributeName=LockID,AttributeType=S \
   --key-schema AttributeName=LockID,KeyType=HASH \
   --provisioned-throughput ReadCapacityUnits=5,WriteCapacityUnits=5 \
-  --region us-east-1
+  --region eu-west-1
 ```
 
 ### 2.3 Update Terraform Backend Config
@@ -70,7 +70,7 @@ cd /home/borhan/university/cs436/project/e-commerce-platform-aws/infrastructure/
 ### 3.1 Create ECR Repositories
 ```bash
 ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
-REGION=us-east-1
+REGION=eu-west-1
 
 for service in ecommerce-api ecommerce-web ecommerce-invoice; do
   aws ecr create-repository --repository-name $service --region $REGION
@@ -99,7 +99,7 @@ docker build -t ecommerce-invoice:latest .
 ### 3.3 Push to ECR
 ```bash
 ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
-REGION=us-east-1
+REGION=eu-west-1
 REGISTRY="$ACCOUNT_ID.dkr.ecr.$REGION.amazonaws.com"
 
 # Login to ECR
@@ -133,7 +133,7 @@ terraform init
 ### 4.2 Plan Development Environment
 ```bash
 ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
-REGISTRY="$ACCOUNT_ID.dkr.ecr.us-east-1.amazonaws.com"
+REGISTRY="$ACCOUNT_ID.dkr.ecr.eu-west-1.amazonaws.com"
 
 terraform plan \
   -var-file="environments/dev.tfvars" \
@@ -204,7 +204,7 @@ aws ecs run-task \
       "command": ["npm", "run", "migrate:up"]
     }]
   }' \
-  --region us-east-1
+  --region eu-west-1
 
 # Wait 5 minutes, then check logs
 aws logs tail /ecs/ecommerce-api-dev --follow
@@ -235,7 +235,7 @@ for script in seed-admin seed-sales-manager seed-product-manager seed-products; 
         \"command\": [\"node\", \"scripts/$script.js\"]
       }]
     }" \
-    --region us-east-1
+    --region eu-west-1
 done
 
 echo "Seed tasks submitted. Check CloudWatch logs in 5 minutes."
@@ -360,9 +360,9 @@ aws route53 change-resource-record-sets \
 # Add these secrets:
 AWS_ACCESS_KEY_ID=<your-access-key>
 AWS_SECRET_ACCESS_KEY=<your-secret-key>
-AWS_REGION=us-east-1
+AWS_REGION=eu-west-1
 AWS_ACCOUNT_ID=<your-account-id>
-ECR_REGISTRY=<your-account-id>.dkr.ecr.us-east-1.amazonaws.com
+ECR_REGISTRY=<your-account-id>.dkr.ecr.eu-west-1.amazonaws.com
 ```
 
 ### 9.2 Push to GitHub
