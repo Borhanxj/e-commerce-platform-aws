@@ -8,7 +8,8 @@ A fully containerized, production-ready e-commerce platform designed for AWS clo
 ## 📋 Quick Navigation
 
 - **[Architecture Overview](ARCHITECTURE.md)** - System design and AWS services
-- **[AWS Deployment Guide](docs/AWS_DEPLOYMENT.md)** - Step-by-step deployment instructions
+- **[AWS GUI Deployment Guide](docs/GUI_DEPLOYMENT_GUIDE.md)** - Full step-by-step AWS Console instructions (No CLI required)
+- **[AWS CLI Deployment Guide](docs/AWS_DEPLOYMENT.md)** - Traditional CLI-based deployment
 - **[Local Development](docs/LOCAL_DEVELOPMENT.md)** - Set up for development
 - **[Troubleshooting](docs/TROUBLESHOOTING.md)** - Common issues and solutions
 - **[Development Guidelines](CLAUDE.md)** - Code standards and Git conventions
