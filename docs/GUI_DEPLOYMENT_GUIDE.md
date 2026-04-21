@@ -46,12 +46,29 @@ We will deploy the following components:
 ---
 
 ## Phase 3: Image Registry (ECR)
-1.  Search for **ECR**.
+This phase is where you store your baked "images" (the code and environment together). Although you are using the GUI, you must run a few commands from your computer once to send your code to AWS.
+
+1.  Search for **Elastic Container Registry (ECR)** in the AWS Console.
 2.  Click **Create repository** for each service:
-    - Name: `ecommerce-api`
-    - Name: `ecommerce-web`
-    - Name: `ecommerce-invoice`
-3.  *Note: You will still need to push your local docker images to these repositories once. Use the "View push commands" button in the ECR console for instructions.*
+    - Repository name: `ecommerce-api`
+    - Repository name: `ecommerce-web`
+    - Repository name: `ecommerce-invoice`
+3.  **Upload your images (Step-by-Step):**
+    For each repository you just created (e.g., `ecommerce-api`):
+    - Click into the repository name.
+    - Look at the top right for the **"View push commands"** button.
+    - **Follow those four commands exactly** in your local terminal. They will:
+      1. **Authenticate**: Log your computer into AWS.
+      2. **Build**: Convert your local code into a Docker image.
+      3. **Tag**: Label the image for AWS.
+      4. **Push**: Upload the image to the cloud.
+
+    **Exactly what is being uploaded:**
+    - For `ecommerce-api`: Your `backend/` folder.
+    - For `ecommerce-web`: Your `frontend/` folder.
+    - For `ecommerce-invoice`: The Python service in `backend/invoice_api/`.
+
+4.  **Copy the URIs**: Once pushed, copy the **Image URI** for each (it looks like `123456789.dkr.ecr.eu-west-1.amazonaws.com/ecommerce-api:latest`). You will need these for Phase 4.
 
 ---
 
