@@ -11,7 +11,7 @@ db_instance_class        = "db.t4g.micro"
 db_allocated_storage     = 20
 db_multi_az              = false
 db_backup_retention_days = 1
-db_engine_version        = "16.3"
+db_engine_version        = "16"
 
 # ECS — one task per service.
 ecs_task_cpu      = 256

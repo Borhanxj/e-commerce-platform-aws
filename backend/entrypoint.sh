@@ -1,6 +1,14 @@
 #!/bin/sh
 set -e
 
+if echo "${DATABASE_URL:-}" | grep -q "rds.amazonaws.com"; then
+  export PGSSLMODE=no-verify
+  case "$DATABASE_URL" in
+    *\?*) export DATABASE_URL="${DATABASE_URL}&sslmode=no-verify" ;;
+    *) export DATABASE_URL="${DATABASE_URL}?sslmode=no-verify" ;;
+  esac
+fi
+
 echo "Waiting for PostgreSQL to be ready..."
 until node -e "require('./db').query('SELECT 1').then(() => process.exit(0)).catch(() => process.exit(1))" 2>/dev/null; do
   echo "  Postgres not ready, retrying in 2s..."
