@@ -101,20 +101,74 @@ This is where your code actually runs. We need to create a **Cluster** (the home
 
 ---
 
-## Phase 5: Routing Traffic (Load Balancer)
-1.  Search for **EC2**, then find **Load Balancers** in the left menu.
-2.  Click **Create Load Balancer** -> **Application Load Balancer**.
-3.  **Scheme**: Internet-facing.
-4.  **Listeners**: HTTP on port 80.
-5.  **Target Groups**: Create a target group for each service (pointing to your ECS tasks).
+## Phase 5: Routing Traffic (Load Balancer & Target Groups)
+The **Application Load Balancer (ALB)** is your website's "Front Door". It receives requests from the internet and sends them to the correct ECS service (Web, API, or Invoice).
+
+### Step 1: Create Target Groups (The Destinations)
+*You need to create 3 Target Groups: `tg-web`, `tg-api`, and `tg-invoice`.*
+
+1. Search for **EC2** and find **Target Groups** in the left sidebar.
+2. Click **Create target group**.
+3. **Target type**: Select **IP addresses** (Required for ECS Fargate).
+4. **Target group name**: `tg-api` (example).
+5. **Protocol/Port**: 
+   - For `tg-api`: Port `3000`
+   - For `tg-web`: Port `80`
+   - For `tg-invoice`: Port `8080`
+6. **VPC**: Select your `ecommerce-project-vpc`.
+7. **Health checks**: 
+   - For API: Set path to `/api/health` 
+   - For Web: Set path to `/`
+8. Click **Next** -> **Create target group** (Do not manually add IPs; ECS will do this automatically!).
+
+### Step 2: Create the Load Balancer (The Front Door)
+1. In the **EC2** menu, click **Load Balancers** > **Create load balancer**.
+2. Select **Application Load Balancer**.
+3. **Name**: `ecommerce-alb`.
+4. **Scheme**: **Internet-facing**.
+5. **Network mapping**: 
+   - Select your `ecommerce-project-vpc`.
+   - Select **both Public Subnets**.
+6. **Security groups**: Create a new group that allows **HTTP (Port 80)** from anywhere (`0.0.0.0/0`).
+7. **Listeners and routing**:
+   - Protocol: HTTP | Port: 80.
+   - Default action: Forward to your `tg-web` (This makes the user see the frontend by default).
+8. Click **Create load balancer**.
+
+### Step 3: Add Routing Rules (The Switchboard)
+1. Once created, select your Load Balancer and go to the **Listeners** tab.
+2. Click **Manage listener** > **Edit rules**.
+3. **Add Rule 1 (API)**: 
+   - If Path is `/api/*` -> Forward to `tg-api`.
+4. **Add Rule 2 (Invoice)**: 
+   - If Path is `/invoice/*` -> Forward to `tg-invoice`.
+5. Save changes. Now, one URL handles all three services!
 
 ---
 
 ## Phase 6: Static Assets (S3 + CloudFront)
-1.  Search for **S3**.
-2.  Create a bucket for static assets (e.g., `ecommerce-assets-YOURNAME`).
-3.  Search for **CloudFront**.
-4.  Create a Distribution pointing to your S3 bucket for fast global delivery.
+For production, you want your images and frontend files to be served globally via a Content Delivery Network (CDN) for maximum speed.
+
+### Step 1: Create the S3 Bucket
+1. Search for **S3** > **Create bucket**.
+2. **Name**: Use a unique name like `ecommerce-production-assets-XXXXX`.
+3. **Object Ownership**: ACLs disabled (Recommended).
+4. **Public Access**: Keep **"Block all public access"** checked (We will use CloudFront to bypass this securely).
+5. Click **Create bucket**.
+
+### Step 2: Create the CloudFront Distribution
+1. Search for **CloudFront** > **Create distribution**.
+2. **Origin domain**: Select your S3 bucket from the list.
+3. **Origin access**: Select **Origin access control settings (recommended)**.
+   - Click **Create control setting** and save.
+4. **Web Application Firewall (WAF)**: Select "Do not enable" for now to save costs (unless you need extra security).
+5. **Default root object**: `index.html`.
+6. Click **Create distribution**.
+7. **CRITICAL**: Once created, CloudFront will show a yellow banner: *"The S3 bucket policy needs to be updated..."*. Click **Copy policy** and then go to your S3 bucket's **Permissions** tab to paste it. This allows the CDN to talk to your private bucket.
+
+### Step 3: Upload your Files
+1. Use the S3 Console to upload your `frontend/dist` folder content (if building locally) or your product images.
+2. Users will now access your site via the **CloudFront Distribution Domain Name** (e.g., `d1234.cloudfront.net`).
 
 ---
 
