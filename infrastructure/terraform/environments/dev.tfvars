@@ -30,7 +30,7 @@ enable_detailed_monitoring = false
 
 # REQUIRED — must be a real address you control; SES will email a verification link.
 # Update before running `terraform apply`.
-ses_sender_email = "CHANGE_ME@example.com"
+ses_sender_email = "ozan.kacmaz@sabanciuniv.edu"
 
 # REQUIRED — GitHub repo allowed to assume the OIDC deploy role.
 github_repo   = "kacmazozan/e-commerce-platform-aws"

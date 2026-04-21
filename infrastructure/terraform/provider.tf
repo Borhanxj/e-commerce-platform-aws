@@ -29,7 +29,6 @@ provider "aws" {
       Project     = "E-Commerce Platform"
       Environment = var.environment
       ManagedBy   = "Terraform"
-      CreatedAt   = timestamp()
     }
   }
 }
