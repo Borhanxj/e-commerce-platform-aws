@@ -16,8 +16,11 @@ const notificationsRouter = require('./routes/notifications')
 
 const app = express()
 
-app.use(cors())
+const allowedOrigins = process.env.ALLOWED_ORIGINS?.split(',').map((o) => o.trim())
+app.use(cors({ origin: allowedOrigins && allowedOrigins.length > 0 ? allowedOrigins : true }))
 app.use(express.json())
+
+app.get('/api/health', (_req, res) => res.json({ ok: true }))
 
 app.use('/api/auth', authRouter)
 app.use('/api/cart', cartRouter)

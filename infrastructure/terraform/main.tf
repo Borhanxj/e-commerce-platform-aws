@@ -1,6 +1,6 @@
-# Main Terraform File - Resource Coordination
+# Main Terraform File - VPC, subnets, routing, security groups, log groups
 
-# VPC Module
+# VPC
 resource "aws_vpc" "main" {
   cidr_block           = var.vpc_cidr
   enable_dns_hostnames = true
@@ -11,7 +11,6 @@ resource "aws_vpc" "main" {
   }
 }
 
-# Internet Gateway
 resource "aws_internet_gateway" "main" {
   vpc_id = aws_vpc.main.id
 
@@ -20,7 +19,6 @@ resource "aws_internet_gateway" "main" {
   }
 }
 
-# Public Subnets
 resource "aws_subnet" "public" {
   count                   = length(var.public_subnet_cidrs)
   vpc_id                  = aws_vpc.main.id
@@ -33,7 +31,6 @@ resource "aws_subnet" "public" {
   }
 }
 
-# Private Subnets
 resource "aws_subnet" "private" {
   count             = length(var.private_subnet_cidrs)
   vpc_id            = aws_vpc.main.id
@@ -45,38 +42,12 @@ resource "aws_subnet" "private" {
   }
 }
 
-# Elastic IP for NAT Gateway
-resource "aws_eip" "nat" {
-  count  = length(var.public_subnet_cidrs)
-  domain = "vpc"
-
-  tags = {
-    Name = "${var.project_name}-nat-eip-${count.index + 1}-${var.environment}"
-  }
-
-  depends_on = [aws_internet_gateway.main]
-}
-
-# NAT Gateway
-resource "aws_nat_gateway" "nat" {
-  count         = length(var.public_subnet_cidrs)
-  allocation_id = aws_eip.nat[count.index].id
-  subnet_id     = aws_subnet.public[count.index].id
-
-  tags = {
-    Name = "${var.project_name}-nat-${count.index + 1}-${var.environment}"
-  }
-
-  depends_on = [aws_internet_gateway.main]
-}
-
-# Route Table for Public Subnets
 resource "aws_route_table" "public" {
   vpc_id = aws_vpc.main.id
 
   route {
-    cidr_block      = "0.0.0.0/0"
-    gateway_id      = aws_internet_gateway.main.id
+    cidr_block = "0.0.0.0/0"
+    gateway_id = aws_internet_gateway.main.id
   }
 
   tags = {
@@ -84,39 +55,32 @@ resource "aws_route_table" "public" {
   }
 }
 
-# Associate Public Subnets with Public Route Table
 resource "aws_route_table_association" "public" {
   count          = length(aws_subnet.public)
   subnet_id      = aws_subnet.public[count.index].id
   route_table_id = aws_route_table.public.id
 }
 
-# Route Table for Private Subnets
+# Private route table has no default route. RDS has no internet access —
+# it only talks to ECS tasks within the VPC.
 resource "aws_route_table" "private" {
-  count  = length(var.private_subnet_cidrs)
   vpc_id = aws_vpc.main.id
 
-  route {
-    cidr_block     = "0.0.0.0/0"
-    nat_gateway_id = aws_nat_gateway.nat[count.index].id
-  }
-
   tags = {
-    Name = "${var.project_name}-private-rt-${count.index + 1}-${var.environment}"
+    Name = "${var.project_name}-private-rt-${var.environment}"
   }
 }
 
-# Associate Private Subnets with Private Route Tables
 resource "aws_route_table_association" "private" {
   count          = length(aws_subnet.private)
   subnet_id      = aws_subnet.private[count.index].id
-  route_table_id = aws_route_table.private[count.index].id
+  route_table_id = aws_route_table.private.id
 }
 
-# Security Group for ALB
+# ALB security group: accepts HTTP/HTTPS from anywhere.
 resource "aws_security_group" "alb" {
   name        = "${var.project_name}-alb-sg-${var.environment}"
-  description = "Security group for ALB"
+  description = "ALB ingress"
   vpc_id      = aws_vpc.main.id
 
   ingress {
@@ -145,24 +109,25 @@ resource "aws_security_group" "alb" {
   }
 }
 
-# Security Group for ECS Tasks
+# ECS tasks: only ALB may reach their container ports; internal 8080 open
+# within the SG so the api task can reach the invoice task via Cloud Map.
 resource "aws_security_group" "ecs_tasks" {
   name        = "${var.project_name}-ecs-tasks-sg-${var.environment}"
-  description = "Security group for ECS tasks"
+  description = "ECS tasks"
   vpc_id      = aws_vpc.main.id
 
   ingress {
-    from_port       = 0
-    to_port         = 65535
+    from_port       = var.app_port
+    to_port         = var.app_port
     protocol        = "tcp"
     security_groups = [aws_security_group.alb.id]
   }
 
   ingress {
-    from_port   = 0
-    to_port     = 65535
-    protocol    = "tcp"
-    cidr_blocks = [var.vpc_cidr]
+    from_port       = var.web_port
+    to_port         = var.web_port
+    protocol        = "tcp"
+    security_groups = [aws_security_group.alb.id]
   }
 
   egress {
@@ -177,10 +142,20 @@ resource "aws_security_group" "ecs_tasks" {
   }
 }
 
-# Security Group for RDS
+# Allow api -> invoice (port 8080) within the same SG.
+resource "aws_security_group_rule" "ecs_invoice_internal" {
+  type                     = "ingress"
+  from_port                = 8080
+  to_port                  = 8080
+  protocol                 = "tcp"
+  security_group_id        = aws_security_group.ecs_tasks.id
+  source_security_group_id = aws_security_group.ecs_tasks.id
+}
+
+# RDS security group: only ECS tasks may connect.
 resource "aws_security_group" "rds" {
   name        = "${var.project_name}-rds-sg-${var.environment}"
-  description = "Security group for RDS"
+  description = "RDS ingress from ECS tasks only"
   vpc_id      = aws_vpc.main.id
 
   ingress {
@@ -190,19 +165,12 @@ resource "aws_security_group" "rds" {
     security_groups = [aws_security_group.ecs_tasks.id]
   }
 
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
   tags = {
     Name = "${var.project_name}-rds-sg-${var.environment}"
   }
 }
 
-# CloudWatch Log Groups
+# CloudWatch log groups
 resource "aws_cloudwatch_log_group" "api" {
   name              = "/ecs/${var.project_name}-api-${var.environment}"
   retention_in_days = 7
@@ -229,3 +197,5 @@ resource "aws_cloudwatch_log_group" "invoice" {
     Name = "${var.project_name}-invoice-logs-${var.environment}"
   }
 }
+
+data "aws_caller_identity" "current" {}

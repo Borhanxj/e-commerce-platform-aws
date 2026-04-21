@@ -79,6 +79,11 @@ output "cloudwatch_log_group_invoice" {
   value       = aws_cloudwatch_log_group.invoice.name
 }
 
+output "ecr_repository_urls" {
+  description = "ECR repository URLs keyed by service name"
+  value       = { for k, r in aws_ecr_repository.this : k => r.repository_url }
+}
+
 output "deployment_info" {
   description = "Deployment information"
   value = {

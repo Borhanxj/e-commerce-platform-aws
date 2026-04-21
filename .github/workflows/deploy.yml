@@ -1,0 +1,118 @@
+name: Deploy to AWS (dev)
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      run_seeds:
+        description: "Run the one-off seed task after deploy"
+        type: boolean
+        default: false
+
+env:
+  AWS_REGION: eu-west-1
+  CLUSTER: ecommerce-cluster-dev
+  PROJECT: ecommerce
+  ENV: dev
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure AWS credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_DEPLOY_ROLE }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        id: ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build and push api
+        uses: docker/build-push-action@v6
+        with:
+          context: ./backend
+          file: ./backend/Dockerfile
+          push: true
+          tags: |
+            ${{ steps.ecr.outputs.registry }}/${{ env.PROJECT }}-api-${{ env.ENV }}:${{ github.sha }}
+            ${{ steps.ecr.outputs.registry }}/${{ env.PROJECT }}-api-${{ env.ENV }}:latest
+
+      - name: Build and push invoice
+        uses: docker/build-push-action@v6
+        with:
+          context: ./backend
+          file: ./backend/Dockerfile.invoice-api
+          push: true
+          tags: |
+            ${{ steps.ecr.outputs.registry }}/${{ env.PROJECT }}-invoice-${{ env.ENV }}:${{ github.sha }}
+            ${{ steps.ecr.outputs.registry }}/${{ env.PROJECT }}-invoice-${{ env.ENV }}:latest
+
+      - name: Resolve ALB DNS (for Vite build-arg)
+        id: alb
+        run: |
+          DNS=$(aws elbv2 describe-load-balancers \
+            --names ${{ env.PROJECT }}-alb-${{ env.ENV }} \
+            --query 'LoadBalancers[0].DNSName' --output text)
+          echo "dns=$DNS" >> $GITHUB_OUTPUT
+
+      - name: Build and push web
+        uses: docker/build-push-action@v6
+        with:
+          context: ./frontend
+          file: ./frontend/Dockerfile
+          push: true
+          build-args: |
+            VITE_API_BASE_URL=http://${{ steps.alb.outputs.dns }}
+          tags: |
+            ${{ steps.ecr.outputs.registry }}/${{ env.PROJECT }}-web-${{ env.ENV }}:${{ github.sha }}
+            ${{ steps.ecr.outputs.registry }}/${{ env.PROJECT }}-web-${{ env.ENV }}:latest
+
+      - name: Roll ECS services
+        run: |
+          for svc in api web invoice; do
+            aws ecs update-service \
+              --cluster "${{ env.CLUSTER }}" \
+              --service "${{ env.PROJECT }}-$svc-service-${{ env.ENV }}" \
+              --force-new-deployment \
+              --no-cli-pager >/dev/null
+          done
+
+      - name: Wait for services to stabilize
+        run: |
+          aws ecs wait services-stable \
+            --cluster "${{ env.CLUSTER }}" \
+            --services \
+              "${{ env.PROJECT }}-api-service-${{ env.ENV }}" \
+              "${{ env.PROJECT }}-web-service-${{ env.ENV }}" \
+              "${{ env.PROJECT }}-invoice-service-${{ env.ENV }}"
+
+      - name: Seed database (one-off)
+        if: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.run_seeds == 'true' }}
+        run: |
+          SUBNETS=$(aws ec2 describe-subnets \
+            --filters "Name=tag:Name,Values=${{ env.PROJECT }}-public-subnet-*-${{ env.ENV }}" \
+            --query 'Subnets[*].SubnetId' --output text | tr '\t' ',')
+          SG=$(aws ec2 describe-security-groups \
+            --filters "Name=group-name,Values=${{ env.PROJECT }}-ecs-tasks-sg-${{ env.ENV }}" \
+            --query 'SecurityGroups[0].GroupId' --output text)
+          aws ecs run-task \
+            --cluster "${{ env.CLUSTER }}" \
+            --task-definition "${{ env.PROJECT }}-api-${{ env.ENV }}" \
+            --launch-type FARGATE \
+            --network-configuration "awsvpcConfiguration={subnets=[$SUBNETS],securityGroups=[$SG],assignPublicIp=ENABLED}" \
+            --overrides '{"containerOverrides":[{"name":"api","environment":[{"name":"RUN_SEEDS","value":"1"}]}]}' \
+            --no-cli-pager
+
+      - name: Deployment summary
+        run: |
+          echo "Deployed ${{ github.sha }} to http://${{ steps.alb.outputs.dns }}" >> $GITHUB_STEP_SUMMARY

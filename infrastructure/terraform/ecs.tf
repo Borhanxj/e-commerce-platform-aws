@@ -1,4 +1,4 @@
-# ECS Cluster and Task Definitions
+# ECS cluster, IAM roles, ALB, target groups, listener rules.
 
 resource "aws_ecs_cluster" "main" {
   name = "${var.project_name}-cluster-${var.environment}"
@@ -14,8 +14,8 @@ resource "aws_ecs_cluster" "main" {
 }
 
 resource "aws_ecs_cluster_capacity_providers" "main" {
-  cluster_name           = aws_ecs_cluster.main.name
-  capacity_providers     = ["FARGATE", "FARGATE_SPOT"]
+  cluster_name       = aws_ecs_cluster.main.name
+  capacity_providers = ["FARGATE", "FARGATE_SPOT"]
   default_capacity_provider_strategy {
     capacity_provider = "FARGATE"
     weight            = 100
@@ -47,7 +47,6 @@ resource "aws_iam_role_policy_attachment" "ecs_task_execution_role_policy" {
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
 }
 
-# Allow pulling from ECR and accessing Secrets Manager
 resource "aws_iam_role_policy" "ecs_task_execution_ecr_secrets" {
   name = "${var.project_name}-ecs-task-execution-ecr-secrets-${var.environment}"
   role = aws_iam_role.ecs_task_execution_role.id
@@ -59,6 +58,7 @@ resource "aws_iam_role_policy" "ecs_task_execution_ecr_secrets" {
         Effect = "Allow"
         Action = [
           "ecr:GetAuthorizationToken",
+          "ecr:BatchCheckLayerAvailability",
           "ecr:BatchGetImage",
           "ecr:GetDownloadUrlForLayer"
         ]
@@ -95,7 +95,6 @@ resource "aws_iam_role" "ecs_task_role" {
   })
 }
 
-# Allow task to send logs to CloudWatch
 resource "aws_iam_role_policy" "ecs_task_logs" {
   name = "${var.project_name}-ecs-task-logs-${var.environment}"
   role = aws_iam_role.ecs_task_role.id
@@ -106,7 +105,6 @@ resource "aws_iam_role_policy" "ecs_task_logs" {
       {
         Effect = "Allow"
         Action = [
-          "logs:CreateLogGroup",
           "logs:CreateLogStream",
           "logs:PutLogEvents"
         ]
@@ -116,7 +114,21 @@ resource "aws_iam_role_policy" "ecs_task_logs" {
   })
 }
 
-# ============= ALB Target Groups =============
+# ============= ALB =============
+
+resource "aws_lb" "main" {
+  name               = "${var.project_name}-alb-${var.environment}"
+  internal           = false
+  load_balancer_type = "application"
+  security_groups    = [aws_security_group.alb.id]
+  subnets            = aws_subnet.public[*].id
+
+  enable_deletion_protection = var.enable_deletion_protection
+
+  tags = {
+    Name = "${var.project_name}-alb-${var.environment}"
+  }
+}
 
 resource "aws_lb_target_group" "api" {
   name        = "${var.project_name}-api-tg-${var.environment}"
@@ -160,22 +172,7 @@ resource "aws_lb_target_group" "web" {
   }
 }
 
-# ============= ALB =============
-
-resource "aws_lb" "main" {
-  name               = "${var.project_name}-alb-${var.environment}"
-  internal           = false
-  load_balancer_type = "application"
-  security_groups    = [aws_security_group.alb.id]
-  subnets            = aws_subnet.public[*].id
-
-  enable_deletion_protection = var.enable_deletion_protection
-
-  tags = {
-    Name = "${var.project_name}-alb-${var.environment}"
-  }
-}
-
+# Default action: forward anything not matching /api/* to the web frontend.
 resource "aws_lb_listener" "http" {
   load_balancer_arn = aws_lb.main.arn
   port              = "80"
@@ -183,11 +180,10 @@ resource "aws_lb_listener" "http" {
 
   default_action {
     type             = "forward"
-    target_group_arn = aws_lb_target_group.api.arn
+    target_group_arn = aws_lb_target_group.web.arn
   }
 }
 
-# ALB Listener Rule for API
 resource "aws_lb_listener_rule" "api" {
   listener_arn = aws_lb_listener.http.arn
   priority     = 100
@@ -200,23 +196,6 @@ resource "aws_lb_listener_rule" "api" {
   condition {
     path_pattern {
       values = ["/api/*"]
-    }
-  }
-}
-
-# ALB Listener Rule for Web
-resource "aws_lb_listener_rule" "web" {
-  listener_arn = aws_lb_listener.http.arn
-  priority     = 101
-
-  action {
-    type             = "forward"
-    target_group_arn = aws_lb_target_group.web.arn
-  }
-
-  condition {
-    path_pattern {
-      values = ["/"]
     }
   }
 }

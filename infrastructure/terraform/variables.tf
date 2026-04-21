@@ -42,7 +42,7 @@ variable "private_subnet_cidrs" {
 variable "db_instance_class" {
   description = "RDS instance type"
   type        = string
-  default     = "db.t3.micro"
+  default     = "db.t4g.micro"
 }
 
 variable "db_allocated_storage" {
@@ -54,7 +54,7 @@ variable "db_allocated_storage" {
 variable "db_engine_version" {
   description = "PostgreSQL engine version"
   type        = string
-  default     = "16.1"
+  default     = "16.3"
 }
 
 variable "db_multi_az" {
@@ -126,9 +126,9 @@ variable "app_port" {
 }
 
 variable "web_port" {
-  description = "Port for web app"
+  description = "Port for web app (nginx in the prod image listens on 80)"
   type        = number
-  default     = 3000
+  default     = 80
 }
 
 # Environment-specific variables

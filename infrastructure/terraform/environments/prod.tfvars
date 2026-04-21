@@ -22,7 +22,12 @@ ecs_max_capacity     = 10
 
 # Application
 app_port = 3000
-web_port = 3000
+web_port = 80
+
+# SES / GitHub OIDC — override before apply
+ses_sender_email = "CHANGE_ME@example.com"
+github_repo      = "kacmazozan/e-commerce-platform-aws"
+github_branch    = "refs/heads/main"
 
 # Security
 enable_deletion_protection = true

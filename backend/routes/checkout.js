@@ -165,6 +165,10 @@ router.post('/confirm', async (req, res) => {
 
     await client.query('COMMIT')
     res.json({ order_id: orderId })
+
+    triggerInvoice(orderId, userId, address, reservations.rows).catch((err) =>
+      console.error(`Invoice dispatch failed for order ${orderId}:`, err)
+    )
   } catch (err) {
     await client.query('ROLLBACK')
     throw err
@@ -172,5 +176,42 @@ router.post('/confirm', async (req, res) => {
     client.release()
   }
 })
+
+async function triggerInvoice(orderId, userId, address, items) {
+  const invoiceApiUrl = process.env.INVOICE_API_URL
+  if (!invoiceApiUrl) return
+
+  const customerResult = await pool.query(
+    `SELECT u.email, c.name
+     FROM auth.users u
+     LEFT JOIN auth.customers c ON c.user_id = u.id
+     WHERE u.id = $1`,
+    [userId]
+  )
+  if (customerResult.rows.length === 0) return
+  const { email, name } = customerResult.rows[0]
+
+  const payload = {
+    invoice_number: `INV-${orderId}`,
+    order_id: String(orderId),
+    customer_name: name || email,
+    customer_email: email,
+    customer_address: address || '',
+    items: items.map((i) => ({
+      description: i.name,
+      quantity: i.quantity,
+      unit_price: parseFloat(i.effective_price),
+    })),
+  }
+
+  const res = await fetch(`${invoiceApiUrl}/api/invoices/generate`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+  })
+  if (!res.ok) {
+    console.error(`Invoice API returned ${res.status} for order ${orderId}`)
+  }
+}
 
 module.exports = router
