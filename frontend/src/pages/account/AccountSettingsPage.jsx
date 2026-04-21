@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import API_BASE from '../../api'
 
 function BackIcon() {
   return (
@@ -102,7 +103,7 @@ export default function AccountSettingsPage({ onBack, token }) {
 
     setPwLoading(true)
     try {
-      const res = await fetch('http://localhost:3000/api/auth/change-password', {
+      const res = await fetch(`${API_BASE}/api/auth/change-password`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

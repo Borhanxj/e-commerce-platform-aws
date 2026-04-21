@@ -11,17 +11,25 @@ echo "PostgreSQL is ready."
 echo "Running migrations..."
 npm run migrate:up
 
-echo "Seeding admin user..."
-node scripts/seed-admin.js
+if [ "${RUN_SEEDS:-0}" = "1" ]; then
+  echo "Seeding admin user..."
+  node scripts/seed-admin.js
 
-echo "Seeding sales manager..."
-node scripts/seed-sales-manager.js
+  echo "Seeding sales manager..."
+  node scripts/seed-sales-manager.js
 
-echo "Seeding product manager..."
-node scripts/seed-product-manager.js
+  echo "Seeding product manager..."
+  node scripts/seed-product-manager.js
 
-echo "Seeding products..."
-node scripts/seed-products.js
+  echo "Seeding products..."
+  node scripts/seed-products.js
+else
+  echo "Skipping seeds (set RUN_SEEDS=1 to run them)."
+fi
 
 echo "Starting server..."
-exec npm run dev
+if [ "$#" -gt 0 ]; then
+  exec "$@"
+else
+  exec npm run dev
+fi
